@@ -46,7 +46,7 @@
                                         {{ $date->format('j F Y') }}
                                     @endif
                                 </td>
-                                <td>-</td>
+                                <td>{{ Cache::get('user-last-page-' . $user->id) }}</td>
                                 <td>
                                     @if($online)
                                         <span class="text-success">online</span>
