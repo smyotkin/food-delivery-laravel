@@ -1,0 +1,15 @@
+img {
+    display: inline-block;
+}
+
+.rounded-5 {
+    border-radius: 2rem!important;
+}
+
+.text-shadow {
+    text-shadow: rgb(0 0 0 / 14%) 0px 7px 15px;
+}
+
+.bg-gradient-ferone {
+    background: linear-gradient(0deg, #1d64ad, #4a87c5, #1d64ad);
+}
