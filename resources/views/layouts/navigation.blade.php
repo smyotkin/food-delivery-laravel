@@ -39,10 +39,8 @@
                         <form method="POST" action="{{ route('logout') }}">
                             @csrf
 
-                            <x-dropdown-link :href="route('logout')"
-                                             onclick="event.preventDefault();
-                                                this.closest('form').submit();">
-                                {{ __('Log Out') }}
+                            <x-dropdown-link :href="route('logout')" onclick="event.preventDefault(); this.closest('form').submit();" class="text-center text-decoration-none">
+                                {{ __('Выйти из системы') }}
                             </x-dropdown-link>
                         </form>
                     </x-slot>
