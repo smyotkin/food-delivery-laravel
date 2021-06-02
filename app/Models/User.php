@@ -46,4 +46,18 @@ class User extends Authenticatable
     protected $casts = [
         'email_verified_at' => 'datetime',
     ];
+
+    public function phoneNumber($number) {
+//        $number = '79895244596';
+
+        $result = sprintf("+%s %s %s-%s-%s",
+            substr($number, 0, 1),
+            substr($number, 1, 3),
+            substr($number, 4, 3),
+            substr($number, 7, 2),
+            substr($number, 9, 2)
+        );
+
+        return $result;
+    }
 }

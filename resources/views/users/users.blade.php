@@ -24,7 +24,7 @@
                         <tr class="fw-light">
                             <td>Имя</td>
                             <td>Телефон</td>
-                            <td>Статус</td>
+                            <td>Должность</td>
                             <td>Регистрация</td>
                             <td>Страница</td>
                             <td>Онлайн</td>
@@ -37,7 +37,7 @@
                                 <td>
                                     <a href="users/{{ $user->id }}" class="text-decoration-none">{{ $user->first_name }} {{ $user->last_name }}</a>
                                 </td>
-                                <td>{{ $user->phone }}</td>
+                                <td>{{ $user->phoneNumber($user->phone) }}</td>
                                 <td>-</td>
                                 <td>
                                     @if (now()->year == $date->year)
