@@ -23,6 +23,8 @@ Route::get('/dashboard', function () {
 })->middleware(['auth'])->name('dashboard');
 
 Route::get('/users', [UsersController::class, 'showUsers'])->middleware(['auth'])->name('users');
+Route::get('/users/add', [UsersController::class, 'addUser'])->middleware(['auth'])->name('users/add');
+Route::post('/users/add', [UsersController::class, 'storeUser'])->middleware(['auth'])->name('users/store');
 Route::get('/users/{id}', [UsersController::class, 'showUser'])->middleware(['auth'])->name('user');
 Route::post('/users/update', [UsersController::class, 'updateUser'])->middleware(['auth'])->name('users/update');
 

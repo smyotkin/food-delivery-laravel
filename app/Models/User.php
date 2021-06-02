@@ -48,14 +48,23 @@ class User extends Authenticatable
     ];
 
     public function phoneNumber($number) {
-        $result = sprintf("+%s %s %s-%s-%s",
-            substr($number, 0, 1),
-            substr($number, 1, 3),
-            substr($number, 4, 3),
-            substr($number, 7, 2),
-            substr($number, 9, 2)
-        );
+
+        if ($number) {
+            $result = sprintf("+%s %s %s-%s-%s",
+                substr($number, 0, 1),
+                substr($number, 1, 3),
+                substr($number, 4, 3),
+                substr($number, 7, 2),
+                substr($number, 9, 2)
+            );
+        } else {
+            $result = false;
+        }
 
         return $result;
+    }
+
+    public static function toDigit($string) {
+        return str_replace(['+', ' ', '-'], '', $string);
     }
 }
