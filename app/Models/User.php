@@ -48,8 +48,6 @@ class User extends Authenticatable
     ];
 
     public function phoneNumber($number) {
-//        $number = '79895244596';
-
         $result = sprintf("+%s %s %s-%s-%s",
             substr($number, 0, 1),
             substr($number, 1, 3),
