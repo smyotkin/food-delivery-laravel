@@ -44,7 +44,8 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-        'email_verified_at' => 'datetime',
+//        'created_at' => 'date:Y-m-d H:m:i',
+//        'updated_at' => 'date:Y-m-d',
     ];
 
     public function phoneNumber($number) {

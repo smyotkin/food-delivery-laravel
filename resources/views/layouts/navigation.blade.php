@@ -5,7 +5,7 @@
             <div class="flex">
                 <!-- Logo -->
                 <div class="flex-shrink-0 flex items-center">
-                    @if (isset($back_href))
+                    @if (isset($back_href) and isset($back_title))
                         <a href="{{ $back_href }}" class="text-decoration-none fs-5">
                             <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="d-inline-block bi bi-chevron-left" viewBox="0 0 16 16">
                                 <path fill-rule="evenodd" d="M11.354 1.646a.5.5 0 0 1 0 .708L5.707 8l5.647 5.646a.5.5 0 0 1-.708.708l-6-6a.5.5 0 0 1 0-.708l6-6a.5.5 0 0 1 .708 0z"/>
@@ -13,9 +13,6 @@
                             <span class="align-middle">{{ $back_title }}</span>
                         </a>
                     @else
-{{--                        <a href="/" class="text-decoration-none fs-5">--}}
-{{--                            <span class="align-middle">Ferone</span>--}}
-{{--                        </a>--}}
                         <h4 class="fw-bold mb-0">Ferone</h4>
                     @endif
                 </div>

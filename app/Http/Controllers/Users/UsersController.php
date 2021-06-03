@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Jenssegers\Date\Date;
+use Cache;
 
 Date::setLocale('ru');
 
@@ -18,6 +19,25 @@ class UsersController extends Controller
         return view('users/users', [
             'users' => User::all()->sortByDesc('last_seen')
         ]);
+    }
+
+    public function getUsersJSON(Request $request)
+    {
+        $users = User::all()->sortByDesc('last_seen');
+        $collection = collect($users);
+
+        $collection->map(function($user) {
+            $date = Date::parse($user->created_at);
+            $timeOrOffline = $user->last_seen != null ? Date::parse($user->last_seen)->diffForHumans() : 'offline';
+
+            $user->phone = $user->phoneNumber($user->phone);
+            $user->registered_at = $date->format(now()->year == $date->year ? 'j F' : 'j F Y');
+            $user->online = Cache::has('user-is-online-' . $user->id) ? 'online' : $timeOrOffline;
+
+            return $user;
+        });
+
+        return $collection->toJson(JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
     }
 
     public function showUser(Request $request)

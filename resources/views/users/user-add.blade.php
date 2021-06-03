@@ -1,4 +1,6 @@
 <x-app-layout>
+    <x-slot name="back_href">{{ route('users') }}</x-slot>
+    <x-slot name="back_title">Пользователи</x-slot>
     <x-slot name="header">
         <h5 class="m-0 fw-bold">Информация о пользователе</h5>
     </x-slot>

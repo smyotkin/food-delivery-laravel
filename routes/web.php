@@ -15,6 +15,10 @@ Route::get('/users', [UsersController::class, 'showUsers'])
     ->middleware(['auth'])
     ->name('users');
 
+Route::get('/users/get', [UsersController::class, 'getUsersJSON'])
+    ->middleware(['auth'])
+    ->name('users/get');
+
 Route::get('/users/add', [UsersController::class, 'addUser'])
     ->middleware(['auth'])
     ->name('users/add');

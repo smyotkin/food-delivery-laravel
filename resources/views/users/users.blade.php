@@ -10,6 +10,11 @@
             <div class="col-5 mt-4">
                 <input type="text" id="name-search" class="form-control rounded-0" placeholder="Поиск по номеру телефона или фамилии" aria-label="Поиск по номеру телефона или фамилии">
             </div>
+            <div class="col-auto mt-4 d-flex align-items-center">
+                <div class="spinner-border text-secondary d-none" role="status" id="preloader">
+                    <span class="sr-only">Loading...</span>
+                </div>
+            </div>
         </div>
         <div class="row mt-5 mb-3">
             <div class="col-auto lh-1">
@@ -21,50 +26,69 @@
         </div>
         <div class="row">
             <div class="col">
-                <table class="table table-striped">
-                     <tbody>
-                        <tr class="fw-light">
-                            <td>Имя</td>
-                            <td>Телефон</td>
-                            <td>Должность</td>
-                            <td>Регистрация</td>
-                            <td>Страница</td>
-                            <td>Онлайн</td>
+                <table class="table table-striped" id="users_json">
+                    <tbody>
+                        <tr class="fw-light bg-light">
+                            <td class="border-0">Имя</td>
+                            <td class="border-0">Телефон</td>
+                            <td class="border-0">Должность</td>
+                            <td class="border-0">Регистрация</td>
+                            <td class="border-0">Страница</tdv>
+                            <td class="border-0">Онлайн</td>
                         </tr>
-                        @foreach ($users as $user)
-                            @php ($online = Cache::has('user-is-online-' . $user->id))
-                            @php ($date = Date::parse($user->created_at))
-
-                            <tr class="{{ $online ? "fw-bold" : '' }}">
-                                <td>
-                                    <a href="users/{{ $user->id }}" class="text-decoration-none">{{ $user->first_name }} {{ $user->last_name }}</a>
-                                </td>
-                                <td>{{ $user->phoneNumber($user->phone) }}</td>
-                                <td>-</td>
-                                <td>
-                                    @if (now()->year == $date->year)
-                                        {{ $date->format('j F') }}
-                                    @else
-                                        {{ $date->format('j F Y') }}
-                                    @endif
-                                </td>
-                                <td>{{ Cache::get('user-last-page-' . $user->id) }}</td>
-                                <td>
-                                    @if($online)
-                                        <span class="text-success">online</span>
-                                    @else
-                                        @if ($user->last_seen != null)
-                                            {{ Date::parse($user->last_seen)->diffForHumans() }}
-                                        @else
-                                            offline
-                                        @endif
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
+
+    <script>
+        $(document).ready(function () {
+            $.ajax({
+                type: 'GET',
+                url: '{{ route('users/get') }}',
+                data: { get_param: 'value' },
+                dataType: 'json',
+                beforeSend: function (data) {
+                    $('#preloader').removeClass('d-none');
+                },
+                complete: function() {
+                    $('#preloader').addClass('d-none');
+                },
+                success: function (data) {
+                    $.each(data, function(index, user) {
+                        $('#users_json').append(
+                            $('<tr>', {
+                                class: user.online == 'online' ? 'fw-bold' : ''
+                            }).append(
+                                $('<td>').append(
+                                    $('<a>', {
+                                        text: user.first_name + ' ' + user.last_name,
+                                        href: 'users/' + user.id,
+                                        class: 'text-decoration-none'
+                                    })
+                                ),
+                                $('<td>', {
+                                    text: user.phone
+                                }),
+                                $('<td>', {
+                                    text: '-'
+                                }),
+                                $('<td>', {
+                                    text: user.registered_at
+                                }),
+                                $('<td>', {
+                                    text: user.last_page
+                                }),
+                                $('<td>', {
+                                    text: user.online,
+                                    class: user.online == 'online' ? 'text-success' : ''
+                                })
+                            )
+                        );
+                    });
+                }
+            });
+        });
+    </script>
 </x-app-layout>
