@@ -1,4 +1,6 @@
 <x-app-layout>
+    <x-slot name="back_href">{{ route('users') }}</x-slot>
+    <x-slot name="back_title">Пользователи</x-slot>
     <x-slot name="header">
         <h5 class="m-0 fw-bold">Информация о пользователе</h5>
     </x-slot>
@@ -52,15 +54,15 @@
 
                     <div class="col-md-6">
                         <label for="first_name" class="form-label">Имя</label>
-                        <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ $user->first_name }}">
+                        <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ $user->first_name }}" placeholder="Имя">
                     </div>
                     <div class="col-md-6">
                         <label for="last_name" class="form-label">Фамилия</label>
-                        <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ $user->last_name }}">
+                        <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ $user->last_name }}" placeholder="Фамилия">
                     </div>
                     <div class="col-12">
                         <label for="phone" class="form-label">Мобильный телефон</label>
-                        <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" placeholder="" value="{{ $user->phoneNumber($user->phone) }}">
+                        <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ $user->phoneNumber($user->phone) }}" placeholder="+7 555 555-55-55">
                     </div>
                     <div class="col-12">
                         <div class="form-check mt-1">
