@@ -29,7 +29,7 @@ class LoginRequest extends FormRequest
     public function rules()
     {
         return [
-            'phone' => 'required|digits:11',
+            'phone' => 'required|regex:/^\+7\s([0-9]){3}\s([0-9]){3}\-([0-9]){2}\-([0-9]){2}$/s',
             'password' => 'required|string',
         ];
     }
@@ -45,7 +45,9 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        if (! Auth::attempt($this->only('phone', 'password'), $this->boolean('remember'))) {
+        $phone = str_replace(['+', ' ', '-'], '', $this->phone);
+
+        if (! Auth::attempt(['phone' => $phone, 'password' => $this->password])) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
@@ -88,6 +90,6 @@ class LoginRequest extends FormRequest
      */
     public function throttleKey()
     {
-        return Str::lower($this->input('phone')).'|'.$this->ip();
+        return Str::lower($this->input('phone')) . '|' . $this->ip();
     }
 }
