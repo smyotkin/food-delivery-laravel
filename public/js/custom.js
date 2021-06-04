@@ -1,7 +1,7 @@
 $(document).ready(function () {
     $('.ru-phone_format').mask("+7 999 999-99-99");
 
-    $('.update_user :input').change(function() {
+    $('.update_user :input').on('keyup change', function() {
         checkUserForm();
     });
 });
