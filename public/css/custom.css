@@ -13,3 +13,7 @@ img {
 .bg-gradient-ferone {
     background: linear-gradient(0deg, #1d64ad, #4a87c5, #1d64ad);
 }
+
+.mh-25 {
+    max-height: 25% !important;
+}

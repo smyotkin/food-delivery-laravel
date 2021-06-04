@@ -28,7 +28,7 @@
             <div class="col">
                 <table class="table table-striped" id="users_json">
                     <tbody>
-                        <tr class="fw-light bg-light">
+                        <tr class="fw-light bg-light table-header">
                             <td class="border-0">Имя</td>
                             <td class="border-0">Телефон</td>
                             <td class="border-0">Должность</td>
@@ -44,10 +44,15 @@
 
     <script>
         $(document).ready(function () {
+            showUsersList();
+            usersUpdateInterval = setInterval(showUsersList, 10000);
+        });
+
+        function showUsersList() {
             $.ajax({
                 type: 'GET',
                 url: '{{ route('users/get') }}',
-                data: { get_param: 'value' },
+                // data: { get_param: 'value' },
                 dataType: 'json',
                 beforeSend: function (data) {
                     $('#preloader').removeClass('d-none');
@@ -56,6 +61,8 @@
                     $('#preloader').addClass('d-none');
                 },
                 success: function (data) {
+                    $('#users_json tr:not(.table-header)').remove();
+
                     $.each(data, function(index, user) {
                         $('#users_json').append(
                             $('<tr>', {
@@ -89,6 +96,6 @@
                     });
                 }
             });
-        });
+        }
     </script>
 </x-app-layout>

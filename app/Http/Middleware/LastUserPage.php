@@ -18,13 +18,13 @@ class LastUserPage
      * @param  \Closure  $next
      * @return mixed
      */
-    public function handle(Request $request, Closure $next)
+    public function handle(Request $request, Closure $next): object
     {
         if (Auth::check()) {
             Cache::put('user-last-page-' . Auth::user()->id, $request->getPathInfo());
 
             User::where('id', Auth::user()->id)->update([
-                'last_page' => $request->getPathInfo()
+                'last_page' => $request->getPathInfo(),
             ]);
         }
 

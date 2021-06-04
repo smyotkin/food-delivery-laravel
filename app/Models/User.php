@@ -45,11 +45,10 @@ class User extends Authenticatable
      */
     protected $casts = [
 //        'created_at' => 'date:Y-m-d H:m:i',
-//        'updated_at' => 'date:Y-m-d',
     ];
 
-    public function phoneNumber($number) {
-
+    public function phoneNumber($number)
+    {
         if ($number) {
             $result = sprintf("+%s %s %s-%s-%s",
                 substr($number, 0, 1),
@@ -65,7 +64,8 @@ class User extends Authenticatable
         return $result;
     }
 
-    public static function toDigit($string) {
+    public static function toDigit($string)
+    {
         return str_replace(['+', ' ', '-'], '', $string);
     }
 }

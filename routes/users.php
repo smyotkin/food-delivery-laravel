@@ -2,11 +2,15 @@
 
 use App\Http\Controllers\Users\UsersController;
 
-Route::get('/users/get', [UsersController::class, 'getUsersJSON'])
-    ->middleware(['auth'])
-    ->name('users/get');
+Route::middleware(['auth'])->group(function () {
+    Route::get('/users/get', [UsersController::class, 'getUsersJSON'])
+        ->name('users/get');
+});
 
 Route::middleware(['auth', 'last.page'])->group(function () {
+    Route::get('/profile', [UsersController::class, 'showProfile'])
+        ->name('profile');
+    
     Route::get('/users', [UsersController::class, 'showUsers'])
         ->name('users');
 

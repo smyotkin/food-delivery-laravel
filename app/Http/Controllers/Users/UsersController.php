@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers\Users;
 
+use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use Jenssegers\Date\Date;
 use Cache;
 
@@ -14,19 +15,30 @@ Date::setLocale('ru');
 
 class UsersController extends Controller
 {
-    public function showUsers()
+    /**
+     * Шаблон отображения всех пользователей
+     *
+     * @return object
+     */
+    public function showUsers(): object
     {
         return view('users/users', [
-            'users' => User::all()->sortByDesc('last_seen')
+            'users' => User::all()->sortByDesc('last_seen'),
         ]);
     }
 
-    public function getUsersJSON(Request $request)
+    /**
+     * Возвращает список пользователей в JSON
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function getUsersJSON(Request $request): string
     {
         $users = User::all()->sortByDesc('last_seen');
         $collection = collect($users);
 
-        $collection->map(function($user) {
+        $collection->map(function ($user) {
             $date = Date::parse($user->created_at);
             $timeOrOffline = $user->last_seen != null ? Date::parse($user->last_seen)->diffForHumans() : 'offline';
 
@@ -37,17 +49,29 @@ class UsersController extends Controller
             return $user;
         });
 
-        return $collection->toJson(JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
+        return $collection->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
-    public function showUser(Request $request)
+    /**
+     * Шаблон отображения 1 пользователя по id
+     *
+     * @param Request $request
+     * @return object
+     */
+    public function showUser(Request $request): object
     {
         return view('users/user', [
-            'user' => User::where('id', $request->route('id'))->first()
+            'user' => User::where('id', $request->route('id'))->first(),
         ]);
     }
 
-    public function updateUser(Request $request)
+    /**
+     * Редактирование пользователя по id
+     *
+     * @param Request $request
+     * @return object
+     */
+    public function updateUser(Request $request): object
     {
         $phone = User::toDigit($request->phone);
         $request->merge(array('phone' => $phone));
@@ -72,12 +96,24 @@ class UsersController extends Controller
         return redirect()->route('user', ['id' => $request->id]);
     }
 
-    public function addUser(Request $request)
+    /**
+     * Шаблон добавления пользователя
+     *
+     * @param Request $request
+     * @return object
+     */
+    public function addUser(Request $request): object
     {
         return view('users/user-add');
     }
 
-    public function storeUser(Request $request)
+    /**
+     * Шаблон добавления пользователя
+     * @param Request $request
+     * @return object
+     * @throws \Exception
+     */
+    public function storeUser(Request $request): object
     {
         $phone = User::toDigit($request->phone);
         $request->merge(array('phone' => $phone));
@@ -101,5 +137,18 @@ class UsersController extends Controller
         event(new Registered($user));
 
         return redirect()->route('user', ['id' => $user->id]);
+    }
+
+    /**
+     * Шаблон профиля пользователя
+     *
+     * @param Request $request
+     * @return object
+     */
+    public function showProfile(Request $request): object
+    {
+        return view('users/profile', [
+            'user' => User::find(Auth::user()->id),
+        ]);
     }
 }
