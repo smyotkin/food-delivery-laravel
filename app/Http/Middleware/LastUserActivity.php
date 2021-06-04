@@ -16,9 +16,9 @@ class LastUserActivity
      *
      * @param  \Illuminate\Http\Request $request
      * @param  \Closure $next
-     * @return mixed
+     * @return object
      */
-    public function handle(Request $request, Closure $next): mixed
+    public function handle(Request $request, Closure $next): object
     {
         if (Auth::check()) {
             $expiresAt = Carbon::now()->addMinutes(1);
