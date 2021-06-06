@@ -2,10 +2,14 @@
 
 namespace App\Models;
 
-use Illuminate\Contracts\Auth\MustVerifyEmail;
+//use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
+use Jenssegers\Date\Date;
+use Illuminate\Support\Facades\Cache;
+
+Date::setLocale('ru');
 
 class User extends Authenticatable
 {
@@ -44,8 +48,44 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
-//        'created_at' => 'date:Y-m-d H:m:i',
+        'is_active' => 'boolean',
     ];
+
+    protected $appends = [
+        'full_name',
+        'phone_formatted',
+        'registered_at',
+        'online',
+    ];
+
+    public function getPhoneFormattedAttribute()
+    {
+        return $this->phoneNumber($this->phone);
+    }
+
+    public function getFullNameAttribute()
+    {
+        return "{$this->first_name} {$this->last_name}";
+    }
+
+    public function getRegisteredAtAttribute()
+    {
+        $date = Date::parse($this->created_at);
+
+        return $date->format(now()->year == $date->year ? 'j F' : 'j F Y');
+    }
+
+    public function getOnlineAttribute()
+    {
+        $timeOrOffline = $this->last_seen != null ? Date::parse($this->last_seen)->diffForHumans() : 'offline';
+
+        return Cache::has('user-is-online-' . $this->id) ? 'online' : $timeOrOffline;
+    }
+
+    public function setPhoneAttribute($value)
+    {
+        $this->attributes['phone'] = $this->toDigit($value);
+    }
 
     public function phoneNumber($number)
     {

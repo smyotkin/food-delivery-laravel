@@ -11,8 +11,6 @@ use App\Models\User;
 use Jenssegers\Date\Date;
 use Cache;
 
-Date::setLocale('ru');
-
 class UsersController extends Controller
 {
     /**
@@ -36,24 +34,12 @@ class UsersController extends Controller
     public function getUsersJSON(Request $request): string
     {
         $users = User::all()->sortByDesc('last_seen');
-        $collection = collect($users);
 
-        $collection->map(function ($user) {
-            $date = Date::parse($user->created_at);
-            $timeOrOffline = $user->last_seen != null ? Date::parse($user->last_seen)->diffForHumans() : 'offline';
-
-            $user->phone = $user->phoneNumber($user->phone);
-            $user->registered_at = $date->format(now()->year == $date->year ? 'j F' : 'j F Y');
-            $user->online = Cache::has('user-is-online-' . $user->id) ? 'online' : $timeOrOffline;
-
-            return $user;
-        });
-
-        return $collection->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+        return $users->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     }
 
     /**
-     * Шаблон отображения 1 пользователя по id
+     * Шаблон отображения пользователя по id
      *
      * @param Request $request
      * @return object
@@ -61,7 +47,7 @@ class UsersController extends Controller
     public function showUser(Request $request): object
     {
         return view('users/user', [
-            'user' => User::where('id', $request->route('id'))->first(),
+            'user' => User::find($request->route('id')),
         ]);
     }
 

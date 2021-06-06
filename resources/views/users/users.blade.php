@@ -70,13 +70,13 @@
                             }).append(
                                 $('<td>').append(
                                     $('<a>', {
-                                        text: user.first_name + ' ' + user.last_name,
+                                        text: user.full_name,
                                         href: 'users/' + user.id,
                                         class: 'text-decoration-none'
                                     })
                                 ),
                                 $('<td>', {
-                                    text: user.phone
+                                    text: user.phone_formatted
                                 }),
                                 $('<td>', {
                                     text: '-'
