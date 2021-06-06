@@ -12,7 +12,7 @@
             </div>
             <div class="col-auto mt-4 d-flex align-items-center">
                 <div class="spinner-border text-secondary d-none" role="status" id="preloader">
-                    <span class="sr-only">Loading...</span>
+                    <span class="sr-only">Загрузка...</span>
                 </div>
             </div>
         </div>
@@ -24,76 +24,35 @@
                 <a href="{{ route('users/add') }}" class="btn btn-outline-primary py-0">Новый пользователь</a>
             </div>
         </div>
-        <div class="row">
-            <div class="col">
-                <table class="table table-striped" id="users_json">
-                    <tbody>
-                        <tr class="fw-light bg-light table-header">
-                            <td class="border-0">Имя</td>
-                            <td class="border-0">Телефон</td>
-                            <td class="border-0">Должность</td>
-                            <td class="border-0">Регистрация</td>
-                            <td class="border-0">Страница</tdv>
-                            <td class="border-0">Онлайн</td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
+
+        <div id="users_ajax">
         </div>
     </div>
 
     <script>
-        $(document).ready(function () {
+        $(document).ready(function() {
             showUsersList();
-            usersUpdateInterval = setInterval(showUsersList, 10000);
+
+            $(document).on('click', '.pagination a', function(event) {
+                event.preventDefault();
+                let page = $(this).attr('href').split('page=')[1];
+
+                showUsersList(page);
+            });
         });
 
-        function showUsersList() {
+        function showUsersList(page = 1) {
             $.ajax({
                 type: 'GET',
-                url: '{{ route('users/get') }}',
-                // data: { get_param: 'value' },
-                dataType: 'json',
-                beforeSend: function (data) {
+                url: '{{ route('users/getAJAX') }}?page=' + page,
+                beforeSend: function () {
                     $('#preloader').removeClass('d-none');
                 },
                 complete: function() {
                     $('#preloader').addClass('d-none');
                 },
                 success: function (data) {
-                    $('#users_json tr:not(.table-header)').remove();
-
-                    $.each(data, function(index, user) {
-                        $('#users_json').append(
-                            $('<tr>', {
-                                class: user.online == 'online' ? 'fw-bold' : ''
-                            }).append(
-                                $('<td>').append(
-                                    $('<a>', {
-                                        text: user.full_name,
-                                        href: 'users/' + user.id,
-                                        class: 'text-decoration-none'
-                                    })
-                                ),
-                                $('<td>', {
-                                    text: user.phone_formatted
-                                }),
-                                $('<td>', {
-                                    text: '-'
-                                }),
-                                $('<td>', {
-                                    text: user.registered_at
-                                }),
-                                $('<td>', {
-                                    text: user.last_page
-                                }),
-                                $('<td>', {
-                                    text: user.online,
-                                    class: user.online == 'online' ? 'text-success' : ''
-                                })
-                            )
-                        );
-                    });
+                    $('#users_ajax').html(data);
                 }
             });
         }

@@ -6,6 +6,9 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
+
+//use Illuminate\Pagination\Paginator;
+use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use App\Models\User;
 use Jenssegers\Date\Date;
@@ -33,9 +36,22 @@ class UsersController extends Controller
      */
     public function getUsersJSON(Request $request): string
     {
-        $users = User::all()->sortByDesc('last_seen');
+        $users = User::all()->sortByDesc('last_seen')->skip(0)->take(100);
 
         return $users->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
+    }
+
+    /**
+     * Возвращает список пользователей в таблице, для AJAX
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function getUsersAJAX(Request $request): string
+    {
+        $data = User::paginate(100);
+
+        return view('users/users-table', compact('data'))->render();
     }
 
     /**
