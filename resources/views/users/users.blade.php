@@ -35,6 +35,7 @@
         let ajaxSearchDelay = 300;
         let usersUpdateDelay = 10000;
         let getSearchCookie = getCookie('users_query_str');
+        let page = 1;
 
         $(document).ready(function() {
 
@@ -56,14 +57,14 @@
 
             $(document).on('click', '.pagination a', function(event) {
                 event.preventDefault();
-                let page = $(this).attr('href').split('page=')[1];
+                page = $(this).attr('href').split('page=')[1];
 
                 showUsersList(page);
             });
         });
 
         function showUsersListInterval() {
-            if ($('#phone_lastname-search').val().length == 0 && $('#users_ajax').attr('data-page') == '1')
+            if ($('#phone_lastname-search').val().length == 0 && page == 1) //  && $('#users_ajax').attr('data-page') == '1'
                 showUsersList();
         }
 
@@ -71,7 +72,7 @@
             $.ajax({
                 type: 'GET',
                 data: {
-                    query: $('#phone_lastname-search').val(), //  getSearchCookie ? getSearchCookie :
+                    query: $('#phone_lastname-search').val(),
                 },
                 url: '{{ route('users/getAJAX') }}?page=' + page,
                 beforeSend: function () {
