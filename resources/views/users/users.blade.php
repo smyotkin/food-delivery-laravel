@@ -8,7 +8,7 @@
     <div class="container-fluid px-5 mb-5">
         <div class="row">
             <div class="col-5 mt-4">
-                <input type="text" id="name-search" class="form-control rounded-0" placeholder="Поиск по номеру телефона или фамилии" aria-label="Поиск по номеру телефона или фамилии">
+                <input type="text" id="phone_lastname-search" class="form-control rounded-0" placeholder="Поиск по номеру телефона или фамилии" aria-label="Поиск по номеру телефона или фамилии">
             </div>
             <div class="col-auto mt-4 d-flex align-items-center">
                 <div class="spinner-border text-secondary d-none" role="status" id="preloader">
@@ -30,9 +30,29 @@
     </div>
 
     <script>
+        let userSearch = $('#phone_lastname-search');
+        let userTable = $('#users_ajax');
+        let ajaxSearchDelay = 300;
+        let usersUpdateDelay = 10000;
+        let getSearchCookie = getCookie('users_query_str');
+
         $(document).ready(function() {
-            showUsersList();
-            setInterval(showUsersList, 10000);
+
+            if (getSearchCookie) {
+                userSearch.val(getSearchCookie);
+                if ($(this).val().length == 0 || $(this).val().length > 1)
+                    setTimeout(showUsersList, ajaxSearchDelay);
+            } else {
+                showUsersList();
+                setInterval(showUsersListInterval, usersUpdateDelay);
+            }
+
+            userSearch.on('keyup', function () {
+                // userTable.attr('data-page', '1');
+                document.cookie = 'users_query_str=' + encodeURIComponent($(this).val());
+                if ($(this).val().length == 0 || $(this).val().length > 1)
+                    setTimeout(showUsersList, ajaxSearchDelay);
+            });
 
             $(document).on('click', '.pagination a', function(event) {
                 event.preventDefault();
@@ -42,9 +62,17 @@
             });
         });
 
+        function showUsersListInterval() {
+            if ($('#phone_lastname-search').val().length == 0 && $('#users_ajax').attr('data-page') == '1')
+                showUsersList();
+        }
+
         function showUsersList(page = 1) {
             $.ajax({
                 type: 'GET',
+                data: {
+                    query: $('#phone_lastname-search').val(), //  getSearchCookie ? getSearchCookie :
+                },
                 url: '{{ route('users/getAJAX') }}?page=' + page,
                 beforeSend: function () {
                     $('#preloader').removeClass('d-none');

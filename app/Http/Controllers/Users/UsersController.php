@@ -48,7 +48,18 @@ class UsersController extends Controller
      */
     public function getUsersAJAX(Request $request): string
     {
-        $data = User::orderBy('last_seen', 'DESC')->orderBy('updated_at', 'DESC')->simplePaginate(100);
+
+        if ($request->input('query')) {
+            $data = User::where('phone', 'like', '%' . $request->input('query') . '%')
+                ->orWhere('last_name', 'like', '%' . $request->input('query') . '%')
+                ->orderBy('last_seen', 'desc')
+                ->orderBy('updated_at', 'desc')
+                ->simplePaginate(100);
+        } else {
+            $data = User::orderBy('last_seen', 'desc')
+                ->orderBy('updated_at', 'desc')
+                ->simplePaginate(100);
+        }
 
         return view('users/users-table', compact('data'))->render();
     }
