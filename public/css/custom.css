@@ -17,3 +17,15 @@ img {
 .mh-25 {
     max-height: 25% !important;
 }
+
+.table-striped>tbody>tr:nth-of-type(odd) {
+    --bs-table-accent-bg: #fff;
+}
+
+.table-striped>tbody>tr:nth-of-type(even) {
+    --bs-table-accent-bg: rgb(0 0 0 / 3%);
+}
+
+.bg-lightgray {
+    background-color: #f0f1f1!important;
+}

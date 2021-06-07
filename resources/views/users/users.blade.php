@@ -25,17 +25,34 @@
             </div>
         </div>
 
-        <div id="users_ajax">
+        <div class="row">
+            <div class="col">
+                <table class="table table-striped">
+                    <thead>
+                        <tr class="fw-light bg-lightgray table-header">
+                            <td class="border-0">Имя</td>
+                            <td class="border-0">Телефон</td>
+                            <td class="border-0">Должность</td>
+                            <td class="border-0">Регистрация</td>
+                            <td class="border-0">Страница</td>
+                            <td class="border-0">Онлайн</td>
+                        </tr>
+                    </thead>
+                    <tbody id="users_ajax"></tbody>
+                </table>
+            </div>
         </div>
     </div>
 
     <script>
         let userSearch = $('#phone_lastname-search');
-        let userTable = $('#users_ajax');
+        let usersBlock = $('#users_ajax');
+        let usersTable = $('#users_ajax > .row');
         let ajaxSearchDelay = 300;
-        let usersUpdateDelay = 10000;
+        let usersUpdateDelay = 3000;
         let getSearchCookie = getCookie('users_query_str');
         let page = 1;
+        let searchNow = false;
 
         $(document).ready(function() {
 
@@ -49,14 +66,19 @@
             }
 
             userSearch.on('keyup', function () {
-                // userTable.attr('data-page', '1');
                 document.cookie = 'users_query_str=' + encodeURIComponent($(this).val());
-                if ($(this).val().length == 0 || $(this).val().length > 1)
+                if ($(this).val().length == 0 || $(this).val().length > 1) {
+                    searchNow = true;
                     setTimeout(showUsersList, ajaxSearchDelay);
+                } else {
+                    searchNow = false;
+                }
             });
 
-            $(document).on('click', '.pagination a', function(event) {
+            $(document).on('click', '.table_pagination a', function(event) {
                 event.preventDefault();
+
+                searchNow = false;
                 page = $(this).attr('href').split('page=')[1];
 
                 showUsersList(page);
@@ -64,8 +86,8 @@
         });
 
         function showUsersListInterval() {
-            if ($('#phone_lastname-search').val().length == 0 && page == 1) //  && $('#users_ajax').attr('data-page') == '1'
-                showUsersList();
+            // if ($('#phone_lastname-search').val().length == 0 && !searchNow) // page == 1  && usersTable.attr('data-page') == '1'
+            //     showUsersList();
         }
 
         function showUsersList(page = 1) {
@@ -77,12 +99,17 @@
                 url: '{{ route('users/getAJAX') }}?page=' + page,
                 beforeSend: function () {
                     $('#preloader').removeClass('d-none');
+                    $('#users_ajax .table_pagination').remove();
                 },
                 complete: function() {
                     $('#preloader').addClass('d-none');
                 },
                 success: function (data) {
-                    $('#users_ajax').html(data);
+                    if (searchNow) {
+                        $('#users_ajax').html(data);
+                    } else {
+                        $('#users_ajax').append(data);
+                    }
                 }
             });
         }
