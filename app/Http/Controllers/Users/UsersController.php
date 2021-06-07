@@ -48,7 +48,7 @@ class UsersController extends Controller
      */
     public function getUsersAJAX(Request $request): string
     {
-        $data = User::orderBy('last_seen', 'DESC')->orderBy('updated_at', 'DESC')->paginate(100);
+        $data = User::orderBy('last_seen', 'DESC')->orderBy('updated_at', 'DESC')->simplePaginate(100);
 
         return view('users/users-table', compact('data'))->render();
     }
