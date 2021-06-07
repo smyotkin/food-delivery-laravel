@@ -32,6 +32,7 @@
     <script>
         $(document).ready(function() {
             showUsersList();
+            setInterval(showUsersList, 10000);
 
             $(document).on('click', '.pagination a', function(event) {
                 event.preventDefault();
