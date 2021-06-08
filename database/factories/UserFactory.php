@@ -23,15 +23,13 @@ class UserFactory extends Factory
      */
     public function definition()
     {
-        $faker = \Faker\Factory::create('ru_RU');
-
         return [
             'city_id' => random_int(1, 9),
             'position_id' => random_int(1, 9),
-            'first_name' => $faker->firstName,
-            'last_name' => $faker->lastName,
+            'first_name' => $this->faker->firstName,
+            'last_name' => $this->faker->lastName,
             'password' => Hash::make(123456),
-            'phone' => $faker->numerify('79#########'),
+            'phone' => $this->faker->numerify('79#########'),
             'is_active' => 1,
         ];
     }

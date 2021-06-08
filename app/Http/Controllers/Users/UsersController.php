@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Users;
 
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
+use App\Http\Requests\SaveUserRequest;
 use App\Http\Controllers\Controller;
 use App\Services\UsersService;
 
@@ -60,13 +61,13 @@ class UsersController extends Controller
     /**
      * Создание или редактирование нового пользователя
      *
-     * @param Request $request
+     * @param SaveUserRequest $request
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function save(Request $request): \Illuminate\Http\RedirectResponse
+    public function save(SaveUserRequest $request): \Illuminate\Http\RedirectResponse
     {
-        $user = UsersService::createOrUpdate($request->toArray());
+        $user = UsersService::createOrUpdate($request->validated());
 
         return redirect()->route('users');
     }

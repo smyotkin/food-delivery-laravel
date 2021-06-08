@@ -20,19 +20,6 @@ class UsersService
      */
     public static function createOrUpdate(?array $array = null): User
     {
-        $array['phone'] = User::toDigit($array['phone']);
-
-        $validator = Validator::make($array, [
-            'id' => 'integer',
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'phone' => 'required|digits:11',
-        ]);
-
-        if ($validator->fails()) {
-            dd($validator->errors());
-        }
-
         $data = [
             'first_name' => $array['first_name'],
             'last_name' => $array['last_name'],
@@ -61,7 +48,7 @@ class UsersService
             event(new Registered($user));
 
             // todo Удалить пароль с логгера
-            Log::info("Create new user: id({$user->id}), phone({$user->phone}), password($password))");
+            Log::info("CREATE_NEW_USER(id: {$user->id}, phone: {$user->phone}, password: $password)");
         }
 
         return $user;
