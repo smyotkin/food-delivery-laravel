@@ -41,7 +41,7 @@ class UsersService
         if ($user->exists) {
             $user->update($updateData);
 
-            Log::info("Update user: id({$user->id})");
+            Log::info("UPDATE_USER: id({$user->id})");
         } else {
             event(new Registered($user));
 
