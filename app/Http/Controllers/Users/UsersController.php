@@ -2,25 +2,18 @@
 
 namespace App\Http\Controllers\Users;
 
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use App\Http\Controllers\Controller;
-use App\Models\User;
-use Jenssegers\Date\Date;
-use Cache;
-
 use App\Services\UsersService;
 
 class UsersController extends Controller
 {
+
     /**
      * Шаблон отображения всех пользователей
      *
-     * @return object
+     * @return string
      */
     public function index(): string
     {
@@ -57,7 +50,7 @@ class UsersController extends Controller
      * Шаблон добавления пользователя
      *
      * @param Request $request
-     * @return object
+     * @return string
      */
     public function add(Request $request): string
     {
@@ -82,7 +75,7 @@ class UsersController extends Controller
      * Шаблон профиля авторизованного пользователя
      *
      * @param Request $request
-     * @return object
+     * @return string
      */
     public function profile(Request $request): string
     {
