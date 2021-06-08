@@ -20,36 +20,36 @@ class UsersService
      */
     public static function createOrUpdate(?array $array = null): User
     {
-        $data = [
+
+        $updateData = [
             'first_name' => $array['first_name'],
             'last_name' => $array['last_name'],
             'phone' => $array['phone'],
             'is_active' => !empty($array['is_active']) ? 1 : 0,
         ];
 
-        if (isset($array['id'])) {
-            $user = User::findOrFail($array['id']);
+        $password = random_int(100000, 999999);
 
-            $user->update($data);
-            $user->save();
+        $registerDate = $updateData + [
+            'city_id' => 0,
+            'position_id' => 0,
+            'password' => Hash::make($password),
+        ];
+
+        $user = User::firstOrNew(['id' => $array['id'] ?? 0], $registerDate);
+
+        if ($user->exists) {
+            $user->update($updateData);
 
             Log::info("Update user: id({$user->id})");
         } else {
-            $password = random_int(100000, 999999);
-
-            $data = $data + [
-                'city_id' => 0,
-                'position_id' => 0,
-                'password' => Hash::make($password),
-            ];
-
-            $user = User::create($data);
-
             event(new Registered($user));
 
             // todo Удалить пароль с логгера
             Log::info("CREATE_NEW_USER(id: {$user->id}, phone: {$user->phone}, password: $password)");
         }
+
+        $user->save();
 
         return $user;
     }
