@@ -49,7 +49,7 @@
         let usersBlock = $('#users_ajax');
         let usersTable = $('#users_ajax > .row');
         let ajaxSearchDelay = 300;
-        let usersUpdateDelay = 3000;
+        let usersUpdateDelay = 10000;
         let getSearchCookie = getCookie('users_query_str');
         let page = 1;
         let searchNow = false;
@@ -67,7 +67,7 @@
 
             userSearch.on('keyup', function () {
                 document.cookie = 'users_query_str=' + encodeURIComponent($(this).val());
-                if ($(this).val().length == 0 || $(this).val().length > 1) {
+                if ($(this).val().length >= 0) { // $(this).val().length == 0 ||
                     searchNow = true;
                     setTimeout(showUsersList, ajaxSearchDelay);
                 } else {
@@ -86,8 +86,8 @@
         });
 
         function showUsersListInterval() {
-            // if ($('#phone_lastname-search').val().length == 0 && !searchNow) // page == 1  && usersTable.attr('data-page') == '1'
-            //     showUsersList();
+            if ($('#phone_lastname-search').val().length == 0 && !searchNow && page == 1)
+                showUsersList();
         }
 
         function showUsersList(page = 1) {
@@ -99,13 +99,14 @@
                 url: '{{ route('users/getAJAX') }}?page=' + page,
                 beforeSend: function () {
                     $('#preloader').removeClass('d-none');
-                    $('#users_ajax .table_pagination').remove();
                 },
                 complete: function() {
                     $('#preloader').addClass('d-none');
                 },
                 success: function (data) {
-                    if (searchNow) {
+                    $('#users_ajax .table_pagination').remove();
+
+                    if (searchNow || page == 1) {
                         $('#users_ajax').html(data);
                     } else {
                         $('#users_ajax').append(data);

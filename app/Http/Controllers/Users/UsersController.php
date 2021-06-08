@@ -13,6 +13,8 @@ use App\Models\User;
 use Jenssegers\Date\Date;
 use Cache;
 
+use App\Services\UsersService;
+
 class UsersController extends Controller
 {
     /**
@@ -22,9 +24,7 @@ class UsersController extends Controller
      */
     public function showUsers(): object
     {
-        return view('users/users', [
-            'users' => User::all()->sortByDesc('last_seen'),
-        ]);
+        return view('users/users');
     }
 
     /**
@@ -122,37 +122,14 @@ class UsersController extends Controller
     }
 
     /**
-     * Шаблон добавления пользователя
+     * Метод добавления нового пользователя
      * @param Request $request
      * @return object
      * @throws \Exception
      */
     public function storeUser(Request $request): object
     {
-        $phone = User::toDigit($request->phone);
-        $request->merge(array('phone' => $phone));
-
-        $request->validate([
-            'first_name' => 'required|string|max:255',
-            'last_name' => 'required|string|max:255',
-            'phone' => 'required|digits:11',
-        ]);
-
-        $password = random_int(100000, 999999);
-
-        $user = User::create([
-            'first_name' => $request->first_name,
-            'last_name' => $request->last_name,
-            'city_id' => 0,
-            'position_id' => 0,
-            'phone' => $request->phone,
-            'password' => Hash::make($password),
-            'is_active' => $request->has('is_active') ? 1 : 0,
-        ]);
-
-        Log::info("Store new user: id({$user->id}), first_name({$user->first_name}), last_name({$user->last_name}), city_id({$user->city_id}), position_id({$user->position_id}), phone({$user->phone}), password($password), is_active({$user->is_active})");
-
-        event(new Registered($user));
+        $user = UsersService::createUser($request->toArray());
 
         return redirect()->route('user', ['id' => $user->id]);
     }
