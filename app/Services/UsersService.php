@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Log;
@@ -10,17 +11,20 @@ use Illuminate\Support\Facades\Validator;
 
 class UsersService
 {
+
     /**
-     * Метод добавления нового пользователя
+     * Создание или редактирование(если указан id) пользователя
+     *
      * @param array|null $array
-     * @return object
+     * @return User
      * @throws \Exception
      */
-    public static function createUser(array $array = null): object
+    public static function createOrUpdate(?array $array = null): User
     {
         $array['phone'] = User::toDigit($array['phone']);
 
         $validator = Validator::make($array, [
+            'id' => 'integer',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|digits:11',
@@ -30,22 +34,73 @@ class UsersService
             dd($validator->errors());
         }
 
-        $password = random_int(100000, 999999);
-
-        $user = User::create([
+        $data = [
             'first_name' => $array['first_name'],
             'last_name' => $array['last_name'],
-            'city_id' => 0,
-            'position_id' => 0,
             'phone' => $array['phone'],
-            'password' => Hash::make($password),
             'is_active' => !empty($array['is_active']) ? 1 : 0,
-        ]);
+        ];
 
-        Log::info("Create new user: id({$user->id}), phone({$user->phone}), password($password))");
+        if (isset($array['id'])) {
+            $user = User::findOrFail($array['id']);
 
-        event(new Registered($user));
+            $user->update($data);
+            $user->save();
+
+            Log::info("Update user: id({$user->id})");
+        } else {
+            $password = random_int(100000, 999999);
+
+            $data = $data + [
+                'city_id' => 0,
+                'position_id' => 0,
+                'password' => Hash::make($password),
+            ];
+
+            $user = User::create($data);
+
+            event(new Registered($user));
+
+            // todo Удалить пароль с логгера
+            Log::info("Create new user: id({$user->id}), phone({$user->phone}), password($password))");
+        }
 
         return $user;
+    }
+
+    /**
+     * Метод поиска пользователей
+     *
+     * @param array|null $array
+     * @return mixed
+     */
+    public static function find(?array $array = null)
+    {
+        if (isset($array['query'])) {
+            $users = User::where('phone', 'like', '%' . $array['query'] . '%')
+                ->orWhere('last_name', 'like', '%' . $array['query'] . '%')
+                ->orderBy('last_seen', 'desc')
+                ->orderBy('updated_at', 'desc')
+                ->simplePaginate(100);
+        } else {
+            $users = User::orderBy('last_seen', 'desc')
+                ->orderBy('updated_at', 'desc')
+                ->simplePaginate(100);
+        }
+
+        return $users;
+    }
+
+    // todo exceptions and validation
+
+    /**
+     * Возвращает одного пользователя
+     *
+     * @param array $array
+     * @return User
+     */
+    public static function get(array $array): User
+    {
+        return User::find($array['id']);
     }
 }

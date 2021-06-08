@@ -96,7 +96,7 @@
                 data: {
                     query: $('#phone_lastname-search').val(),
                 },
-                url: '{{ route('users/getAJAX') }}?page=' + page,
+                url: '{{ route('users/getAjax') }}?page=' + page,
                 beforeSend: function () {
                     $('#preloader').removeClass('d-none');
                 },
