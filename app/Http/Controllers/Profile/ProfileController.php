@@ -18,7 +18,7 @@ class ProfileController extends Controller
     public function index(Request $request): string
     {
         return view('users/profile', [
-            'user' => UsersService::get(Auth::user()->id),
+            'user' => UsersService::get(['id' => Auth::user()->id]),
         ])->render();
     }
 }

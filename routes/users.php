@@ -23,12 +23,12 @@ Route::middleware(['auth'])->group(function () {
 
         Route::post('/users/{id}', [UsersController::class, 'update'])
             ->name('users/update');
+    });
 
+    Route::middleware(['role:users_profile_view'])->group(function () {
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
     });
-
-
 });
 
 
