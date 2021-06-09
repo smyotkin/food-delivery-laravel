@@ -10,29 +10,31 @@
             <div class="col d-flex align-items-center">
                 <div class="info">
                     <h4 class="text-muted fw-light">{{ $user->first_name ?? 'Имя' }} {{ $user->last_name ?? 'Фамилия' }}</h4>
-                    <h6 class="text-muted fw-normal mb-0">{{ $user->phoneNumber($user->phone) }}</h6>
+                    <h6 class="text-muted fw-normal mb-0">{{ isset($user->phone) ? $user->phoneNumber($user->phone) : 'Телефон' }}</h6>
                 </div>
             </div>
             <div class="col text-end lh-base">
                 <p class="mb-1">
                     <a href="javascript:" onclick="event.preventDefault(); $('#user_form').submit();" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
                 </p>
-                <p class="mb-0 text-muted">
-                    @php ($created_at = Date::parse($user->created_at))
+                @if (isset($user))
+                    <p class="mb-0 text-muted">
+                        @php ($created_at = Date::parse($user->created_at))
 
-                    <small>
-                        Регистрация: {{ $user->first_name }} {{ $user->last_name }},
-                        {{ $created_at->format(now()->year == $created_at->year ? 'j F, H:i' : 'j F Y') }}
-                    </small>
-                </p>
-                <p class="mb-0 text-muted">
-                    @php ($updated_at = Date::parse($user->updated_at))
+                        <small>
+                            Регистрация: {{ $user->first_name }} {{ $user->last_name }},
+                            {{ $created_at->format(now()->year == $created_at->year ? 'j F, H:i' : 'j F Y') }}
+                        </small>
+                    </p>
+                    <p class="mb-0 text-muted">
+                        @php ($updated_at = Date::parse($user->updated_at))
 
-                    <small>
-                        Изменения: {{ $user->first_name }} {{ $user->last_name }},
-                        {{ $updated_at->format( now()->year == $updated_at->year ? 'j F, H:i' : 'j F Y') }}
-                    </small>
-                </p>
+                        <small>
+                            Изменения: {{ $user->first_name }} {{ $user->last_name }},
+                            {{ $updated_at->format( now()->year == $updated_at->year ? 'j F, H:i' : 'j F Y') }}
+                        </small>
+                    </p>
+                @endif
             </div>
         </div>
     </div>
@@ -47,29 +49,29 @@
         </div>
         <div class="row">
             <div class="col-4">
-                <form method="POST" action="{{ route('users/update', ['id' => $user->id]) }}" id="user_form" class="row g-3 update_user">
+                    <form method="POST" action="{{ isset($user) ? route('users/update', ['id' => $user->id]) : route('users/store') }}" id="user_form" class="row g-3 update_user">
                     @csrf
 
-                    <input type="hidden" name="id" value="{{ $user->id }}">
+                    @if (isset($user))
+                        <input type="hidden" name="id" value="{{ $user->id }}">
+                    @endif
 
                     <div class="col-md-6">
                         <label for="first_name" class="form-label">Имя</label>
-                        <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ $user->first_name }}" placeholder="Имя">
+                        <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ $user->first_name ?? '' }}" placeholder="Имя">
                     </div>
                     <div class="col-md-6">
                         <label for="last_name" class="form-label">Фамилия</label>
-                        <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ $user->last_name }}" placeholder="Фамилия">
+                        <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ $user->last_name ?? '' }}" placeholder="Фамилия">
                     </div>
                     <div class="col-12">
                         <label for="phone" class="form-label">Мобильный телефон</label>
-                        <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ $user->phoneNumber($user->phone) }}" placeholder="+7 555 555-55-55">
+                        <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ isset($user->phone) ? $user->phoneNumber($user->phone) : '' }}" placeholder="+7 555 555-55-55">
                     </div>
                     <div class="col-12">
                         <div class="form-check mt-1">
-                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {{ $user->is_active ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">
-                                Учетная запись активна
-                            </label>
+                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {{ !empty($user->is_active) || !isset($user) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_active">Учетная запись активна</label>
                         </div>
                     </div>
                 </form>

@@ -37,12 +37,11 @@ class UsersController extends Controller
     /**
      * Шаблон добавления пользователя
      *
-     * @param Request $request
      * @return string
      */
-    public function create(Request $request): string
+    public function create(): string
     {
-        return view('users/user-add')->render();
+        return view('users/user')->render();
     }
 
     /**
