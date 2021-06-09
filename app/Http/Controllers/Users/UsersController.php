@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers\Users;
 
-use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
-use App\Http\Requests\SaveUserRequest;
+use App\Http\Requests\Users\UpdateUserRequest;
+use App\Http\Requests\Users\StoreUserRequest;
 use App\Http\Controllers\Controller;
 use App\Services\UsersService;
 
@@ -22,25 +22,12 @@ class UsersController extends Controller
     }
 
     /**
-     * Возвращает список пользователей в таблице, для AJAX
-     *
-     * @param Request $request
-     * @return string
-     */
-    public function getAjax(Request $request): string
-    {
-        return view('users/users-table', [
-            'data' => UsersService::find($request->toArray()),
-        ])->render();
-    }
-
-    /**
      * Шаблон отображения пользователя по id
      *
      * @param int $id
      * @return string
      */
-    public function detail(int $id): string
+    public function show(int $id): string
     {
         return view('users/user', [
             'user' => UsersService::get(['id' => $id]),
@@ -53,35 +40,49 @@ class UsersController extends Controller
      * @param Request $request
      * @return string
      */
-    public function add(Request $request): string
+    public function create(Request $request): string
     {
         return view('users/user-add')->render();
     }
 
     /**
-     * Создание или редактирование нового пользователя
+     * Редактирование пользователя
      *
-     * @param SaveUserRequest $request
+     * @param UpdateUserRequest $request
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function save(SaveUserRequest $request): \Illuminate\Http\RedirectResponse
+    public function update(UpdateUserRequest $request): \Illuminate\Http\RedirectResponse
     {
-        UsersService::createOrUpdate($request->validated()); // input() $user =
+        UsersService::createOrUpdate($request->validated());
 
-        return redirect()->route('users')->withInput();
+        return redirect()->route('users');
     }
 
     /**
-     * Шаблон профиля авторизованного пользователя
+     * Создание нового пользователя
+     *
+     * @param StoreUserRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     */
+    public function store(StoreUserRequest $request): \Illuminate\Http\RedirectResponse
+    {
+        UsersService::createOrUpdate($request->validated());
+
+        return redirect()->route('users');
+    }
+
+    /**
+     * Возвращает список пользователей в таблице, для AJAX
      *
      * @param Request $request
      * @return string
      */
-    public function profile(Request $request): string
+    public function getAjax(Request $request): string
     {
-        return view('users/profile', [
-            'user' => UsersService::get(Auth::user()->id),
+        return view('users/users-table', [
+            'data' => UsersService::find($request->toArray()),
         ])->render();
     }
 }

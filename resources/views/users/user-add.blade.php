@@ -30,7 +30,7 @@
         </div>
         <div class="row">
             <div class="col-4">
-                <form method="POST" action="{{ route('users/save') }}" id="user_form" class="row g-3 update_user">
+                <form method="POST" action="{{ route('users/store') }}" id="user_form" class="row g-3 update_user">
                     @csrf
 
                     <div class="col-md-6">

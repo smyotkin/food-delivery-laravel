@@ -4,7 +4,6 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Validator;
 use Illuminate\Auth\Events\Registered;
 use App\Models\User;
 
@@ -63,15 +62,15 @@ class UsersService
     public static function find(?array $array = null)
     {
         $users = User::query()
-            ->when(isset($array['query']), function ($q) use ($array) {
-                $q
+            ->when(isset($array['query']), function ($query) use ($array) {
+                $query
                     ->where('phone', 'like', '%' . $array['query'] . '%')
                     ->orWhere('last_name', 'like', '%' . $array['query'] . '%');
             })
             ->orderBy('last_seen', 'desc')
             ->orderBy('updated_at', 'desc');
 
-        return $users->simplePaginate(100);
+        return $users->simplePaginate();
     }
 
     // todo exceptions and validation

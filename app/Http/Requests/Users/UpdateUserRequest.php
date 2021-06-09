@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Http\Requests;
+namespace App\Http\Requests\Users;
 
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\User;
 
-class SaveUserRequest extends FormRequest
+class UpdateUserRequest extends FormRequest
 {
     protected function prepareForValidation()
     {
@@ -30,22 +30,13 @@ class SaveUserRequest extends FormRequest
     public function rules()
     {
         return [
-            'id' => 'integer|exists:users,id',
+            'id' => 'required|integer|exists:users,id',
             'city_id' => 'integer',
             'position_id' => 'integer',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'phone' => 'required|digits:11', // |unique:users,phone
+            'phone' => 'required|digits:11',
             'is_active' => 'nullable'
         ];
     }
-
-//    public function messages()
-//    {
-//        return [
-//            'title.required' => 'Требуется Заголовок.',
-//            'title.unique' => 'Заголовок сообщения уже существует.',
-//            ...
-//        ];
-//    }
 }
