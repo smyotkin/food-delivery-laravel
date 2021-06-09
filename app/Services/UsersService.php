@@ -61,6 +61,12 @@ class UsersService
      */
     public static function find(?array $array = null)
     {
+//        $user = User::find(646);
+//        dd($user->hasRole('web-developer')); //вернёт true
+//        dd($user->hasRole('project-manager')); //вернёт false
+//        dd($user->givePermissionsTo('manage-users')); //выдаём разрешение
+//        dd($user->hasPermission('manage-users')); //вернёт true
+
         $users = User::query()
             ->when(isset($array['query']), function ($query) use ($array) {
                 $query

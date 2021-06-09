@@ -2,18 +2,19 @@
 
 namespace App\Models;
 
-//use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Jenssegers\Date\Date;
 use Illuminate\Support\Facades\Cache;
 
+use App\Traits\HasRolesAndPermissions;
+
 Date::setLocale('ru');
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable;
+    use HasFactory, Notifiable, HasRolesAndPermissions;
 
     protected $perPage = 100;
 

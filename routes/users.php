@@ -27,6 +27,8 @@ Route::middleware(['auth'])->group(function () {
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
     });
+
+
 });
 
 

@@ -176,6 +176,8 @@ return [
         App\Providers\RouteServiceProvider::class,
 
         Jenssegers\Date\DateServiceProvider::class,
+        App\Providers\RolesServiceProvider::class,
+        App\Providers\PermissionServiceProvider::class,
     ],
 
     /*
