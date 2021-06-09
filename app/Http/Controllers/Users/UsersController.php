@@ -37,13 +37,13 @@ class UsersController extends Controller
     /**
      * Шаблон отображения пользователя по id
      *
-     * @param Request $request
+     * @param int $id
      * @return string
      */
-    public function detail(Request $request): string
+    public function detail(int $id): string
     {
         return view('users/user', [
-            'user' => UsersService::get(['id' => $request->route('id')]),
+            'user' => UsersService::get(['id' => $id]),
         ])->render();
     }
 
@@ -67,9 +67,9 @@ class UsersController extends Controller
      */
     public function save(SaveUserRequest $request): \Illuminate\Http\RedirectResponse
     {
-        $user = UsersService::createOrUpdate($request->validated());
+        UsersService::createOrUpdate($request->validated()); // input() $user =
 
-        return redirect()->route('users');
+        return redirect()->route('users')->withInput();
     }
 
     /**

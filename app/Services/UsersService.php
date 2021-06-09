@@ -62,19 +62,16 @@ class UsersService
      */
     public static function find(?array $array = null)
     {
-        if (isset($array['query'])) {
-            $users = User::where('phone', 'like', '%' . $array['query'] . '%')
-                ->orWhere('last_name', 'like', '%' . $array['query'] . '%')
-                ->orderBy('last_seen', 'desc')
-                ->orderBy('updated_at', 'desc')
-                ->simplePaginate(100);
-        } else {
-            $users = User::orderBy('last_seen', 'desc')
-                ->orderBy('updated_at', 'desc')
-                ->simplePaginate(100);
-        }
+        $users = User::query()
+            ->when(isset($array['query']), function ($q) use ($array) {
+                $q
+                    ->where('phone', 'like', '%' . $array['query'] . '%')
+                    ->orWhere('last_name', 'like', '%' . $array['query'] . '%');
+            })
+            ->orderBy('last_seen', 'desc')
+            ->orderBy('updated_at', 'desc');
 
-        return $users;
+        return $users->simplePaginate(100);
     }
 
     // todo exceptions and validation

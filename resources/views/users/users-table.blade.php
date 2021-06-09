@@ -4,16 +4,10 @@
             <td>
                 <a href="users/{{ $user->id }}" class="text-decoration-none {{ $user->is_active == 0 ? 'link-secondary' : '' }}">{{ $user->full_name }}</a>
             </td>
-            <td>
-                {{ $user->phone_formatted }}
-            </td>
+            <td>{{ $user->phone_formatted }}</td>
             <td>-</td>
-            <td>
-                {{ $user->registered_at }}
-            </td>
-            <td>
-                {{ $user->last_page }}
-            </td>
+            <td>{{ $user->registered_at }}</td>
+            <td>{{ $user->last_page }}</td>
             <td class="{{ $user->online == 'online' ? 'text-success' : '' }}">
                 {{ $user->online }}
             </td>

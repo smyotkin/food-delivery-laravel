@@ -35,8 +35,17 @@ class SaveUserRequest extends FormRequest
             'position_id' => 'integer',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
-            'phone' => 'required|digits:11',
+            'phone' => 'required|digits:11', // |unique:users,phone
             'is_active' => 'nullable'
         ];
     }
+
+//    public function messages()
+//    {
+//        return [
+//            'title.required' => 'Требуется Заголовок.',
+//            'title.unique' => 'Заголовок сообщения уже существует.',
+//            ...
+//        ];
+//    }
 }

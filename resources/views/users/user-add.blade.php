@@ -35,15 +35,15 @@
 
                     <div class="col-md-6">
                         <label for="first_name" class="form-label">Имя</label>
-                        <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="" placeholder="Имя">
+                        <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ old('first_name') }}" placeholder="Имя">
                     </div>
                     <div class="col-md-6">
                         <label for="last_name" class="form-label">Фамилия</label>
-                        <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value=""  placeholder="Фамилия">
+                        <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ old('last_name') }}"  placeholder="Фамилия">
                     </div>
                     <div class="col-12">
                         <label for="phone" class="form-label">Мобильный телефон</label>
-                        <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="" placeholder="+7 555 555-55-55">
+                        <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ old('phone') }}" placeholder="+7 555 555-55-55">
                     </div>
                     <div class="col-12">
                         <div class="form-check mt-1">
