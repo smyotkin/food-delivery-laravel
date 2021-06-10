@@ -25,7 +25,7 @@ class UsersService
 
         if ($user = User::find($array['id'] ?? 0)) {
             $user->update($basicParams);
-            $user->save();
+            $user->saveOrFail();
 
             Log::info("UPDATE_USER: id({$user->id})");
         } else {
@@ -72,6 +72,12 @@ class UsersService
      */
     public static function get(array $array): User
     {
-        return User::find($array['id']);
+        try {
+            $user = User::findOrFail($array['id']);
+        } catch (ModelNotFoundException $exception) {
+            return back()->withError($exception->getMessage());
+        }
+
+        return $user;
     }
 }

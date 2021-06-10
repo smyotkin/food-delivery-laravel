@@ -5,12 +5,10 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-use Jenssegers\Date\Date;
 use Illuminate\Support\Facades\Cache;
+use Jenssegers\Date\Date;
 
 use App\Traits\HasRolesAndPermissions;
-
-Date::setLocale('ru');
 
 class User extends Authenticatable
 {
@@ -60,6 +58,11 @@ class User extends Authenticatable
         'registered_at',
         'online',
     ];
+
+    public function __construct()
+    {
+        Date::setLocale('ru');
+    }
 
     public function getPhoneFormattedAttribute()
     {
