@@ -66,6 +66,7 @@ trait HasRolesAndPermissions
                 return true;
             }
         }
+
         return false;
     }
 
@@ -85,10 +86,13 @@ trait HasRolesAndPermissions
     public function givePermissionsTo(...$permissions)
     {
         $permissions = $this->getAllPermissions($permissions);
+
         if ($permissions === null) {
             return $this;
         }
+
         $this->permissions()->saveMany($permissions);
+
         return $this;
     }
 
@@ -99,7 +103,9 @@ trait HasRolesAndPermissions
     public function deletePermissions(...$permissions)
     {
         $permissions = $this->getAllPermissions($permissions);
+
         $this->permissions()->detach($permissions);
+
         return $this;
     }
 
@@ -110,6 +116,7 @@ trait HasRolesAndPermissions
     public function refreshPermissions(...$permissions)
     {
         $this->permissions()->detach();
+
         return $this->givePermissionsTo($permissions);
     }
 }

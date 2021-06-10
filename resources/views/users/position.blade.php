@@ -70,7 +70,7 @@
                         <select class="form-select" id="status" name="status" required>
                             <option disabled selected>Ничего не выбрано</option>
                             @forelse (config('custom.statuses') as $key => $status)
-                                <option value="{{ $key }}" {{ isset($role->status) && $role->status == $key ? 'selected' : '' }}>{{ $status }}</option>
+                                <option value="{{ $key }}" {{ isset($role->status) && $role->status == $key ? 'selected' : '' }}>{{ $status['name'] }}</option>
                             @empty
                             @endforelse
                         </select>
