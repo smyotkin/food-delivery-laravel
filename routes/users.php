@@ -8,8 +8,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/getAjax', [UsersController::class, 'getAjax'])
         ->name('users/getAjax');
 
-    Route::get('/users/getPositionsAjax', [PositionsController::class, 'getAjax'])
-        ->name('users/getPositionsAjax');
+    Route::get('/users/positions/getAjax', [PositionsController::class, 'getAjax'])
+        ->name('positions.getAjax');
 
     Route::middleware(['last.page'])->group(function () {
         Route::resource('users/positions', PositionsController::class)->except([

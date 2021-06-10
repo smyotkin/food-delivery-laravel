@@ -55,12 +55,19 @@
         let searchNow = false;
 
         $(document).ready(function() {
-            showUsersList();
+            if (getSearchCookie) {
+                userSearch.val(getSearchCookie);
+            }
+
+            showPositions();
 
             userSearch.on('keyup', function () {
                 document.cookie = 'positions_query_str=' + encodeURIComponent($(this).val());
+
                 if ($(this).val().length >= 0) {
                     searchNow = true;
+
+                    showPositions();
                 } else {
                     searchNow = false;
                 }
@@ -72,17 +79,18 @@
                 searchNow = false;
                 page = $(this).attr('href').split('page=')[1];
 
-                showUsersList(page);
+                showPositions(page);
             });
         });
 
-        function showUsersList(page = 1) {
+        function showPositions(page = 1) {
             $.ajax({
                 type: 'GET',
                 data: {
+                    page: page,
                     query: userSearch.val(),
                 },
-                url: '{{ route('users/getPositionsAjax') }}?page=' + page,
+                url: '{{ route('positions.getAjax') }}',
                 beforeSend: function () {
                     $('#preloader').removeClass('d-none');
                 },
