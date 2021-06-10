@@ -25,7 +25,8 @@ Route::middleware(['auth'])->group(function () {
             ->name('users/update');
     });
 
-    Route::middleware(['role:users_profile_view'])->group(function () {
+    //role:position,permission
+    Route::middleware(['role:manager'])->group(function () {
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
     });

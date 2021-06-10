@@ -7,9 +7,18 @@ use App\Models\User;
 
 class UpdateUserRequest extends FormRequest
 {
-    protected function prepareForValidation()
+
+    /**
+     * Обработка перед валидацией
+     *
+     * @return void
+     */
+    protected function prepareForValidation(): void
     {
-        $this->merge(['phone' => User::toDigit($this->phone)]);
+        $this->merge([
+            'phone' => User::toDigit($this->phone),
+            'is_active' => !empty($this->is_active) ? 1 : 0,
+        ]);
     }
 
     /**
@@ -17,7 +26,7 @@ class UpdateUserRequest extends FormRequest
      *
      * @return bool
      */
-    public function authorize()
+    public function authorize(): bool
     {
         return true;
     }
@@ -27,7 +36,7 @@ class UpdateUserRequest extends FormRequest
      *
      * @return array
      */
-    public function rules()
+    public function rules(): array
     {
         return [
             'id' => 'required|integer|exists:users,id',
@@ -36,7 +45,7 @@ class UpdateUserRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'phone' => 'required|digits:11',
-            'is_active' => 'nullable'
+            'is_active' => 'boolean'
         ];
     }
 }
