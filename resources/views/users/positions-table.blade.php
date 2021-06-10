@@ -5,7 +5,7 @@
                 <a href="/users/positions/{{ $position->id }}" class="text-decoration-none">{{ $position->name }}</a>
             </td>
             <td>{{ $position->slug }}</td>
-            <td>-</td>
+            <td>{{ config('custom.statuses.' . $position->status)  }}</td>
         </tr>
     @endforeach
 

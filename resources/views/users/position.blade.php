@@ -67,12 +67,12 @@
 
                     <div class="col-12">
                         <label for="status" class="form-label">Статус</label>
-                        <select class="form-select" id="status" required>
+                        <select class="form-select" id="status" name="status" required>
                             <option disabled selected>Ничего не выбрано</option>
-                            <option value="owner">Владелец</option>
-                            <option value="head">Директор</option>
-                            <option value="specialist">Специалист</option>
-                            <option value="employee">Сотрудник</option>
+                            @forelse (config('custom.statuses') as $key => $status)
+                                <option value="{{ $key }}" {{ isset($role->status) && $role->status == $key ? 'selected' : '' }}>{{ $status }}</option>
+                            @empty
+                            @endforelse
                         </select>
                     </div>
                 </form>

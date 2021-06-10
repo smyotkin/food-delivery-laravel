@@ -27,6 +27,7 @@ class CreateOrUpdatePositionRequest extends FormRequest
             'id' => 'required|integer|exists:roles,id',
             'name' => 'required|string|max:255',
             'slug' => 'required|string|max:255',
+            'status' => 'required|in:owner,head,specialist,employee',
         ]);
 
         switch ($this->method()) {

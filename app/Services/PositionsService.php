@@ -21,7 +21,7 @@ class PositionsService
     public static function createOrUpdate(?array $array = null): Role
     {
         $basicParams = collect($array)
-            ->only(['name', 'slug'])
+            ->only(['name', 'slug', 'status'])
             ->all();
 
         if ($role = Role::find($array['id'] ?? 0)) {
