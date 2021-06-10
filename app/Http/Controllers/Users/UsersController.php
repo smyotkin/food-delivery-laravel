@@ -3,7 +3,6 @@
 namespace App\Http\Controllers\Users;
 
 use Illuminate\Http\Request;
-use App\Http\Requests\Users\UpdateUserRequest;
 use App\Http\Requests\Users\CreateOrUpdateUserRequest;
 use App\Http\Controllers\Controller;
 use App\Services\UsersService;
@@ -55,7 +54,7 @@ class UsersController extends Controller
     {
         UsersService::createOrUpdate($request->validated());
 
-        return redirect()->route('users');
+        return redirect()->route('users.index');
     }
 
     /**
@@ -69,7 +68,7 @@ class UsersController extends Controller
     {
         UsersService::createOrUpdate($request->validated());
 
-        return redirect()->route('users');
+        return redirect()->route('users.index');
     }
 
     /**
@@ -84,4 +83,5 @@ class UsersController extends Controller
             'data' => UsersService::find($request->toArray()),
         ])->render();
     }
+
 }

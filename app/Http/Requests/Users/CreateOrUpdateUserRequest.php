@@ -62,6 +62,5 @@ class CreateOrUpdateUserRequest extends FormRequest
             default:
                 return $rules->all();
         }
-
     }
 }

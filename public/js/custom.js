@@ -4,6 +4,10 @@ $(document).ready(function () {
     $('.update_user :input').on('keyup change', function() {
         checkUserForm();
     });
+
+    $('.update_position :input').on('keyup change', function() {
+        checkPositionForm();
+    });
 });
 
 function checkUserForm() {
@@ -19,6 +23,18 @@ function checkUserForm() {
     //     return;
 
     $('#save_user').removeClass('disabled btn-outline-secondary').addClass('btn-outline-primary');
+}
+
+function checkPositionForm() {
+    $('#save').addClass('disabled btn-outline-secondary');
+
+    if ($('#name').val().length < 2)
+        return;
+
+    if ($('#slug').val().length < 2)
+        return;
+
+    $('#save').removeClass('disabled btn-outline-secondary').addClass('btn-outline-primary');
 }
 
 function getCookie(name) {

@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="back_href">{{ route('users') }}</x-slot>
+    <x-slot name="back_href">{{ route('users.index') }}</x-slot>
     <x-slot name="back_title">Пользователи</x-slot>
     <x-slot name="header">
         <h5 class="m-0 fw-bold">Информация о пользователе</h5>
@@ -49,7 +49,7 @@
         </div>
         <div class="row">
             <div class="col-4">
-                    <form method="post" action="{{ isset($user) ? route('users/update', ['id' => $user->id]) : route('users/store') }}" id="user_form" class="row g-3 update_user">
+                    <form method="post" action="{{ isset($user) ? route('users.update', ['user' => $user]) : route('users.store') }}" id="user_form" class="row g-3 update_user">
                     @method(isset($user) ? 'patch' : 'post')
                     @csrf
 

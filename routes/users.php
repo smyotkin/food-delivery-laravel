@@ -1,28 +1,24 @@
 <?php
 
 use App\Http\Controllers\Users\UsersController;
+use App\Http\Controllers\Users\PositionsController;
 use App\Http\Controllers\Profile\ProfileController;
 
 Route::middleware(['auth'])->group(function () {
     Route::get('/users/getAjax', [UsersController::class, 'getAjax'])
         ->name('users/getAjax');
 
+    Route::get('/users/getPositionsAjax', [PositionsController::class, 'getAjax'])
+        ->name('users/getPositionsAjax');
+
     Route::middleware(['last.page'])->group(function () {
-        Route::get('/users', [UsersController::class, 'index'])
-            ->name('users');
+        Route::resource('users/positions', PositionsController::class)->except([
+            'edit'
+        ]);
 
-        Route::get('/users/create', [UsersController::class, 'create'])
-            ->name('users/create');
-
-        Route::post('/users', [UsersController::class, 'store'])
-            ->name('users/store');
-
-        Route::get('/users/{id}', [UsersController::class, 'show'])
-            ->whereNumber('id')
-            ->name('user');
-
-        Route::patch('/users/{id}', [UsersController::class, 'update'])
-            ->name('users/update');
+        Route::resource('users', UsersController::class)->except([
+            'edit', 'destroy'
+        ]);
     });
 
     //role:position,permission

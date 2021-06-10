@@ -5,6 +5,8 @@
         <h5 class="m-0 fw-bold">Пользователи</h5>
     </x-slot>
 
+    @include('layouts.sub-navigation')
+
     <div class="container-fluid px-5 mb-5">
         <div class="row">
             <div class="col-5 mt-4">
@@ -21,7 +23,7 @@
                 <h5 class="d-inline-block fw-normal align-middle m-0">Пользователи <a href="javascript:" class="btn btn-sm btn-danger align-bottom rounded-0 px-1 py-0 ms-2"><small>CSV</small></a></h5>
             </div>
             <div class="col text-end">
-                <a href="{{ route('users/create') }}" class="btn btn-outline-primary py-0">Новый пользователь</a>
+                <a href="{{ route('users.create') }}" class="btn btn-outline-primary py-0">Новый пользователь</a>
             </div>
         </div>
 

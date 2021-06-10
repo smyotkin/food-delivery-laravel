@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\User;
+use App\Models\Role;
 
 
 class UsersService
@@ -73,9 +74,10 @@ class UsersService
         try {
             $user = User::findOrFail($array['id']);
         } catch (ModelNotFoundException $exception) {
-            return back()->withError($exception->getMessage());
+            return abort(404);
         }
 
         return $user;
     }
+
 }
