@@ -4,12 +4,12 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Auth\Events\Registered;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use App\Models\User;
+
 
 class UsersService
 {
-
     /**
      * Создание или редактирование(если указан id) пользователя
      *
@@ -61,8 +61,6 @@ class UsersService
 
         return $users->simplePaginate();
     }
-
-    // todo exceptions and validation
 
     /**
      * Возвращает одного пользователя

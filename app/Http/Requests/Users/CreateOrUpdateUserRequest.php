@@ -5,7 +5,7 @@ namespace App\Http\Requests\Users;
 use Illuminate\Foundation\Http\FormRequest;
 use App\Models\User;
 
-class UpdateUserRequest extends FormRequest
+class CreateOrUpdateUserRequest extends FormRequest
 {
 
     /**
@@ -38,14 +38,30 @@ class UpdateUserRequest extends FormRequest
      */
     public function rules(): array
     {
-        return [
+        $rules = collect([
             'id' => 'required|integer|exists:users,id',
             'city_id' => 'integer',
             'position_id' => 'integer',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
+            'is_active' => 'boolean',
             'phone' => 'required|digits:11',
-            'is_active' => 'boolean'
-        ];
+        ]);
+
+        switch ($this->method()) {
+            case 'POST': {
+                return $rules->merge([
+                    'id' => 'integer|exists:users,id',
+                    'phone' => 'required|digits:11|unique:users,phone',
+                ])->all();
+            }
+            case 'PUT':
+            case 'PATCH': {
+                return $rules->all();
+            }
+            default:
+                return $rules->all();
+        }
+
     }
 }

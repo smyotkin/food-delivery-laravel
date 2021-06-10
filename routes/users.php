@@ -21,7 +21,7 @@ Route::middleware(['auth'])->group(function () {
             ->whereNumber('id')
             ->name('user');
 
-        Route::post('/users/{id}', [UsersController::class, 'update'])
+        Route::patch('/users/{id}', [UsersController::class, 'update'])
             ->name('users/update');
     });
 

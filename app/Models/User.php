@@ -12,7 +12,9 @@ use App\Traits\HasRolesAndPermissions;
 
 class User extends Authenticatable
 {
-    use HasFactory, Notifiable, HasRolesAndPermissions;
+    use HasFactory;
+    use HasRolesAndPermissions;
+    use Notifiable;
 
     protected $perPage = 100;
 
@@ -58,11 +60,6 @@ class User extends Authenticatable
         'registered_at',
         'online',
     ];
-
-    public function __construct()
-    {
-        Date::setLocale('ru');
-    }
 
     public function getPhoneFormattedAttribute()
     {

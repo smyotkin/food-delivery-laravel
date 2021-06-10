@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Users;
 
 use Illuminate\Http\Request;
 use App\Http\Requests\Users\UpdateUserRequest;
-use App\Http\Requests\Users\StoreUserRequest;
+use App\Http\Requests\Users\CreateOrUpdateUserRequest;
 use App\Http\Controllers\Controller;
 use App\Services\UsersService;
 
@@ -47,11 +47,11 @@ class UsersController extends Controller
     /**
      * Редактирование пользователя
      *
-     * @param UpdateUserRequest $request
+     * @param CreateOrUpdateUserRequest $request
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function update(UpdateUserRequest $request): \Illuminate\Http\RedirectResponse
+    public function update(CreateOrUpdateUserRequest $request): \Illuminate\Http\RedirectResponse
     {
         UsersService::createOrUpdate($request->validated());
 
@@ -61,11 +61,11 @@ class UsersController extends Controller
     /**
      * Создание нового пользователя
      *
-     * @param StoreUserRequest $request
+     * @param CreateOrUpdateUserRequest $request
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
      */
-    public function store(StoreUserRequest $request): \Illuminate\Http\RedirectResponse
+    public function store(CreateOrUpdateUserRequest $request): \Illuminate\Http\RedirectResponse
     {
         UsersService::createOrUpdate($request->validated());
 

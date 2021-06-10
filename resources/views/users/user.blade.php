@@ -49,7 +49,8 @@
         </div>
         <div class="row">
             <div class="col-4">
-                    <form method="POST" action="{{ isset($user) ? route('users/update', ['id' => $user->id]) : route('users/store') }}" id="user_form" class="row g-3 update_user">
+                    <form method="post" action="{{ isset($user) ? route('users/update', ['id' => $user->id]) : route('users/store') }}" id="user_form" class="row g-3 update_user">
+                    @method(isset($user) ? 'patch' : 'post')
                     @csrf
 
                     @if (isset($user))
