@@ -96,6 +96,19 @@ trait HasRolesAndPermissions
         return $this;
     }
 
+    public function givePermissionsArray($array)
+    {
+        $permissions = $this->getAllPermissions($array);
+
+        if ($permissions === null) {
+            return $this;
+        }
+
+        $this->permissions()->saveMany($permissions);
+
+        return $this;
+    }
+
     /**
      * @param mixed ...$permissions
      * @return $this

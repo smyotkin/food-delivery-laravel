@@ -38,19 +38,4 @@ class Permission extends Model
     {
         return $this->belongsToMany(Role::class, 'roles_permissions');
     }
-
-    public static function statusPermissionsToTop(array $statusPermissions)
-    {
-        $deletedValues = collect([]);
-        $allPermissions = Permission::get();
-
-        foreach($allPermissions as $key => $permission) {
-            if (in_array($permission->slug, $statusPermissions)) {
-                $deletedValues[] = $permission;
-                $allPermissions->forget($key);
-            }
-        }
-
-        return $deletedValues->merge($allPermissions);
-    }
 }

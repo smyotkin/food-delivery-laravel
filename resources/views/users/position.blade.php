@@ -10,7 +10,7 @@
             <div class="col d-flex align-items-center">
                 <div class="info">
                     <h4 class="text-muted fw-light">{{ $role->name ?? 'Название' }} ({{ $role->slug ?? 'Метка' }})</h4>
-                    <h6 class="text-muted fw-normal mb-0">{{ config('custom.statuses.' . $role->status . '.name') ?? 'Статус' }}</h6>
+                    <h6 class="text-muted fw-normal mb-0">{{ isset($role->status) ? $statuses[$role->status]['name'] : 'Статус' }}</h6>
                 </div>
             </div>
             <div class="col text-end lh-base">
@@ -45,84 +45,87 @@
                 <x-auth-validation-errors class="mb-4" :errors="$errors" />
             </div>
         </div>
-        <div class="row">
-            <div class="col-4">
-                    <form method="post" action="{{ isset($role) ? route('positions.update', ['position' => $role]) : route('positions.store') }}" id="position_form" class="row g-3 update_position">
-                    @method(isset($role) ? 'patch' : 'post')
-                    @csrf
+        <form method="post" action="{{ isset($role) ? route('positions.update', ['position' => $role]) : route('positions.store') }}" id="position_form" class="update_position">
+            @method(isset($role) ? 'patch' : 'post')
+            @csrf
 
-                    @if (isset($role))
-                        <input type="hidden" name="id" value="{{ $role->id }}">
-                    @endif
+            <div class="row g-3">
+                <div class="col-4">
+                    <div class="row g-3">
+                        @if (isset($role))
+                            <input type="hidden" name="id" value="{{ $role->id }}">
+                        @endif
 
-                    <div class="col-12">
-                        <label for="name" class="form-label">Название</label>
-                        <input type="text" class="form-control rounded-0" id="name" name="name" value="{{ $role->name ?? '' }}" placeholder="Название">
+                        <div class="col-12">
+                            <label for="name" class="form-label">Название</label>
+                            <input type="text" class="form-control rounded-0" id="name" name="name" value="{{ $role->name ?? '' }}" placeholder="Название">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="slug" class="form-label">Метка</label>
+                            <input type="text" class="form-control rounded-0" id="slug" name="slug" value="{{ $role->slug ?? '' }}" placeholder="Метка (латиницей с нижним подчеркиванием)">
+                        </div>
+
+                        <div class="col-12">
+                            <label for="status" class="form-label">Статус</label>
+                            <select class="form-select" id="status" name="status" required>
+                                <option disabled selected>Ничего не выбрано</option>
+                                @foreach ($statuses as $key => $status)
+                                    <option value="{{ $key }}" {{ isset($role->status) && $role->status == $key ? 'selected' : '' }}>{{ $status['name'] }}</option>
+                                @endforeach
+                            </select>
+                        </div>
                     </div>
+                </div>
 
-                    <div class="col-12">
-                        <label for="slug" class="form-label">Метка</label>
-                        <input type="text" class="form-control rounded-0" id="slug" name="slug" value="{{ $role->slug ?? '' }}" placeholder="Метка (латиницей с нижним подчеркиванием)">
-                    </div>
+                <div class="col-6">
+                    <div class="row g-3">
+                        <div class="col-12">
+                            <label class="form-label">Права</label>
 
-                    <div class="col-12">
-                        <label for="status" class="form-label">Статус</label>
-                        <select class="form-select" id="status" name="status" required>
-                            <option disabled selected>Ничего не выбрано</option>
-                            @forelse (config('custom.statuses') as $key => $status)
-                                <option value="{{ $key }}" {{ isset($role->status) && $role->status == $key ? 'selected' : '' }}>{{ $status['name'] }}</option>
-                            @empty
-                            @endforelse
-                        </select>
-                    </div>
-                </form>
-            </div>
-
-            <div class="col-6">
-                <div class="col-12">
-                    <label class="form-label">Права</label>
-
-                    <table class="table table-sm align-middle">
-                        <thead>
-                            <tr class="bg-lightgray">
-                                <th class="text-start px-4" scope="col"></th>
-                                <th scope="col">Название</th>
-                                <th scope="col">Метка</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @php ($previousGroupValue = '')
-
-                            @foreach ($permissions as $permission)
-                                @if ($permission->group != $previousGroupValue)
-                                    <tr>
-                                        <td></td>
-                                        <td colspan="2" class="py-3">
-                                            <strong>{{ $permission->group }}</strong>
-                                        </td>
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                    <tr class="bg-lightgray">
+                                        <th class="text-start px-4" scope="col"></th>
+                                        <th scope="col">Название</th>
+                                        <th scope="col">Метка</th>
                                     </tr>
-                                @endif
+                                </thead>
+                                <tbody>
+                                    @php ($previousGroupValue = '')
 
-                                <tr>
-                                    <td class="text-center">
-                                        <input class="form-check-input" type="checkbox" value="" id="{{ $permission->slug }}" {{ in_array($permission->slug, $status_permissions) ? 'checked disabled' : '' }}>
-                                    </td>
-                                    <td>
-                                        <label class="form-check-label" for="{{ $permission->slug }}">
-                                            {{ $permission->name }}
-                                        </label>
-                                    </td>
-                                    <td>
-                                        {{ $permission->slug }}
-                                    </td>
-                                </tr>
+                                    @foreach ($permissions as $permission)
+                                        @if ($permission->group != $previousGroupValue)
+                                            <tr>
+                                                <td></td>
+                                                <td colspan="2" class="py-3">
+                                                    <strong>{{ $permission->group }}</strong>
+                                                </td>
+                                            </tr>
+                                        @endif
 
-                                @php ($previousGroupValue = $permission->group)
-                            @endforeach
-                        </tbody>
-                    </table>
+                                        <tr class="bg-light">
+                                            <td class="text-center">
+                                                <input class="form-check-input permission" type="checkbox" name="permissions[]" value="{{ $permission->slug }}" id="{{ $permission->slug }}" {{ isset($role_permissions) && in_array($permission->slug, $role_permissions) ? 'checked' : '' }}>
+                                            </td>
+                                            <td>
+                                                <label class="form-check-label" for="{{ $permission->slug }}">
+                                                    {{ $permission->name }}
+                                                </label>
+                                            </td>
+                                            <td>
+                                                {{ $permission->slug }}
+                                            </td>
+                                        </tr>
+
+                                        @php ($previousGroupValue = $permission->group)
+                                    @endforeach
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
 </x-app-layout>

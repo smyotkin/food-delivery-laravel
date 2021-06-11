@@ -27,7 +27,10 @@ class PositionsController extends Controller
      */
     public function create(): string
     {
-        return view('users/position')->render();
+        return view('users/position', [
+            'statuses' => PositionsService::statuses,
+            'permissions' => Permission::orderBy('group', 'desc')->get(),
+        ])->render();
     }
 
     /**
@@ -36,6 +39,7 @@ class PositionsController extends Controller
      * @param CreateOrUpdatePositionRequest $request
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
+     * @throws \Throwable
      */
     public function store(CreateOrUpdatePositionRequest $request): \Illuminate\Http\RedirectResponse
     {
@@ -52,13 +56,13 @@ class PositionsController extends Controller
      */
     public function show($id): string
     {
-        $position = PositionsService::get(['id' => $id]);
-        $statusPermissions = PositionsService::getStatusPermissions($position->status);
+        $role = PositionsService::getWithPermissions(['id' => $id]);
 
         return view('users/position', [
-            'role' => $position,
+            'role' => $role,
+            'role_permissions' => $role->permissions->pluck('slug')->toArray(),
+            'statuses' => PositionsService::statuses,
             'permissions' => Permission::orderBy('group', 'desc')->get(),
-            'status_permissions' => $statusPermissions,
         ])->render();
     }
 
@@ -67,6 +71,7 @@ class PositionsController extends Controller
      *
      * @param CreateOrUpdatePositionRequest $request
      * @return \Illuminate\Http\RedirectResponse
+     * @throws \Throwable
      * @throws \Exception
      */
     public function update(CreateOrUpdatePositionRequest $request): \Illuminate\Http\RedirectResponse
@@ -76,16 +81,16 @@ class PositionsController extends Controller
         return redirect()->route('positions.index');
     }
 
-    /**
-     * Удаление должности
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
-    }
+//    /**
+//     * Удаление должности
+//     *
+//     * @param  int  $id
+//     * @return \Illuminate\Http\Response
+//     */
+//    public function destroy($id)
+//    {
+//        //
+//    }
 
     /**
      * Возвращает список должностей в таблице, для AJAX
@@ -97,6 +102,7 @@ class PositionsController extends Controller
     {
         return view('users/positions-table', [
             'data' => PositionsService::find($request->toArray()),
+            'statuses' => PositionsService::statuses,
         ])->render();
     }
 }

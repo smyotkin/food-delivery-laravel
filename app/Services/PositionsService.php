@@ -2,21 +2,36 @@
 
 namespace App\Services;
 
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Database\Eloquent\ModelNotFoundException;
-use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use App\Models\Role;
 
 class PositionsService
 {
+    /**
+     * Статусы(фильтр) должностей при создании пользователя
+     */
+    public const statuses = [
+        'owner' => [
+            'name' => 'Владелец',
+        ],
+        'head' => [
+            'name' => 'Руководитель',
+        ],
+        'specialist' => [
+            'name' => 'Специалист',
+        ],
+        'employee' => [
+            'name' => 'Сотрудник',
+        ],
+    ];
 
     /**
      * Создание или редактирование(если указан id) должности
      *
      * @param array|null $array
      * @return Role
-     * @throws \Exception
+     * @throws \Throwable
      */
     public static function createOrUpdate(?array $array = null): Role
     {
@@ -28,9 +43,15 @@ class PositionsService
             $role->update($basicParams);
             $role->saveOrFail();
 
+            DB::table('roles_permissions')->where('role_id', '=', $role->id)->delete();
+            $role->givePermissionsArray($array['permissions']);
+
             Log::info("UPDATE_POSITION: id({$role->id})");
         } else {
             $role = Role::create($basicParams);
+
+            DB::table('roles_permissions')->where('role_id', '=', $role->id)->delete();
+            $role->givePermissionsArray($array['permissions']);
 
             Log::info("CREATE_NEW_POSITION(id: {$role->id}, name: {$role->name}, slug: {$role->slug})");
         }
@@ -58,7 +79,7 @@ class PositionsService
     }
 
     /**
-     * Возвращает одну должность
+     * Возвращает должность
      *
      * @param array $array
      * @return mixed
@@ -69,14 +90,13 @@ class PositionsService
     }
 
     /**
-     * Возвращает базовые права должности
+     * Возвращает должность c правами
      *
-     * @param string $status
-     * @return array
+     * @param array $array
+     * @return mixed
      */
-    public static function getStatusPermissions(string $status): array
+    public static function getWithPermissions(array $array)
     {
-        return config('custom.statuses.' . $status . '.permissions');
+        return Role::where('id', $array['id'])->with('permissions')->firstOrFail();
     }
-
 }
