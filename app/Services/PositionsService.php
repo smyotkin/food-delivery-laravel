@@ -61,17 +61,11 @@ class PositionsService
      * Возвращает одну должность
      *
      * @param array $array
-     * @return Role
+     * @return mixed
      */
-    public static function get(array $array): Role
+    public static function get(array $array)
     {
-        try {
-            $role = Role::findOrFail($array['id']);
-        } catch (ModelNotFoundException $exception) {
-            return abort(404);
-        }
-
-        return $role;
+        return Role::findOrFail($array['id']);
     }
 
     /**
