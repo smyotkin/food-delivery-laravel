@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Services\PositionsService;
 use Illuminate\Http\Request;
 use App\Http\Requests\Users\CreateOrUpdatePositionRequest;
+use App\Models\Permission;
 
 class PositionsController extends Controller
 {
@@ -51,8 +52,13 @@ class PositionsController extends Controller
      */
     public function show($id): string
     {
+        $position = PositionsService::get(['id' => $id]);
+        $statusPermissions = PositionsService::getStatusPermissions($position->status);
+
         return view('users/position', [
-            'role' => PositionsService::get(['id' => $id]),
+            'role' => $position,
+            'permissions' => Permission::get(),
+            'status_permissions' => $statusPermissions,
         ])->render();
     }
 

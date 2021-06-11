@@ -74,4 +74,15 @@ class PositionsService
         return $role;
     }
 
+    /**
+     * Возвращает базовые права должности
+     *
+     * @param string $status
+     * @return array
+     */
+    public static function getStatusPermissions(string $status): array
+    {
+        return config('custom.statuses.' . $status . '.permissions');
+    }
+
 }

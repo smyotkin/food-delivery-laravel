@@ -9,8 +9,8 @@
         <div class="row">
             <div class="col d-flex align-items-center">
                 <div class="info">
-                    <h4 class="text-muted fw-light">{{ $role->name ?? 'Название' }}</h4>
-                    <h6 class="text-muted fw-normal mb-0">{{ $role->slug ?? 'Метка' }}</h6>
+                    <h4 class="text-muted fw-light">{{ $role->name ?? 'Название' }} ({{ $role->slug ?? 'Метка' }})</h4>
+                    <h6 class="text-muted fw-normal mb-0">{{ config('custom.statuses.' . $role->status . '.name') ?? 'Статус' }}</h6>
                 </div>
             </div>
             <div class="col text-end lh-base">
@@ -75,6 +75,19 @@
                             @endforelse
                         </select>
                     </div>
+
+                        <div class="col-12">
+                            <label class="form-label">Права</label>
+
+                            @foreach ($permissions as $permission)
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" value="" id="{{ $permission->slug }}" {{ in_array($permission->slug, $status_permissions) ? 'checked disabled' : '' }}>
+                                    <label class="form-check-label" for="{{ $permission->slug }}">
+                                        {{ $permission->name }}
+                                    </label>
+                                </div>
+                            @endforeach
+                        </div>
                 </form>
             </div>
         </div>
