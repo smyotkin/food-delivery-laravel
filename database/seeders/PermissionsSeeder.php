@@ -15,100 +15,100 @@ class PermissionsSeeder extends Seeder
     public function run()
     {
         $str_permissions = '
-            Просмотр экрана КЦ	callcenter_view
-            Назначение курьера на заказ КЦ	callcenter_courier_set
-            Переключение (вперед) статусов КЦ	callcenter_status_change
-            Откат статусов КЦ	callcenter_status_rollback
-            Перемещение заказа на другую точку КЦ	callcenter_shop_change
-            Право открыть смену точки КЦ	callcenter_shift_open
-            Право закрыть смену точки КЦ	callcenter_shift_close
-            Создать новый заказ КЦ	callcenter_order_create
-            Отменить заказ КЦ	callcenter_order_cancel
-            Просмотр заказа в текущей смене КЦ	callcenter_order_view
-            Редактировать принятый заказ КЦ	callcenter_order_modify
-            Отправить гостю смс/пуш об опоздании КЦ	callcenter_fuckedup_send
-            Добавить второй тип оплаты КЦ	callcenter_paytype_split
-            Разблокировать заказ КЦ	callcenter_detail_unlock
+            Колл-центр	Просмотр (доступ к экрану) экрана Колл-центр	callcenter_view
+            Колл-центр	Назначение курьера на заказ на экране КЦ	callcenter_courier_set
+            Колл-центр	Переключение (вперед) статусов на экране КЦ	callcenter_status_change
+            Колл-центр	Откат статусов на экране КЦ	callcenter_status_rollback
+            Колл-центр	Перемещение заказа на другую точку на экране КЦ	callcenter_shop_change
+            Колл-центр	Право открыть смену точки	callcenter_shift_open
+            Колл-центр	Право закрыть смену точки	callcenter_shift_close
+            Колл-центр	Создать новый заказ	callcenter_order_create
+            Колл-центр	Отменить заказ	callcenter_order_cancel
+            Колл-центр	Просмотр заказа в текущей смене	callcenter_order_view
+            Колл-центр	Редактировать принятый заказ	callcenter_order_modify
+            Колл-центр	Отправить гостю смс/пуш об опоздании	callcenter_fuckedup_send
+            Колл-центр	Добавить второй тип оплаты	callcenter_paytype_split
+            Колл-центр	Разблокировать заказ (если заказ кем-то занят, возможность выкинуть этого человека из заказа)	callcenter_detail_unlock
 
-            Просмотр экрана управляющего УПРАВЛЕНИЕ	manager_view
-            Настройка времени доставки/самовывоза по торговой точке УПРАВЛЕНИЕ	manager_timer_set
-            Включение/отключение, доставки/самовывоза на торговой точке УПРАВЛЕНИЕ	manager_stop_set
+            Экран управляющего	Просмотр экрана управляющего	manager_view
+            Экран управляющего	Настройка времени доставки/самовывоза по торговой точке	manager_timer_set
+            Экран управляющего	Включение / отключение, доставки / самовывоза на торговой точке	manager_stop_set
 
-            Просмотр экрана КУХНЯ	kitchen_view
-            "Запись" экран КУХНЯ	kitchen_modify
+            Кухня	Просмотр экрана кухни	kitchen_view
+            Кухня	"Запись" экран кухни	kitchen_modify
 
-            Просмотр экрана СБОРКА	packing_view
-            "Запись" экран СБОРКА	packing_modify
+            Сборка	Просмотр экрана сборки	packing_view
+            Сборка	"Запись" экран сборки	packing_modify
 
-            Просмотр экрана ДОСТАВКА	delivery_view
-            "Запись" экрана ДОСТАВКА	delivery_modify
+            Доставка	Просмотр экрана доставки	delivery_view
+            Доставка	"Запись" экрана доставки	delivery_modify
 
-            Доступ к разделу CRM CRM	crm_view
-            Выгрузка списка гостей CRM	crm_download
-            Просмотр профиля гостя CRM	crm_guest_view
-            Редактирование профиля гостя CRM	crm_guest_modify
-            Просмотр черного списка CRM/ЧС	crm_bl_view
-            Редактирование черного списка CRM/ЧС	crm_bl_modify
-            Просмотр заданий рассылки CRM/СООБЩЕНИЯ	crm_messages_view
-            Добавление заданий рассылки CRM/СООБЩЕНИЯ	crm_messages_add
-            Редактирование заданий рассылки CRM/СООБЩЕНИЯ	crm_messages_modify
-            Просмотр списка отзывов CRM/ОТЗЫВЫ	crm_reviews_view
-            Добавить отзыв CRM/ОТЗЫВЫ	crm_reviews_add
-            Выгрузка списка отзывов CRM/ОТЗЫВЫ	crm_reviews_download
-            Просмотр отзыва CRM/ОТЗЫВЫ	crm_reviews_detail_view
-            Редактирование отзывов CRM/ОТЗЫВЫ	crm_reviews_detail_modify
-            Просмотр списка заказов CRM/ЗАКАЗЫ	crm_orders_view
-            Просмотр заказа из прошлых смен CRM/ЗАКАЗЫ	crm_orders_detail_view
+            CRM	Доступ к разделу CRM	crm_view
+            CRM	Выгрузка списка гостей	crm_download
+            CRM	Просмотр профиля гостя	crm_guest_view
+            CRM	Редактирование профиля гостя	crm_guest_modify
+            CRM / ЧС	Просмотр черного списка	crm_bl_view
+            CRM / ЧС	Редактирование черного списка	crm_bl_modify
+            CRM / Сообщения	Просмотр заданий рассылки	crm_messages_view
+            CRM / Сообщения	Добавление заданий рассылки	crm_messages_add
+            CRM / Сообщения	Редактирование заданий рассылки	crm_messages_modify
+            CRM / Отзывы	Просмотр списка отзывов (доступ к разделу отзывы)	crm_reviews_view
+            CRM / Отзывы	Добавить отзыв	crm_reviews_add
+            CRM / Отзывы	Выгрузка списка отзывов	crm_reviews_download
+            CRM / Отзывы	Просмотр отзыва	crm_reviews_detail_view
+            CRM / Отзывы	Редактирование отзывов	crm_reviews_detail_modify
+            CRM / Заказы	Просмотр списка заказов	crm_orders_view
+            CRM / Заказы / Конкретный заказ	Просмотр заказа из прошлых смен	crm_orders_detail_view
 
-            Просмотр МЕНЮ 	menu_view
-            Создание и редактирование блюд, групп и модификаторов МЕНЮ	menu_modify
-            Настройка приказов МЕНЮ	menu_price_tasks
-            Настройка стопов блюд МЕНЮ	menu_stop_tasks
+            Меню	Просмотр 	menu_view
+            Меню	Создание и редактирование блюд, групп и модификаторов	menu_modify
+            Меню	Настройка приказов	menu_price_tasks
+            Меню	Настройка стопов блюд	menu_stop_tasks
 
-            Просмотр акций ПЛ	loyalty_view
-            Создание и редактирование акций ПЛ	loyalty_modify
-            Включение и выключение существующих акций ПЛ	loyalty_activate
+            Программа лояльности	Просмотр акций	loyalty_view
+            Программа лояльности	Создание и редактирование акций	loyalty_modify
+            Программа лояльности	Включение и выключение существующих акций	loyalty_activate
 
-            Просмотр ГОРОДА	cities_view
-            Редактирование ГОРОДА	cities_modify
-            Просмотр профиля доставки ГОРОДА	cities_profiles_view
-            Редактирование профиля доставки ГОРОДА	cities_profiles_modify
+            Города	Просмотр	cities_view
+            Города	Редактирование	cities_modify
+            Города	Просмотр профиля доставки	cities_profiles_view
+            Города	Редактирование профиля доставки	cities_profiles_modify
 
-            Просмотр ЗАВЕДЕНИЯ	shops_view
-            Редактирование ЗАВЕДЕНИЯ	shops_modify
-            Просмотр профиля доставки ЗАВЕДЕНИЯ	shops_profiles_view
-            Редактирование профиля доставки ЗАВЕДЕНИЯ	shops_profiles_modify
+            Заведения	Просмотр	shops_view
+            Заведения	Редактирование	shops_modify
+            Заведения	Просмотр профиля доставки	shops_profiles_view
+            Заведения	Редактирование профиля доставки	shops_profiles_modify
 
-            Просмотр списка сотрудников ПОЛЬЗОВАТЕЛИ	users_view
-            Выгрузка списка сотрудников ПОЛЬЗОВАТЕЛИ	users_download
-            Редактирование прав у пользователей ПОЛЬЗОВАТЕЛИ	users_modes_modify
-            Создание новых сотрудников ПОЛЬЗОВАТЕЛИ	users_employee_add
-            Просмотр карточки сотрудника ПОЛЬЗОВАТЕЛИ	users_employee_view
-            Редактирование карточки сотрудника ПОЛЬЗОВАТЕЛИ	users_employee_modify
-            Удаление сотрудника ПОЛЬЗОВАТЕЛИ	users_employee_delete
-            Создание новых сотрудников ПОЛЬЗОВАТЕЛИ	users_specialist_add
-            Просмотр карточки сотрудника ПОЛЬЗОВАТЕЛИ	users_specialist_view
-            Редактирование карточки сотрудника ПОЛЬЗОВАТЕЛИ	users_specialist_modify
-            Удаление сотрудника ПОЛЬЗОВАТЕЛИ	users_specialist_delete
-            Создание новых сотрудников ПОЛЬЗОВАТЕЛИ	users_head_add
-            Просмотр карточки сотрудника ПОЛЬЗОВАТЕЛИ	users_head_view
-            Редактирование карточки сотрудника ПОЛЬЗОВАТЕЛИ	users_head_modify
-            Удаление сотрудника ПОЛЬЗОВАТЕЛИ	users_head_delete
-            Создание новых сотрудников ПОЛЬЗОВАТЕЛИ	users_owner_add
-            Просмотр карточки сотрудника ПОЛЬЗОВАТЕЛИ	users_owner_view
-            Редактирование карточки сотрудника ПОЛЬЗОВАТЕЛИ	users_owner_modify
-            Удаление сотрудникаПОЛЬЗОВАТЕЛИ	users_owner_delete
-            Создавать новые должности ПОЛЬЗОВАТЕЛИ/ДОЛЖНОСТИ	users_position_create
-            Просматривать права у текущих должностей ПОЛЬЗОВАТЕЛИ/ДОЛЖНОСТИ	users_position_view
-            Редактировать права у текущих должностей ПОЛЬЗОВАТЕЛИ/ДОЛЖНОСТИ	users_position_modify
+            Пользователи	Просмотр списка сотрудников	users_view
+            Пользователи	Выгрузка списка сотрудников	users_download
+            Пользователи	Редактирование прав у пользователей	users_modes_modify
+            Пользователи	Создание новых сотрудников	users_employee_add
+            Пользователи	Просмотр карточки сотрудника	users_employee_view
+            Пользователи	Редактирование карточки сотрудника	users_employee_modify
+            Пользователи	Удаление сотрудника	users_employee_delete
+            Пользователи	Создание новых сотрудников	users_specialist_add
+            Пользователи	Просмотр карточки сотрудника	users_specialist_view
+            Пользователи	Редактирование карточки сотрудника	users_specialist_modify
+            Пользователи	Удаление сотрудника	users_specialist_delete
+            Пользователи	Создание новых сотрудников	users_head_add
+            Пользователи	Просмотр карточки сотрудника	users_head_view
+            Пользователи	Редактирование карточки сотрудника	users_head_modify
+            Пользователи	Удаление сотрудника	users_head_delete
+            Пользователи	Создание новых сотрудников	users_owner_add
+            Пользователи	Просмотр карточки сотрудника	users_owner_view
+            Пользователи	Редактирование карточки сотрудника	users_owner_modify
+            Пользователи	Удаление сотрудника	users_owner_delete
+            Пользователи / Должности	Создавать новые должности	users_position_create
+            Пользователи / Должности	Просматривать права у текущих должностей	users_position_view
+            Пользователи / Должности	Редактировать права у текущих должностей	users_position_modify
 
-            Просмотр НАСТРОЙКИ	settings_view
-            Редактирование НАСТРОЙКИ	settings_modify
-            Добавление адреса НАСТРОЙКИ	settings_address_add
+            Настройки	Просмотр	settings_view
+            Настройки	Редактирование	settings_modify
+            Настройки	Добавление адреса	settings_address_add
 
-            Просмотр МОНИТОРИНГ	monitoring_view
-            Просмотр незавершенных текущих заказов МОНИТОРИНГ	monitoring_unsent_view
-            Очистка незавершенных текущих заказов МОНИТОРИНГ	monitoring_unsent_clear
+            Мониторинг	Просмотр мониторинга	monitoring_view
+            Мониторинг	Просмотр незавершенных текущих заказов	monitoring_unsent_view
+            Мониторинг	Очистка незавершенных текущих заказов	monitoring_unsent_clear
         ';
 
         $rows = explode("\n", $str_permissions);
@@ -117,13 +117,14 @@ class PermissionsSeeder extends Seeder
             $row = trim($row);
 
             if (!empty($row) && strpos($row, "\t") !== false) {
-                list($name, $slug) = explode("\t", trim($row));
+                list($group, $name, $slug) = explode("\t", trim($row));
 
                 Permission::updateOrCreate(
                     [
                         'slug' => $slug
                     ],
                     [
+                        'group' => $group,
                         'name' => $name,
                         'slug' => $slug,
                     ]
