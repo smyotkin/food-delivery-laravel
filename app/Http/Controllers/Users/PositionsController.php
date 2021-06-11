@@ -54,10 +54,11 @@ class PositionsController extends Controller
     {
         $position = PositionsService::get(['id' => $id]);
         $statusPermissions = PositionsService::getStatusPermissions($position->status);
+        $sortedPermissions = Permission::statusPermissionsToTop($statusPermissions);
 
         return view('users/position', [
             'role' => $position,
-            'permissions' => Permission::get(),
+            'permissions' => $sortedPermissions,
             'status_permissions' => $statusPermissions,
         ])->render();
     }

@@ -75,20 +75,40 @@
                             @endforelse
                         </select>
                     </div>
-
-                        <div class="col-12">
-                            <label class="form-label">Права</label>
-
-                            @foreach ($permissions as $permission)
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" value="" id="{{ $permission->slug }}" {{ in_array($permission->slug, $status_permissions) ? 'checked disabled' : '' }}>
-                                    <label class="form-check-label" for="{{ $permission->slug }}">
-                                        {{ $permission->name }}
-                                    </label>
-                                </div>
-                            @endforeach
-                        </div>
                 </form>
+            </div>
+
+            <div class="col-6">
+                <div class="col-12">
+{{--                    <label class="form-label">Права</label>--}}
+
+                    <table class="table table-striped table-sm align-middle">
+                        <thead>
+                            <tr>
+                                <th class="text-start" scope="col">Вкл/Откл</th>
+                                <th scope="col">Название</th>
+                                <th scope="col">Метка</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach ($permissions as $permission)
+                                <tr>
+                                    <td class="text-center">
+                                        <input class="form-check-input" type="checkbox" value="" id="{{ $permission->slug }}" {{ in_array($permission->slug, $status_permissions) ? 'checked disabled' : '' }}>
+                                    </td>
+                                    <td>
+                                        <label class="form-check-label" for="{{ $permission->slug }}">
+                                            {{ $permission->name }}
+                                        </label>
+                                    </td>
+                                    <td>
+                                        {{ $permission->slug }}
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>
