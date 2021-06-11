@@ -85,7 +85,7 @@
                     <table class="table table-striped table-sm align-middle">
                         <thead>
                             <tr>
-                                <th class="text-start" scope="col">Вкл/Откл</th>
+                                <th class="text-start px-3" scope="col"></th>
                                 <th scope="col">Название</th>
                                 <th scope="col">Метка</th>
                             </tr>
