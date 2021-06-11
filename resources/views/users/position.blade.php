@@ -80,18 +80,29 @@
 
             <div class="col-6">
                 <div class="col-12">
-{{--                    <label class="form-label">Права</label>--}}
+                    <label class="form-label">Права</label>
 
-                    <table class="table table-striped table-sm align-middle">
+                    <table class="table table-sm align-middle">
                         <thead>
-                            <tr>
-                                <th class="text-start px-3" scope="col"></th>
+                            <tr class="bg-lightgray">
+                                <th class="text-start px-4" scope="col"></th>
                                 <th scope="col">Название</th>
                                 <th scope="col">Метка</th>
                             </tr>
                         </thead>
                         <tbody>
+                            @php ($previousGroupValue = '')
+
                             @foreach ($permissions as $permission)
+                                @if ($permission->group != $previousGroupValue)
+                                    <tr>
+                                        <td></td>
+                                        <td colspan="2" class="py-3">
+                                            <strong>{{ $permission->group }}</strong>
+                                        </td>
+                                    </tr>
+                                @endif
+
                                 <tr>
                                     <td class="text-center">
                                         <input class="form-check-input" type="checkbox" value="" id="{{ $permission->slug }}" {{ in_array($permission->slug, $status_permissions) ? 'checked disabled' : '' }}>
@@ -105,6 +116,8 @@
                                         {{ $permission->slug }}
                                     </td>
                                 </tr>
+
+                                @php ($previousGroupValue = $permission->group)
                             @endforeach
                         </tbody>
                     </table>

@@ -57,7 +57,7 @@ class PositionsController extends Controller
 
         return view('users/position', [
             'role' => $position,
-            'permissions' => Permission::statusPermissionsToTop($statusPermissions),
+            'permissions' => Permission::orderBy('group', 'desc')->get(),
             'status_permissions' => $statusPermissions,
         ])->render();
     }
