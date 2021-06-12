@@ -5,7 +5,9 @@ namespace App\Http\Controllers\Users;
 use Illuminate\Http\Request;
 use App\Http\Requests\Users\CreateOrUpdateUserRequest;
 use App\Http\Controllers\Controller;
+
 use App\Services\UsersService;
+use App\Services\PositionsService;
 
 class UsersController extends Controller
 {
@@ -30,6 +32,7 @@ class UsersController extends Controller
     {
         return view('users/user', [
             'user' => UsersService::get(['id' => $id]),
+            'statuses' => PositionsService::statuses,
         ])->render();
     }
 
