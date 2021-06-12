@@ -21,8 +21,11 @@ Route::middleware(['auth'])->group(function () {
         ]);
     });
 
-    //role:position,permission
-    Route::middleware(['role:manager'])->group(function () {
+    /**
+     * Формат проверки по должности: role:position,permission
+     * Формат проверки по правам: permissions:permission1|permission2|...
+     */
+    Route::middleware(['permissions:users_specialist_view'])->group(function () {
         Route::get('/profile', [ProfileController::class, 'index'])
             ->name('profile');
     });
