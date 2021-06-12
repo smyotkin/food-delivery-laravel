@@ -16,16 +16,10 @@ class PermissionMiddleware
      */
     public function handle(Request $request, Closure $next, $permissions)
     {
-//        if ($permission !== null && !auth()->user()->can($permission)) {
-//            abort(403);
-//        }
         $permissions = is_array($permissions) ? $permissions : explode('|', $permissions);
-
-        dd($permissions);
 
         foreach ($permissions as $permission) {
             if (!auth()->user()->can($permission)) {
-//                return $next($request);
                 abort(403);
             }
         }

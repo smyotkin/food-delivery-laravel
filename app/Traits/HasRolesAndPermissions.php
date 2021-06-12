@@ -50,7 +50,7 @@ trait HasRolesAndPermissions
      * @param $permission
      * @return bool
      */
-    protected function hasPermissionTo($permission)
+    public function hasPermissionTo($permission)
     {
         return $this->hasPermission($permission);
     }
