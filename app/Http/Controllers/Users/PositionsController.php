@@ -105,4 +105,46 @@ class PositionsController extends Controller
             'statuses' => PositionsService::statuses,
         ])->render();
     }
+
+    /**
+     * Возвращает список должностей в <select>, для AJAX
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function getAjaxByStatus(Request $request): string
+    {
+        return view('users/positions-select', [
+            'positions' => PositionsService::find($request->toArray()),
+        ])->render();
+    }
+
+    /**
+     * Возвращает Должность с правами в таблице, для AJAX
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function getRolePermissionsAjax(Request $request): string
+    {
+        return view('users/permissions-table', [
+            'data' => PositionsService::getWithPermissions($request->input()),
+        ])->render();
+    }
+
+    /**
+     * Возвращает Должность с правами в таблице
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function getPermissionsWithRole(Request $request): string
+    {
+        $role = PositionsService::getWithPermissions($request->input());
+
+        return view('users/permissions-table', [
+            'data' => Permission::orderBy('group', 'desc')->get(),
+            'role_permissions' => $role->permissions->pluck('slug')->toArray(),
+        ])->render();
+    }
 }

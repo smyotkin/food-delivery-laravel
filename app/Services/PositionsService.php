@@ -73,6 +73,10 @@ class PositionsService
                     ->where('name', 'like', '%' . $array['query'] . '%')
                     ->orWhere('slug', 'like', '%' . $array['query'] . '%');
             })
+            ->when(isset($array['status']), function ($query) use ($array) {
+                $query
+                    ->where('status', '=', $array['status']);
+            })
             ->orderBy('created_at', 'desc');
 
         return $users->simplePaginate();
@@ -82,9 +86,20 @@ class PositionsService
      * Возвращает должность
      *
      * @param array $array
+     * @return Role
+     */
+    public static function get(array $array): Role
+    {
+        return Role::find($array['id']);
+    }
+
+    /**
+     * Возвращает должность или ошибку
+     *
+     * @param array $array
      * @return mixed
      */
-    public static function get(array $array)
+    public static function getOrFail(array $array)
     {
         return Role::findOrFail($array['id']);
     }
@@ -93,9 +108,9 @@ class PositionsService
      * Возвращает должность c правами
      *
      * @param array $array
-     * @return mixed
+     * @return Role
      */
-    public static function getWithPermissions(array $array)
+    public static function getWithPermissions(array $array): Role
     {
         return Role::where('id', $array['id'])->with('permissions')->firstOrFail();
     }
