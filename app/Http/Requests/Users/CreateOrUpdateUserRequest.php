@@ -41,7 +41,7 @@ class CreateOrUpdateUserRequest extends FormRequest
         $rules = collect([
             'id' => 'required|integer|exists:users,id',
             'city_id' => 'integer',
-            'position_id' => 'integer',
+            'position_id' => 'required|integer',
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'is_active' => 'boolean',
