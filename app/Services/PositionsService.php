@@ -86,9 +86,9 @@ class PositionsService
      * Возвращает должность
      *
      * @param array $array
-     * @return Role
+     * @return Role|null
      */
-    public static function get(array $array): Role
+    public static function get(array $array): ?Role
     {
         return Role::find($array['id']);
     }
