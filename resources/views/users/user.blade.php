@@ -74,11 +74,19 @@
 
                     <div class="col-12">
                         <label for="status" class="form-label">Статус</label>
+
                         <select class="form-select" id="status" name="status" required>
                             <option disabled selected>Ничего не выбрано</option>
                             @foreach ($statuses as $key => $status)
-                                <option value="{{ $key }}" {{ isset($role->status) && $role->status == $key ? 'selected' : '' }}>{{ $status['name'] }}</option>
+                                <option value="{{ $key }}" {{ isset($role->status) && $role->status == $key || old('status') == $key ? 'selected' : '' }}>{{ $status['name'] }}</option>
                             @endforeach
+                        </select>
+                    </div>
+
+                    <div class="col-12">
+                        <label for="position" class="form-label">Должность</label>
+                        <select class="form-select" id="position" name="position_id" required>
+                            @include('users/positions-select')
                         </select>
                     </div>
 
@@ -93,7 +101,7 @@
 
             <div class="col-6">
                 <div class="row g-3">
-                    <div class="col-12">
+                    <div class="col-12" id="permissions">
                         <label class="form-label">Права</label>
 
                         @if (isset($permissions))
@@ -136,11 +144,53 @@
                             </tbody>
                         </table>
                         @else
-                            <p class="text-muted text-center py-4">Статус не выбран, или нет прав</p>
+                            <p class="text-muted text-center py-4">Пусто</p>
                         @endif
                     </div>
                 </div>
             </div>
         </form>
     </div>
+
+    <script>
+        $(document).ready(function() {
+            $("#status").on('change', function() {
+                // $('#permissions').html('');
+
+                $.ajax({
+                    type: 'GET',
+                    data: {
+                        status: $(this).val(),
+                    },
+                    url: '{{ route('positions.getAjaxByStatus') }}',
+                    success: function (data) {
+                        $('#permissions').html($(
+                            '<label class="form-label">Права</label><p class="text-muted text-center py-4">Пусто</p>'
+                        ));
+
+                        if (data.length > 0) {
+                            $('#position').attr('disabled', false);
+
+                            $('#position').html(data);
+                        } else {
+                            $('#position').attr('disabled', true);
+                        }
+                    }
+                });
+            });
+
+            $("#position").on('change', function() {
+                $.ajax({
+                    type: 'GET',
+                    data: {
+                        id: $(this).val(),
+                    },
+                    url: '{{ route('positions.getPermissionsWithRole') }}',
+                    success: function (data) {
+                        $('#permissions').html(data);
+                    }
+                });
+            });
+        });
+    </script>
 </x-app-layout>

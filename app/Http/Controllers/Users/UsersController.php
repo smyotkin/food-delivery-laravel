@@ -30,9 +30,14 @@ class UsersController extends Controller
      */
     public function show(int $id): string
     {
+        $user = UsersService::getOrFail(['id' => $id]);
+        $role = PositionsService::get(['id' => $user->position_id]);
+
         return view('users/user', [
-            'user' => UsersService::get(['id' => $id]),
+            'user' => $user,
             'statuses' => PositionsService::statuses,
+            'role' => $role,
+            'positions' => PositionsService::find(['status' => $role->status ?? 0 ]),
         ])->render();
     }
 
@@ -52,6 +57,7 @@ class UsersController extends Controller
      * @param CreateOrUpdateUserRequest $request
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
+     * @throws \Throwable
      */
     public function update(CreateOrUpdateUserRequest $request): \Illuminate\Http\RedirectResponse
     {
@@ -66,6 +72,7 @@ class UsersController extends Controller
      * @param CreateOrUpdateUserRequest $request
      * @return \Illuminate\Http\RedirectResponse
      * @throws \Exception
+     * @throws \Throwable
      */
     public function store(CreateOrUpdateUserRequest $request): \Illuminate\Http\RedirectResponse
     {

@@ -17,11 +17,12 @@ class UsersService
      * @param array|null $array
      * @return User
      * @throws \Exception
+     * @throws \Throwable
      */
     public static function createOrUpdate(?array $array = null): User
     {
         $basicParams = collect($array)
-            ->only(['first_name', 'last_name', 'phone', 'is_active'])
+            ->only(['first_name', 'last_name', 'phone', 'is_active', 'position_id'])
             ->all();
 
         if ($user = User::find($array['id'] ?? 0)) {
@@ -32,7 +33,6 @@ class UsersService
         } else {
             $user = User::create($basicParams + [
                     'city_id' => 0,
-                    'position_id' => 0,
                     'password' => Hash::make($password = random_int(100000, 999999)),
                 ]);
 
@@ -71,13 +71,18 @@ class UsersService
      */
     public static function get(array $array): User
     {
-        try {
-            $user = User::findOrFail($array['id']);
-        } catch (ModelNotFoundException $exception) {
-            return abort(404);
-        }
+        return User::find($array['id']);
+    }
 
-        return $user;
+    /**
+     * Возвращает одного пользователя или ошибку
+     *
+     * @param array $array
+     * @return mixed
+     */
+    public static function getOrFail(array $array)
+    {
+        return User::findOrFail($array['id']);
     }
 
 }
