@@ -67,7 +67,7 @@ class PositionsService
      */
     public static function find(?array $array = null)
     {
-        $users = Role::query()
+        $roles = Role::query()
             ->when(isset($array['query']), function ($query) use ($array) {
                 $query
                     ->where('name', 'like', '%' . $array['query'] . '%')
@@ -79,7 +79,7 @@ class PositionsService
             })
             ->orderBy('created_at', 'desc');
 
-        return $users->simplePaginate();
+        return $roles->simplePaginate();
     }
 
     /**
