@@ -32,12 +32,13 @@ class UsersController extends Controller
     {
         $user = UsersService::getOrFail(['id' => $id]);
         $role = PositionsService::get(['id' => $user->position_id]);
+        $selected_status = $role->status ?? old('status');
 
         return view('users/user', [
             'user' => $user,
             'statuses' => PositionsService::statuses,
             'role' => $role,
-            'positions' => PositionsService::find(['status' => $role->status ?? 0]),
+            'positions' => PositionsService::find(['status' => $selected_status ?? '']),
         ])->render();
     }
 
