@@ -37,7 +37,7 @@ class UsersController extends Controller
             'user' => $user,
             'statuses' => PositionsService::statuses,
             'role' => $role,
-            'positions' => PositionsService::find(['status' => $role->status ?? 0 ]),
+            'positions' => PositionsService::find(['status' => $role->status ?? 0]),
         ])->render();
     }
 
@@ -48,7 +48,9 @@ class UsersController extends Controller
      */
     public function create(): string
     {
-        return view('users/user')->render();
+        return view('users/user', [
+            'statuses' => PositionsService::statuses,
+        ])->render();
     }
 
     /**

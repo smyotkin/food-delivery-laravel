@@ -85,7 +85,7 @@
 
                     <div class="col-12">
                         <label for="position" class="form-label">Должность</label>
-                        <select class="form-select" id="position" name="position_id" required>
+                        <select class="form-select" id="position" name="position_id" required disabled>
                             @include('users/positions-select')
                         </select>
                     </div>

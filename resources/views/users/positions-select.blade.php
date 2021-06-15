@@ -4,4 +4,6 @@
     @foreach($positions as $position)
         <option value="{{ $position->id }}" {{ isset($role->id) && $role->id == $position->id ? 'selected' : '' }}>{{ $position->name }}</option>
     @endforeach
+@else
+    <option disabled selected>Ничего не выбрано</option>
 @endif
