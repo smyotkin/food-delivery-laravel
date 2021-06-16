@@ -131,6 +131,6 @@ class UsersService
     {
         $userRole = DB::table('users_roles')->where('user_id', '=', $array['id'])->first();
 
-        return PositionsService::getWithPermissions(['id' => $userRole->role_id]);
+        return !empty($userRole->role_id) ? PositionsService::getWithPermissions(['id' => $userRole->role_id]) : null;
     }
 }
