@@ -4,6 +4,7 @@ namespace App\Services;
 
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\DB;
 use App\Models\User;
 
 class UsersService
@@ -12,32 +13,57 @@ class UsersService
      * Создание или редактирование(если указан id) пользователя
      *
      * @param array|null $array
-     * @return User
+     * @return void
      * @throws \Exception
      * @throws \Throwable
      */
-    public static function createOrUpdate(?array $array = null): User
+    public static function createOrUpdate(?array $array = null): void
     {
-        $basicParams = collect($array)
-            ->only(['first_name', 'last_name', 'phone', 'is_active', 'position_id'])
-            ->all();
+        try {
+            $basicParams = collect($array)
+                ->only(['first_name', 'last_name', 'phone', 'is_active', 'position_id'])
+                ->all();
 
-        if ($user = User::find($array['id'] ?? 0)) {
-            $user->update($basicParams);
-            $user->saveOrFail();
+            $permissionsParams = collect($array)
+                ->only(['status', 'position_id', 'permissions'])
+                ->all();
 
-            Log::info("UPDATE_USER: id({$user->id})");
-        } else {
-            $user = User::create($basicParams + [
-                    'city_id' => 0,
-                    'password' => Hash::make($password = random_int(100000, 999999)),
-                ]);
+            DB::transaction(function() use ($array, $basicParams, $permissionsParams) {
+                if ($user = User::find($array['id'] ?? 0)) {
+                    $user->update($basicParams);
+                    $user->saveOrFail();
 
-            // todo Удалить пароль с логгера
-            Log::info("CREATE_NEW_USER(id: {$user->id}, phone: {$user->phone}, password: $password)");
+                    DB::table('users_roles')->updateOrInsert(
+                        ['user_id' => $user->id],
+                        ['role_id' => $permissionsParams['position_id']],
+                    );
+
+                    DB::table('users_permissions')->where('user_id', '=', $user->id)->delete();
+                    $user->givePermissionsArray($permissionsParams['permissions'] ?? []);
+
+                    Log::info("UPDATE_USER: id({$user->id})");
+
+                } else {
+                    $newUser = User::create($basicParams + [
+                        'city_id' => 0,
+                        'password' => Hash::make($password = random_int(100000, 999999)),
+                    ]);
+
+                    DB::table('users_roles')->updateOrInsert(
+                        ['user_id' => $newUser->id],
+                        ['role_id' => $permissionsParams['position_id']],
+                    );
+
+                    $newUser->givePermissionsArray($permissionsParams['permissions'] ?? []);
+
+                    // todo Удалить пароль с логгера
+                    Log::info("CREATE_NEW_USER(id: {$newUser->id}, phone: {$newUser->phone}, password: $password)");
+                }
+            });
+        } catch (\Exception $e) {
+            Log::info("CREATE_OR_UPDATE_ERROR:{$e->getMessage()}");
+            abort(500);
         }
-
-        return $user;
     }
 
     /**
@@ -80,6 +106,17 @@ class UsersService
     public static function getOrFail(array $array)
     {
         return User::findOrFail($array['id']);
+    }
+
+    /**
+     * Возвращает права пользователя
+     *
+     * @param array $array
+     * @return \Illuminate\Support\Collection|null
+     */
+    public static function getPermissions(array $array): ?\Illuminate\Support\Collection
+    {
+        return DB::table('users_permissions')->where('user_id', '=', $array['id'])->get();
     }
 
 }
