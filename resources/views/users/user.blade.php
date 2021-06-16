@@ -58,17 +58,17 @@
 
                     <div class="col-6">
                         <label for="first_name" class="form-label fw-bold">Имя</label>
-                        <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ $user->first_name ?? '' }}" placeholder="Имя">
+                        <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ old('first_name') ?? $user->first_name ?? '' }}" placeholder="Имя">
                     </div>
 
                     <div class="col-6">
                         <label for="last_name" class="form-label fw-bold">Фамилия</label>
-                        <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ $user->last_name ?? '' }}" placeholder="Фамилия">
+                        <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ old('last_name') ?? $user->last_name ?? '' }}" placeholder="Фамилия">
                     </div>
 
                     <div class="col-12">
                         <label for="phone" class="form-label fw-bold">Мобильный телефон</label>
-                        <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ isset($user->phone) ? $user->phoneNumber($user->phone) : '' }}" placeholder="+7 555 555-55-55">
+                        <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ old('phone') ?? $user->phone_formatted ?? '' }}" placeholder="+7 555 555-55-55">
                     </div>
 
                     <div class="col-12">
