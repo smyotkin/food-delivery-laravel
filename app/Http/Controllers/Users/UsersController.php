@@ -41,6 +41,7 @@ class UsersController extends Controller
             'positions' => PositionsService::find(['status' => old('status') ?? $role->status ?? '']),
             'permissions' => Permission::orderBy('group', 'desc')->get(),
             'role_permissions' => !empty($role) ? $role->permissions->pluck('slug')->toArray() : [],
+            'user_permissions' => UsersService::getPermissions(['id' => $id])->pluck('permission_id')->toArray(),
         ])->render();
     }
 
@@ -53,6 +54,8 @@ class UsersController extends Controller
     {
         return view('users/user', [
             'statuses' => PositionsService::statuses,
+            'positions' => PositionsService::find(['status' => old('status') ?? $role->status ?? '']),
+            'permissions' => Permission::orderBy('group', 'desc')->get(),
         ])->render();
     }
 
