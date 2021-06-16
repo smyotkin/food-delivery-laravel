@@ -1,4 +1,6 @@
-<select class="form-select" id="position" name="position_id" required {{ !old('status') ? 'disabled' : '' }}>
+<label for="position" class="form-label fw-bold">Должность</label>
+
+<select class="form-select" id="position" name="position_id" required {{ old('status') || isset($role->status) ? '' : 'disabled' }}>
     @if(!empty($positions) && $positions->count())
         <option disabled selected>Ничего не выбрано</option>
 

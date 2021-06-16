@@ -17,7 +17,7 @@
                 <p class="mb-1">
                     <a href="javascript:" onclick="event.preventDefault(); $('#user_form').submit();" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
                 </p>
-                @if (isset($user))
+                @isset($user)
                     <p class="mb-0 text-muted">
                         @php ($created_at = Date::parse($user->created_at))
 
@@ -34,11 +34,10 @@
                             {{ $updated_at->format( now()->year == $updated_at->year ? 'j F, H:i' : 'j F Y') }}
                         </small>
                     </p>
-                @endif
+                @endisset
             </div>
         </div>
     </div>
-
 
     <div class="container-fluid px-5 mb-5">
         <div class="row">
@@ -53,39 +52,30 @@
 
             <div class="col-4">
                 <div class="row g-3">
-                    @if (isset($user))
+                    @isset($user)
                         <input type="hidden" name="id" value="{{ $user->id }}">
-                    @endif
+                    @endisset
 
                     <div class="col-6">
-                        <label for="first_name" class="form-label">Имя</label>
+                        <label for="first_name" class="form-label fw-bold">Имя</label>
                         <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ $user->first_name ?? '' }}" placeholder="Имя">
                     </div>
 
                     <div class="col-6">
-                        <label for="last_name" class="form-label">Фамилия</label>
+                        <label for="last_name" class="form-label fw-bold">Фамилия</label>
                         <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ $user->last_name ?? '' }}" placeholder="Фамилия">
                     </div>
 
                     <div class="col-12">
-                        <label for="phone" class="form-label">Мобильный телефон</label>
+                        <label for="phone" class="form-label fw-bold">Мобильный телефон</label>
                         <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ isset($user->phone) ? $user->phoneNumber($user->phone) : '' }}" placeholder="+7 555 555-55-55">
                     </div>
 
                     <div class="col-12">
-                        <label for="status" class="form-label">Статус</label>
-
-                        <select class="form-select" id="status" name="status" required>
-                            <option disabled selected>Ничего не выбрано</option>
-                            @foreach ($statuses as $key => $status)
-                                <option value="{{ $key }}" {{ isset($role->status) && $role->status == $key || old('status') == $key ? 'selected' : '' }}>{{ $status['name'] }}</option>
-                            @endforeach
-                        </select>
+                        @include('users/statuses-select')
                     </div>
 
                     <div class="col-12">
-                        <label for="position" class="form-label">Должность</label>
-
                         @include('users/positions-select')
                     </div>
 
@@ -101,50 +91,7 @@
             <div class="col-6">
                 <div class="row g-3">
                     <div class="col-12" id="permissions">
-                        <label class="form-label">Права</label>
-
-                        @if (isset($permissions))
-                        <table class="table table-sm align-middle">
-                            <thead>
-                                <tr class="bg-lightgray">
-                                    <th class="text-start px-4" scope="col"></th>
-                                    <th scope="col">Название</th>
-                                    <th scope="col">Метка</th>
-                                </tr>
-                            </thead>
-
-                            <tbody>
-                            @php ($previousGroupValue = '')
-
-                            @forelse ($permissions as $permission)
-                                @if ($permission->group != $previousGroupValue)
-                                    <tr>
-                                        <td></td>
-                                        <td colspan="2" class="py-3">
-                                            <strong>{{ $permission->group }}</strong>
-                                        </td>
-                                    </tr>
-                                @endif
-
-                                <tr class="bg-light">
-                                    <td class="text-center">
-                                        <input class="form-check-input permission" type="checkbox" name="permissions[]" value="{{ $permission->slug }}" id="{{ $permission->slug }}" {{ isset($role_permissions) && in_array($permission->slug, $role_permissions) ? 'checked' : '' }}>
-                                    </td>
-                                    <td>
-                                        <label class="form-check-label" for="{{ $permission->slug }}">{{ $permission->name }}</label>
-                                    </td>
-                                    <td>{{ $permission->slug }}</td>
-                                </tr>
-
-                                @php ($previousGroupValue = $permission->group)
-                            @empty
-                                none
-                            @endforelse
-                            </tbody>
-                        </table>
-                        @else
-                            <p class="text-muted text-center py-4">Пусто</p>
-                        @endif
+                        @include('users/permissions-table')
                     </div>
                 </div>
             </div>
@@ -154,8 +101,6 @@
     <script>
         $(document).ready(function() {
             $("#status").on('change', function() {
-                // $('#permissions').html('');
-
                 $.ajax({
                     type: 'GET',
                     data: {
