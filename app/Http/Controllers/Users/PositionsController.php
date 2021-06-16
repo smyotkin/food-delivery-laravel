@@ -138,12 +138,12 @@ class PositionsController extends Controller
      * @param Request $request
      * @return string
      */
-    public function getPermissionsWithRole(Request $request): string
+    public function getWithPermissions(Request $request): string
     {
         $role = PositionsService::getWithPermissions($request->input());
 
         return view('users/permissions-table', [
-            'data' => Permission::orderBy('group', 'desc')->get(),
+            'permissions' => Permission::orderBy('group', 'desc')->get(),
             'role_permissions' => $role->permissions->pluck('slug')->toArray(),
         ])->render();
     }
