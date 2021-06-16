@@ -91,7 +91,9 @@
             <div class="col-6">
                 <div class="row g-3">
                     <div class="col-12" id="permissions">
-                        @include('users/permissions-table')
+                        @if (!empty($user->position_id))
+                            @include('users/permissions-table')
+                        @endif
                     </div>
                 </div>
             </div>
@@ -108,17 +110,11 @@
                     },
                     url: '{{ route('positions.getAjaxByStatus') }}',
                     success: function (data) {
-                        $('#permissions').html($(
-                            '<label class="form-label">Права</label><p class="text-muted text-center py-4">Пусто</p>'
-                        ));
+                        $('#permissions').html('');
 
-                        if (data.length > 0) {
-                            $('#position').attr('disabled', false);
-
-                            $('#position').html(data);
-                        } else {
-                            $('#position').attr('disabled', true);
-                        }
+                        $('#position').attr('disabled',
+                            data.length > 0 ? false : true
+                        ).html(data);
                     }
                 });
             });
@@ -129,7 +125,7 @@
                     data: {
                         id: $(this).val(),
                     },
-                    url: '{{ route('positions.getPermissionsWithRole') }}',
+                    url: '{{ route('positions.getWithPermissions') }}',
                     success: function (data) {
                         $('#permissions').html(data);
                     }
