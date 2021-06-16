@@ -69,7 +69,7 @@
 
             userSearch.on('keyup', function () {
                 document.cookie = 'users_query_str=' + encodeURIComponent($(this).val());
-                if ($(this).val().length >= 0) { // $(this).val().length == 0 ||
+                if ($(this).val().length >= 0) {
                     searchNow = true;
                     setTimeout(showUsersList, ajaxSearchDelay);
                 } else {
