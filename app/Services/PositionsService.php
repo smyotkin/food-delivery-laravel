@@ -108,10 +108,10 @@ class PositionsService
      * Возвращает должность c правами
      *
      * @param array $array
-     * @return Role
+     * @return Role|null
      */
-    public static function getWithPermissions(array $array): Role
+    public static function getWithPermissions(array $array): ?Role
     {
-        return Role::where('id', $array['id'])->with('permissions')->firstOrFail();
+        return Role::where('id', $array['id'])->with('permissions')->first();
     }
 }
