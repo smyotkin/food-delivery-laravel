@@ -96,6 +96,7 @@ class UsersController extends Controller
     {
         return view('users/users-table', [
             'data' => UsersService::find($request->toArray()),
+            'roles' => PositionsService::find(null, false),
         ])->render();
     }
 
