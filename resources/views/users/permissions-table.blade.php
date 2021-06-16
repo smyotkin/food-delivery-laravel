@@ -1,7 +1,7 @@
-@if(!empty($data) && $data->count())
+@if(!empty($permissions) && $permissions->count())
     <label class="form-label">Права</label>
 
-    <table class="table table-sm align-middle">
+    <table class="table table-sm align-middle" id="permissions">
         <thead>
             <tr class="bg-lightgray">
                 <th class="text-start px-4" scope="col"></th>
@@ -13,7 +13,7 @@
         <tbody>
             @php ($previousGroupValue = '')
 
-            @foreach ($data as $permission)
+            @foreach ($permissions as $permission)
             @if ($permission->group != $previousGroupValue)
                 <tr>
                     <td></td>

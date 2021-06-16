@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Users;
 
+use App\Models\Permission;
 use Illuminate\Http\Request;
 use App\Http\Requests\Users\CreateOrUpdateUserRequest;
 use App\Http\Controllers\Controller;
@@ -31,14 +32,16 @@ class UsersController extends Controller
     public function show(int $id): string
     {
         $user = UsersService::getOrFail(['id' => $id]);
-        $role = PositionsService::get(['id' => $user->position_id]);
+        $role = PositionsService::getWithPermissions(['id' => $user->position_id]);
         $selected_status = $role->status ?? old('status');
 
         return view('users/user', [
             'user' => $user,
-            'statuses' => PositionsService::statuses,
             'role' => $role,
+            'statuses' => PositionsService::statuses,
             'positions' => PositionsService::find(['status' => $selected_status ?? '']),
+            'permissions' => Permission::orderBy('group', 'desc')->get(),
+            'role_permissions' => $role->permissions->pluck('slug')->toArray(),
         ])->render();
     }
 
