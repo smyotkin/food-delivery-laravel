@@ -66,6 +66,11 @@ class User extends Authenticatable
         return $this->belongsToMany(Permission::class, 'users_permissions'); // ->withDefault()
     }
 
+    public function roles()
+    {
+        return $this->belongsToMany(Role::class, 'users_roles'); // ->withDefault()
+    }
+
     protected $perPage = 100;
 
     /**

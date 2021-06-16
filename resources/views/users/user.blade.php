@@ -91,7 +91,7 @@
             <div class="col-6">
                 <div class="row g-3">
                     <div class="col-12" id="permissions">
-                        @if (!empty($user->position_id))
+                        @if (!empty($role))
                             @include('users/permissions-table')
                         @endif
                     </div>

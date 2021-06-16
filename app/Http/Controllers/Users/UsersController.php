@@ -32,7 +32,7 @@ class UsersController extends Controller
     public function show(int $id): string
     {
         $user = UsersService::getOrFail(['id' => $id]);
-        $role = PositionsService::getWithPermissions(['id' => $user->position_id]);
+        $role = UsersService::getRoleWithPermissions(['id' => $id]);
 
         return view('users/user', [
             'user' => $user,

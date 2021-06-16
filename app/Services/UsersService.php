@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
+use App\Services\PositionsService;
 
 class UsersService
 {
@@ -21,7 +22,7 @@ class UsersService
     {
         try {
             $basicParams = collect($array)
-                ->only(['first_name', 'last_name', 'phone', 'is_active', 'position_id'])
+                ->only(['first_name', 'last_name', 'phone', 'is_active']) // , 'position_id'
                 ->all();
 
             $permissionsParams = collect($array)
@@ -49,10 +50,10 @@ class UsersService
                         'password' => Hash::make($password = random_int(100000, 999999)),
                     ]);
 
-                    DB::table('users_roles')->updateOrInsert(
-                        ['user_id' => $newUser->id],
-                        ['role_id' => $permissionsParams['position_id']],
-                    );
+                    DB::table('users_roles')->insert([
+                        'user_id' => $newUser->id,
+                        'role_id' => $permissionsParams['position_id'],
+                    ]);
 
                     $newUser->givePermissionsArray($permissionsParams['permissions'] ?? []);
 
@@ -61,7 +62,7 @@ class UsersService
                 }
             });
         } catch (\Exception $e) {
-            Log::info("CREATE_OR_UPDATE_ERROR:{$e->getMessage()}");
+            Log::info("CREATE_OR_UPDATE_ERROR: {$e->getMessage()}");
             abort(500);
         }
     }
@@ -81,7 +82,8 @@ class UsersService
                     ->orWhere('last_name', 'like', '%' . $array['query'] . '%');
             })
             ->orderBy('last_seen', 'desc')
-            ->orderBy('updated_at', 'desc');
+            ->orderBy('updated_at', 'desc')
+            ->with('roles');
 
         return $users->simplePaginate();
     }
@@ -119,4 +121,16 @@ class UsersService
         return DB::table('users_permissions')->where('user_id', '=', $array['id'])->get();
     }
 
+    /**
+     * Возвращает должность пользователя
+     *
+     * @param array $array
+     * @return \App\Models\Role|null
+     */
+    public static function getRoleWithPermissions(array $array): ?\App\Models\Role
+    {
+        $userRole = DB::table('users_roles')->where('user_id', '=', $array['id'])->first();
+
+        return PositionsService::getWithPermissions(['id' => $userRole->role_id]);
+    }
 }
