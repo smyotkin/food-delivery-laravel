@@ -61,6 +61,11 @@ class User extends Authenticatable
     use HasRolesAndPermissions;
     use Notifiable;
 
+    public function permissions()
+    {
+        return $this->belongsToMany(Permission::class, 'users_permissions'); // ->withDefault()
+    }
+
     protected $perPage = 100;
 
     /**
