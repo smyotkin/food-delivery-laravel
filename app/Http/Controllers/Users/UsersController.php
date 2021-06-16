@@ -33,15 +33,14 @@ class UsersController extends Controller
     {
         $user = UsersService::getOrFail(['id' => $id]);
         $role = PositionsService::getWithPermissions(['id' => $user->position_id]);
-        $selected_status = $role->status ?? old('status');
 
         return view('users/user', [
             'user' => $user,
             'role' => $role,
             'statuses' => PositionsService::statuses,
-            'positions' => PositionsService::find(['status' => $selected_status ?? '']),
+            'positions' => PositionsService::find(['status' => old('status') ?? $role->status ?? '']),
             'permissions' => Permission::orderBy('group', 'desc')->get(),
-            'role_permissions' => $role->permissions->pluck('slug')->toArray(),
+            'role_permissions' => !empty($role) ? $role->permissions->pluck('slug')->toArray() : [],
         ])->render();
     }
 
