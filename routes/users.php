@@ -14,8 +14,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/positions/getAjaxByStatus', [PositionsController::class, 'getAjaxByStatus'])
         ->name('positions.getAjaxByStatus');
 
-    Route::get('/users/positions/getPermissionsWithRole', [PositionsController::class, 'getPermissionsWithRole'])
-        ->name('positions.getPermissionsWithRole');
+    Route::get('/users/positions/getWithPermissions', [PositionsController::class, 'getWithPermissions'])
+        ->name('positions.getWithPermissions');
 
     Route::middleware(['last.page'])->group(function () {
         Route::resource('users/positions', PositionsController::class)->except([
