@@ -63,9 +63,10 @@ class PositionsService
      * Метод поиска должностей
      *
      * @param array|null $array
+     * @param bool $paginate
      * @return mixed
      */
-    public static function find(?array $array = null)
+    public static function find(?array $array = null, bool $paginate = true)
     {
         $roles = Role::query()
             ->when(isset($array['query']), function ($query) use ($array) {
@@ -79,7 +80,7 @@ class PositionsService
             })
             ->orderBy('created_at', 'desc');
 
-        return $roles->simplePaginate();
+        return $paginate ? $roles->simplePaginate() : $roles->get();
     }
 
     /**
