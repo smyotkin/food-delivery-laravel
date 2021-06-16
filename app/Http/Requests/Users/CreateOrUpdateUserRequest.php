@@ -46,6 +46,8 @@ class CreateOrUpdateUserRequest extends FormRequest
             'last_name' => 'required|string|max:255',
             'is_active' => 'boolean',
             'phone' => 'required|digits:11',
+            'status' => 'required|in:owner,head,specialist,employee',
+            'permissions' => 'array|exists:permissions,slug',
         ]);
 
         switch ($this->method()) {
