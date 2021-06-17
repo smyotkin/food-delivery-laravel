@@ -19,8 +19,8 @@ class PermissionMiddleware
         $permissions = is_array($permissions) ? $permissions : explode('|', $permissions);
 
         foreach ($permissions as $permission) {
-            if (!auth()->user()->can($permission)) {
-                abort(403);
+            if (!auth()->user()->hasPermission($permission)) {
+                abort(403, 'Нет права: ' . $permission);
             }
         }
 
