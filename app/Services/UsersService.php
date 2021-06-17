@@ -22,7 +22,7 @@ class UsersService
     {
         try {
             $basicParams = collect($array)
-                ->only(['first_name', 'last_name', 'phone', 'is_active']) // , 'position_id'
+                ->only(['first_name', 'last_name', 'phone', 'is_active', 'is_custom_permissions'])
                 ->all();
 
             $permissionsParams = collect($array)
@@ -39,8 +39,10 @@ class UsersService
                         ['role_id' => $permissionsParams['position_id']],
                     );
 
-                    DB::table('users_permissions')->where('user_id', '=', $user->id)->delete();
-                    $user->givePermissionsArray($permissionsParams['permissions'] ?? []);
+                    if ($basicParams['is_custom_permissions'] == true) {
+                        DB::table('users_permissions')->where('user_id', '=', $user->id)->delete();
+                        $user->givePermissionsArray($permissionsParams['permissions'] ?? []);
+                    }
 
                     Log::info("UPDATE_USER: id({$user->id})");
 
@@ -118,7 +120,9 @@ class UsersService
      */
     public static function getPermissions(array $array): ?\Illuminate\Support\Collection
     {
-        return DB::table('users_permissions')->where('user_id', '=', $array['id'])->get();
+        $user = User::with('permissions')->where('id', '=', $array['id'])->first();
+
+        return !empty($user) ? $user->permissions : null;
     }
 
     /**
