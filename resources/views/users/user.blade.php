@@ -127,11 +127,21 @@
             });
 
             $("#position").on('change', function() {
+                getPermissionsCheckedAjax($(this), $("#is_custom_permissions"));
+            });
+
+            $("#is_custom_permissions").on('change', function() {
+                if ($('#position').val() > 0) {
+                    getPermissionsCheckedAjax($('#position'), $(this));
+                }
+            });
+
+            function getPermissionsCheckedAjax($position, $is_custom_permissions) {
                 $.ajax({
                     type: 'GET',
                     data: {
-                        id: $(this).val(),
-                        is_custom_permissions: $("#is_custom_permissions").prop('checked'),
+                        id: $position.val(),
+                        is_custom_permissions: $is_custom_permissions.prop('checked'),
                         {{ isset($user) ? "user_id: {$user->id}," : '' }}
                     },
                     url: '{{ route('users.getPermissionsCheckedAjax') }}',
@@ -139,24 +149,7 @@
                         $('#permissions').html(data);
                     }
                 });
-            });
-
-            $("#is_custom_permissions").on('change', function() {
-                if ($('#position').val() > 0) {
-                    $.ajax({
-                        type: 'GET',
-                        data: {
-                            id: $('#position').val(),
-                            is_custom_permissions: $(this).prop('checked'),
-                            {{ isset($user) ? "user_id: {$user->id}," : '' }}
-                        },
-                        url: '{{ route('users.getPermissionsCheckedAjax') }}',
-                        success: function (data) {
-                            $('#permissions').html(data);
-                        }
-                    });
-                }
-            });
+            }
         });
     </script>
 </x-app-layout>
