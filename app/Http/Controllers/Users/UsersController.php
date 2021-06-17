@@ -14,6 +14,20 @@ class UsersController extends Controller
 {
 
     /**
+     * Настройка доступа через Middleware
+     *
+     * @return string
+     */
+    public function __construct()
+    {
+        $this->middleware('permissions:users_modes_modify')->only([
+            'update',
+            'create',
+            'store',
+        ]);
+    }
+
+    /**
      * Шаблон отображения всех пользователей
      *
      * @return string
@@ -111,8 +125,12 @@ class UsersController extends Controller
         ])->render();
     }
 
-
-
+    /**
+     * Возвращает таблицу со всеми правами и выбранными checkbox'ами по должности или кастомным настройками
+     *
+     * @param Request $request
+     * @return string
+     */
     public function getPermissionsCheckedAjax(Request $request): string
     {
         $user = UsersService::getPermissions(['id' => $request->user_id ?? 0]);
