@@ -5,9 +5,12 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('users') ? 'active disabled' : '' }}" href="{{ route('users.index') }}">Пользователи</a>
                 </li>
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('users/positions') ? 'active disabled' : '' }}" href="{{ route('positions.index') }}">Должности</a>
-                </li>
+
+                @permission('users_position_view')
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('users/positions') ? 'active disabled' : '' }}" href="{{ route('positions.index') }}">Должности</a>
+                    </li>
+                @endpermission
             </ul>
         </div>
     </div>
