@@ -18,6 +18,7 @@ class CreateOrUpdateUserRequest extends FormRequest
         $this->merge([
             'phone' => User::toDigit($this->phone),
             'is_active' => !empty($this->is_active) ? 1 : 0,
+            'is_custom_permissions' => !empty($this->is_custom_permissions) ? 1 : 0,
         ]);
     }
 
@@ -45,6 +46,7 @@ class CreateOrUpdateUserRequest extends FormRequest
             'first_name' => 'required|string|max:255',
             'last_name' => 'required|string|max:255',
             'is_active' => 'boolean',
+            'is_custom_permissions' => 'boolean',
             'phone' => 'required|digits:11',
             'status' => 'required|in:owner,head,specialist,employee',
             'permissions' => 'array|exists:permissions,slug',
