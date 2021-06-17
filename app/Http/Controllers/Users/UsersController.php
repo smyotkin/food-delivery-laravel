@@ -33,6 +33,13 @@ class UsersController extends Controller
     {
         $user = UsersService::getOrFail(['id' => $id]);
         $role = UsersService::getRoleWithPermissions(['id' => $id]);
+        $role_permissions = !empty($role) ? $role->permissions->pluck('slug')->toArray() : [];
+
+        if ($is_custom_permissions = !empty($user->is_custom_permissions)) {
+            $current_permissions = UsersService::getPermissions(['id' => $id])->pluck('slug')->toArray();
+        } else {
+            $current_permissions = $role_permissions;
+        }
 
         return view('users/user', [
             'user' => $user,
@@ -40,8 +47,9 @@ class UsersController extends Controller
             'statuses' => PositionsService::statuses,
             'positions' => PositionsService::find(['status' => old('status') ?? $role->status ?? '']),
             'permissions' => Permission::orderBy('group', 'desc')->get(),
-            'role_permissions' => !empty($role) ? $role->permissions->pluck('slug')->toArray() : [],
-            'user_permissions' => UsersService::getPermissions(['id' => $id])->pluck('permission_id')->toArray(),
+            'is_custom_permissions' => $is_custom_permissions,
+            'role_permissions' => $role_permissions,
+            'current_permissions' => $current_permissions,
         ])->render();
     }
 
@@ -100,6 +108,28 @@ class UsersController extends Controller
         return view('users/users-table', [
             'data' => UsersService::find($request->toArray()),
             'roles' => PositionsService::find(null, false),
+        ])->render();
+    }
+
+
+
+    public function getPermissionsCheckedAjax(Request $request): string
+    {
+        $user = UsersService::getPermissions(['id' => $request->user_id ?? 0]);
+        $role = PositionsService::getWithPermissions(['id' => $request->id]);
+        $role_permissions = !empty($role) ? $role->permissions->pluck('slug')->toArray() : [];
+
+        if ($is_custom_permissions = !empty($request->boolean('is_custom_permissions'))) {
+            $current_permissions = !empty($user) ? $user->pluck('slug')->toArray() : [];
+        } else {
+            $current_permissions = $role_permissions;
+        }
+
+        return view('users/permissions-table', [
+            'permissions' => Permission::orderBy('group', 'desc')->get(),
+            'is_custom_permissions' => $is_custom_permissions,
+            'role_permissions' => $role_permissions,
+            'current_permissions' => $current_permissions,
         ])->render();
     }
 

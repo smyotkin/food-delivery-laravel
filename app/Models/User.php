@@ -88,6 +88,7 @@ class User extends Authenticatable
         'phone',
         'last_seen',
         'is_active',
+        'is_custom_permissions',
     ];
 
     /**

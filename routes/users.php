@@ -17,6 +17,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/positions/getWithPermissions', [PositionsController::class, 'getWithPermissions'])
         ->name('positions.getWithPermissions');
 
+    Route::get('/users/getPermissionsCheckedAjax', [UsersController::class, 'getPermissionsCheckedAjax'])
+        ->name('users.getPermissionsCheckedAjax');
+
     Route::middleware(['last.page'])->group(function () {
         Route::resource('users/positions', PositionsController::class)->except([
             'edit'

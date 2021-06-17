@@ -85,6 +85,13 @@
                             <label class="form-check-label" for="is_active">Учетная запись активна</label>
                         </div>
                     </div>
+
+                    <div class="col-12">
+                        <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="is_custom_permissions" name="is_custom_permissions" {{ !empty($user->is_custom_permissions) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="is_custom_permissions">Персонализированные права</label>
+                        </div>
+                    </div>
                 </div>
             </div>
 
@@ -124,12 +131,31 @@
                     type: 'GET',
                     data: {
                         id: $(this).val(),
+                        is_custom_permissions: $("#is_custom_permissions").prop('checked'),
+                        {{ isset($user) ? "user_id: {$user->id}," : '' }}
                     },
-                    url: '{{ route('positions.getWithPermissions') }}',
+                    url: '{{ route('users.getPermissionsCheckedAjax') }}',
                     success: function (data) {
                         $('#permissions').html(data);
                     }
                 });
+            });
+
+            $("#is_custom_permissions").on('change', function() {
+                if ($('#position').val() > 0) {
+                    $.ajax({
+                        type: 'GET',
+                        data: {
+                            id: $('#position').val(),
+                            is_custom_permissions: $(this).prop('checked'),
+                            {{ isset($user) ? "user_id: {$user->id}," : '' }}
+                        },
+                        url: '{{ route('users.getPermissionsCheckedAjax') }}',
+                        success: function (data) {
+                            $('#permissions').html(data);
+                        }
+                    });
+                }
             });
         });
     </script>

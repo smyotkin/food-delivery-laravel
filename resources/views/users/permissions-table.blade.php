@@ -25,17 +25,14 @@
 
                 <tr class="bg-light">
                     <td class="text-center">
-                        @php ($checkUserPermissions = !empty($user_permissions) && in_array($permission->id, $user_permissions))
-                        @php ($checkRolePermissions = !empty($role_permissions) && in_array($permission->slug, $role_permissions))
-
-                        <input class="form-check-input permission" type="checkbox" name="permissions[]" value="{{ $permission->slug }}" id="{{ $permission->slug }}" {{ $checkUserPermissions || (empty($user_permissions) && $checkRolePermissions) ? 'checked' : '' }}>
+                        <input class="form-check-input permission" type="checkbox" name="permissions[]" value="{{ $permission->slug }}" id="{{ $permission->slug }}" {{ isset($current_permissions) && in_array($permission->slug, $current_permissions) ? 'checked' : '' }} {{ !$is_custom_permissions ? 'disabled' : '' }}>
                     </td>
                     <td>
-                        <label class="form-check-label {{ isset($role_permissions) && in_array($permission->slug, $role_permissions) ? 'bg-secondary text-white px-2' : '' }}" for="{{ $permission->slug }}">
+                        <label class="form-check-label {{ isset($role_permissions) && in_array($permission->slug, $role_permissions) ? 'bg-secondary text-white px-2' : '' }} {{ !$is_custom_permissions ? 'bg-transparent text-muted' : '' }} " for="{{ $permission->slug }}">
                             {{ $permission->name }}
                         </label>
                     </td>
-                    <td>
+                    <td class="{{ !$is_custom_permissions ? 'text-muted' : '' }}">
                         {{ $permission->slug }}
                     </td>
                 </tr>
