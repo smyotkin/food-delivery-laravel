@@ -11,6 +11,16 @@ use App\Models\Permission;
 class PositionsController extends Controller
 {
     /**
+     * Настройка доступа через Middleware
+     */
+    public function __construct()
+    {
+        $this->middleware('permissions:users_position_delete')->only([
+            'destroy',
+        ]);
+    }
+
+    /**
      * Отображение таблицы всех должностей
      *
      * @return string
@@ -81,16 +91,18 @@ class PositionsController extends Controller
         return redirect()->route('positions.index');
     }
 
-//    /**
-//     * Удаление должности
-//     *
-//     * @param  int  $id
-//     * @return \Illuminate\Http\Response
-//     */
-//    public function destroy($id)
-//    {
-//        //
-//    }
+    /**
+     * Удаление должности
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\Response
+     */
+    public function destroy($id)
+    {
+        PositionsService::destroy($id);
+
+        return redirect()->route('positions.index');
+    }
 
     /**
      * Возвращает список должностей в таблице, для AJAX

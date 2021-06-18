@@ -95,6 +95,17 @@ class PositionsService
     }
 
     /**
+     * Удаляет должность
+     *
+     * @param int $id
+     * @return bool
+     */
+    public static function destroy(int $id): bool
+    {
+        return Role::find($id)->delete();
+    }
+
+    /**
      * Возвращает должность или ошибку
      *
      * @param array $array
