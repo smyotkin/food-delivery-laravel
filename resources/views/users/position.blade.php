@@ -57,17 +57,17 @@
                         @endif
 
                         <div class="col-12">
-                            <label for="name" class="form-label">Название</label>
+                            <label for="name" class="form-label fw-bold">Название</label>
                             <input type="text" class="form-control rounded-0" id="name" name="name" value="{{ $role->name ?? '' }}" placeholder="Название">
                         </div>
 
                         <div class="col-12">
-                            <label for="slug" class="form-label">Метка</label>
+                            <label for="slug" class="form-label fw-bold">Метка</label>
                             <input type="text" class="form-control rounded-0" id="slug" name="slug" value="{{ $role->slug ?? '' }}" placeholder="Метка (латиницей с нижним подчеркиванием)">
                         </div>
 
                         <div class="col-12">
-                            <label for="status" class="form-label">Статус</label>
+                            <label for="status" class="form-label fw-bold">Статус</label>
                             <select class="form-select" id="status" name="status" required>
                                 <option disabled selected>Ничего не выбрано</option>
                                 @foreach ($statuses as $key => $status)
@@ -81,7 +81,7 @@
                 <div class="col-6">
                     <div class="row g-3">
                         <div class="col-12">
-                            <label class="form-label">Права</label>
+                            <label class="form-label fw-bold">Права</label>
 
                             <table class="table table-sm align-middle">
                                 <thead>
@@ -125,6 +125,23 @@
                         </div>
                     </div>
                 </div>
+
+                @if (isset($role))
+                    <div class="col-2">
+                        <label class="form-label fw-bold">Управление</label>
+
+                        <div class="text-center">
+                            @permission('users_position_delete')
+                                <form action="{{ route('positions.destroy', ['position' => $role->id]) }}" method="post">
+                                    @method('delete')
+                                    @csrf
+
+                                    <button onclick="return confirm('Удалить?')" class="btn btn-sm btn-danger">Удалить должность</button>
+                                </form>
+                            @endpermission
+                        </div>
+                    </div>
+                @endif
             </div>
         </form>
     </div>
