@@ -95,9 +95,9 @@ class PositionsController extends Controller
      * Удаление должности
      *
      * @param  int  $id
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse
      */
-    public function destroy($id)
+    public function destroy($id): \Illuminate\Http\RedirectResponse
     {
         PositionsService::destroy($id);
 
