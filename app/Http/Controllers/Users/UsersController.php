@@ -15,8 +15,6 @@ class UsersController extends Controller
 
     /**
      * Настройка доступа через Middleware
-     *
-     * @return string
      */
     public function __construct()
     {
