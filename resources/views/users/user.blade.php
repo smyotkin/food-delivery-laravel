@@ -104,6 +104,25 @@
                     </div>
                 </div>
             </div>
+
+            @if (isset($user))
+                <div class="col-2">
+                    <label class="form-label fw-bold">Управление</label>
+
+                    <div class="text-center">
+                        @if (isset($role->status) && Auth::user()->id != $user->id)
+                            @permission('users_' . $role->status . '_delete')
+                                <form action="{{ route('positions.destroy', ['position' => $role->id]) }}" method="post">
+                                    @method('delete')
+                                    @csrf
+
+                                    <button onclick="return confirm('Удалить?')" class="btn btn-sm btn-danger">Удалить пользователя</button>
+                                </form>
+                            @endpermission
+                        @endif
+                    </div>
+                </div>
+            @endif
         </form>
     </div>
 
