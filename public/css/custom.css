@@ -29,3 +29,8 @@ img {
 .bg-lightgray {
     background-color: #f0f1f1!important;
 }
+
+.fit-by-content {
+    width: 1%;
+    white-space: nowrap;
+}
