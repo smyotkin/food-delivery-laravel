@@ -42,7 +42,7 @@
                 </div>
                 <div class="col-4 py-3">
                     <div class="row">
-                        <div class="col">
+                        <div class="col-6">
                             <a href="javascript:" class="text-decoration-none text-center text-white fs-5">
                                 <div class="text-center">
                                     <img src="/img/clients-icon.png" class="rounded rounded-5 shadow">
@@ -50,14 +50,17 @@
                                 <div class="name mt-3 lh-1 text-shadow">Клиенты</div>
                             </a>
                         </div>
-                        <div class="col">
-                            <a href="/users" class="text-decoration-none text-center text-white fs-5">
-                                <div class="text-center">
-                                    <img src="/img/users-icon.png" class="rounded rounded-5 shadow">
-                                </div>
-                                <div class="name mt-3 lh-1 text-shadow">Пользователи</div>
-                            </a>
-                        </div>
+
+                        @permission('users_view')
+                            <div class="col-6">
+                                <a href="/users" class="text-decoration-none text-center text-white fs-5">
+                                    <div class="text-center">
+                                        <img src="/img/users-icon.png" class="rounded rounded-5 shadow">
+                                    </div>
+                                    <div class="name mt-3 lh-1 text-shadow">Пользователи</div>
+                                </a>
+                            </div>
+                        @endpermission
                     </div>
                 </div>
             </div>
