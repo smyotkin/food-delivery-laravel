@@ -113,6 +113,17 @@ class UsersService
     }
 
     /**
+     * Удаляет пользователя
+     *
+     * @param int $id
+     * @return bool
+     */
+    public static function destroy(int $id): bool
+    {
+        return User::find($id)->delete();
+    }
+
+    /**
      * Возвращает права пользователя
      *
      * @param array $array

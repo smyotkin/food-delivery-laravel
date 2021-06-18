@@ -34,7 +34,7 @@ Route::middleware(['auth'])->group(function () {
 
         Route::middleware(['permissions:users_view'])->group(function () {
             Route::resource('users', UsersController::class)->except([
-                'edit', 'destroy'
+                'edit'
             ]);
         });
 

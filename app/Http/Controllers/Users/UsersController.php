@@ -110,6 +110,19 @@ class UsersController extends Controller
     }
 
     /**
+     * Удаление должности
+     *
+     * @param  int  $id
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function destroy($id): \Illuminate\Http\RedirectResponse
+    {
+        UsersService::destroy($id);
+
+        return redirect()->route('users.index');
+    }
+
+    /**
      * Возвращает список пользователей в таблице, для AJAX
      *
      * @param Request $request
