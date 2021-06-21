@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Role;
+use Illuminate\Support\Facades\Auth;
 
 class PositionsService
 {
@@ -102,6 +103,10 @@ class PositionsService
      */
     public static function destroy(int $id): bool
     {
+        if (!Auth::user()->hasPermission('users_position_delete')) {
+            abort(403, 'Нет права: ' . 'users_position_delete');
+        }
+
         return Role::find($id)->delete();
     }
 
