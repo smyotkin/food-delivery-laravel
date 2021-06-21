@@ -46,64 +46,65 @@
                 <x-auth-validation-errors class="mb-4" :errors="$errors" />
             </div>
         </div>
-        <form method="post" action="{{ isset($user) ? route('users.update', ['user' => $user]) : route('users.store') }}" id="user_form" class="row g-3 update_user">
-            @method(isset($user) ? 'patch' : 'post')
-            @csrf
 
-            <div class="col-4">
+        <div class="row">
+            <form method="post" action="{{ isset($user) ? route('users.update', ['user' => $user]) : route('users.store') }}" id="user_form" class="col-10 update_user">
+                @method(isset($user) ? 'patch' : 'post')
+                @csrf
+
                 <div class="row g-3">
-                    @isset($user)
-                        <input type="hidden" name="id" value="{{ $user->id }}">
-                    @endisset
+                    <div class="col-5">
+                        <div class="row g-3">
+                            @isset($user)
+                                <input type="hidden" name="id" value="{{ $user->id }}">
+                            @endisset
 
-                    <div class="col-6">
-                        <label for="first_name" class="form-label fw-bold">Имя</label>
-                        <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ old('first_name') ?? $user->first_name ?? '' }}" placeholder="Имя">
-                    </div>
+                            <div class="col-6">
+                                <label for="first_name" class="form-label fw-bold">Имя</label>
+                                <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ old('first_name') ?? $user->first_name ?? '' }}" placeholder="Имя">
+                            </div>
 
-                    <div class="col-6">
-                        <label for="last_name" class="form-label fw-bold">Фамилия</label>
-                        <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ old('last_name') ?? $user->last_name ?? '' }}" placeholder="Фамилия">
-                    </div>
+                            <div class="col-6">
+                                <label for="last_name" class="form-label fw-bold">Фамилия</label>
+                                <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ old('last_name') ?? $user->last_name ?? '' }}" placeholder="Фамилия">
+                            </div>
 
-                    <div class="col-12">
-                        <label for="phone" class="form-label fw-bold">Мобильный телефон</label>
-                        <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ old('phone') ?? $user->phone_formatted ?? '' }}" placeholder="+7 555 555-55-55">
-                    </div>
+                            <div class="col-12">
+                                <label for="phone" class="form-label fw-bold">Мобильный телефон</label>
+                                <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ old('phone') ?? $user->phone_formatted ?? '' }}" placeholder="+7 555 555-55-55">
+                            </div>
 
-                    <div class="col-12">
-                        @include('users/statuses-select')
-                    </div>
+                            <div class="col-12">
+                                @include('users/statuses-select')
+                            </div>
 
-                    <div class="col-12">
-                        @include('users/positions-select')
-                    </div>
+                            <div class="col-12">
+                                @include('users/positions-select')
+                            </div>
 
-                    <div class="col-12">
-                        <div class="form-check mt-1">
-                            <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {{ !empty($user->is_active) || !isset($user) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_active">Учетная запись активна</label>
+                            <div class="col-12">
+                                <div class="form-check mt-1">
+                                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {{ !empty($user->is_active) || !isset($user) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_active">Учетная запись активна</label>
+                                </div>
+                            </div>
+
+                            <div class="col-12">
+                                <div class="form-check mt-1">
+                                    <input class="form-check-input" type="checkbox" id="is_custom_permissions" name="is_custom_permissions" {{ !empty($user->is_custom_permissions) ? 'checked' : '' }}>
+                                    <label class="form-check-label" for="is_custom_permissions">Персонализированные права</label>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
-                    <div class="col-12">
-                        <div class="form-check mt-1">
-                            <input class="form-check-input" type="checkbox" id="is_custom_permissions" name="is_custom_permissions" {{ !empty($user->is_custom_permissions) ? 'checked' : '' }}>
-                            <label class="form-check-label" for="is_custom_permissions">Персонализированные права</label>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="col-6">
-                <div class="row g-3">
-                    <div class="col-12" id="permissions">
+                    <div class="col-7" id="permissions">
                         @if (!empty($role))
                             @include('users/permissions-table')
                         @endif
                     </div>
                 </div>
-            </div>
+            </form>
 
             @if (isset($user))
                 <div class="col-2">
@@ -112,18 +113,18 @@
                     <div class="text-center">
                         @if (isset($role->status) && Auth::user()->id != $user->id)
                             @permission('users_' . $role->status . '_delete')
-                                <form action="{{ route('positions.destroy', ['position' => $role->id]) }}" method="post">
+                                <form action="{{ route('users.destroy', ['user' => $user->id]) }}" id="delete_user" method="post">
                                     @method('delete')
                                     @csrf
 
-                                    <button onclick="return confirm('Удалить?')" class="btn btn-sm btn-danger">Удалить пользователя</button>
+                                    <button class="btn btn-sm btn-danger w-100 py-2" onclick="return confirm('Удалить?')">Удалить пользователя</button>
                                 </form>
                             @endpermission
                         @endif
                     </div>
                 </div>
             @endif
-        </form>
+        </div>
     </div>
 
     <script>
