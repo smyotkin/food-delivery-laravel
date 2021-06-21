@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Services\PositionsService;
+use Illuminate\Support\Facades\Auth;
 
 class UsersService
 {
@@ -120,6 +121,13 @@ class UsersService
      */
     public static function destroy(int $id): bool
     {
+        $user = Auth::user();
+        $role = self::getRoleWithPermissions(['id' => $user->id]);
+
+        if (!isset($role->status) && !$user->hasPermission("users_{$role->status}_delete") && Auth::user()->id == $id) {
+            abort(403, 'Нет права: ' . "users_{$role->status}_delete");
+        }
+
         return User::find($id)->delete();
     }
 
