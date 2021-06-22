@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Auth;
 use Jenssegers\Date\Date;
 
 use App\Traits\HasRolesAndPermissions;
@@ -115,7 +116,13 @@ class User extends Authenticatable
         'phone_formatted',
         'registered_at',
         'online',
+        'status',
     ];
+
+    public function getStatusAttribute()
+    {
+        return $this->roles->first()->status ?? null;
+    }
 
     public function getPhoneFormattedAttribute()
     {
@@ -166,5 +173,15 @@ class User extends Authenticatable
     public static function toDigit($string)
     {
         return str_replace(['+', ' ', '-'], '', $string);
+    }
+
+    public static function isRoot($id = null)
+    {
+        return !empty($id) ? User::find($id)->id === 1 : Auth::user()->id === 1;
+    }
+
+    public static function notRoot()
+    {
+        return !self::isRoot();
     }
 }
