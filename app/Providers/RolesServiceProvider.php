@@ -33,7 +33,11 @@ class RolesServiceProvider extends ServiceProvider
         });
 
         Blade::directive('permission', function ($permission) {
-            return "<?php if (auth()->check() && auth()->user()->hasPermission({$permission})): ?>";
+            return "<?php if (auth()->check() && (auth()->user()->hasPermission({$permission}) || auth()->user()->isRoot())): ?>";
+        });
+
+        Blade::directive('else_permission', function ($permission) {
+            return "<?php else: ?>";
         });
 
         Blade::directive('endpermission', function ($permission) {
