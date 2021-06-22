@@ -42,6 +42,8 @@ class PositionsService
             ->all();
 
         if ($role = Role::find($array['id'] ?? 0)) {
+            self::checkPermission('modify');
+
             $role->update($basicParams);
             $role->saveOrFail();
 
@@ -50,6 +52,8 @@ class PositionsService
 
             Log::info("UPDATE_POSITION: id({$role->id})");
         } else {
+            self::checkPermission('create');
+
             $role = Role::create($basicParams);
 
             DB::table('roles_permissions')->where('role_id', '=', $role->id)->delete();
@@ -93,7 +97,7 @@ class PositionsService
      */
     public static function get(array $array): ?Role
     {
-        return Role::find($array['id']);
+        return self::checkPermission('view') ? Role::find($array['id']) : null;
     }
 
     /**
@@ -104,17 +108,16 @@ class PositionsService
      */
     public static function destroy(int $id): bool
     {
-        return self::checkPermission($id, 'delete') ? Role::find($id)->delete() : false;
+        return self::checkPermission('delete') ? Role::find($id)->delete() : false;
     }
 
     /**
      * Проверяет права на действие(action) у авторизированного пользователя
      *
-     * @param $id
      * @param $action
      * @return mixed
      */
-    public static function checkPermission($id, $action)
+    public static function checkPermission($action)
     {
         $permission = "users_position_$action";
 
