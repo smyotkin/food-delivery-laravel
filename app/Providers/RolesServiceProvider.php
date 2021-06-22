@@ -43,5 +43,19 @@ class RolesServiceProvider extends ServiceProvider
         Blade::directive('endpermission', function ($permission) {
             return "<?php endif; ?>";
         });
+
+        Blade::if('anyPermission', function ($permissions) {
+            $permissions = explode('|', $permissions);
+            $hasPermission = false;
+
+            foreach ($permissions as $permission) {
+                if (auth()->user()->hasPermission($permission) || auth()->user()->isRoot()) {
+                    $hasPermission = true;
+                    break;
+                }
+            }
+
+            return $hasPermission;
+        });
     }
 }
