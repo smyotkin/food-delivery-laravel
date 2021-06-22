@@ -5,6 +5,7 @@ namespace App\Services;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Role;
+use App\Models\User;
 use Illuminate\Support\Facades\Auth;
 
 class PositionsService
@@ -45,14 +46,14 @@ class PositionsService
             $role->saveOrFail();
 
             DB::table('roles_permissions')->where('role_id', '=', $role->id)->delete();
-            $role->givePermissionsArray($array['permissions']);
+            $role->givePermissionsArray($array['permissions'] ?? []);
 
             Log::info("UPDATE_POSITION: id({$role->id})");
         } else {
             $role = Role::create($basicParams);
 
             DB::table('roles_permissions')->where('role_id', '=', $role->id)->delete();
-            $role->givePermissionsArray($array['permissions']);
+            $role->givePermissionsArray($array['permissions'] ?? []);
 
             Log::info("CREATE_NEW_POSITION(id: {$role->id}, name: {$role->name}, slug: {$role->slug})");
         }
@@ -103,11 +104,25 @@ class PositionsService
      */
     public static function destroy(int $id): bool
     {
-        if (!Auth::user()->hasPermission('users_position_delete')) {
-            abort(403, 'Нет права: ' . 'users_position_delete');
+        return self::checkPermission($id, 'delete') ? Role::find($id)->delete() : false;
+    }
+
+    /**
+     * Проверяет права на действие(action) у авторизированного пользователя
+     *
+     * @param $id
+     * @param $action
+     * @return mixed
+     */
+    public static function checkPermission($id, $action)
+    {
+        $permission = "users_position_$action";
+
+        if (!User::isRoot() && !Auth::user()->hasPermission($permission)) {
+            abort(403, "Нет права: $permission");
         }
 
-        return Role::find($id)->delete();
+        return true;
     }
 
     /**
