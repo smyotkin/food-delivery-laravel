@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\User;
-use App\Services\PositionsService;
+use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
 
 class UsersService
@@ -32,6 +32,13 @@ class UsersService
 
             DB::transaction(function() use ($array, $basicParams, $permissionsParams) {
                 if ($user = User::find($array['id'] ?? 0)) {
+                    if (
+                        Role::find($permissionsParams['position_id'])->status != $permissionsParams['status'] ||
+                        Auth::user()->hasPermission("users_{$permissionsParams['status']}_modify") === false
+                    ) {
+                        abort(403, 'Нет права: ' . "users_{$permissionsParams['status']}_modify");
+                    }
+
                     $user->update($basicParams);
                     $user->saveOrFail();
 
@@ -48,6 +55,13 @@ class UsersService
                     Log::info("UPDATE_USER: id({$user->id})");
 
                 } else {
+                    if (
+                        Role::find($permissionsParams['position_id'])->status != $permissionsParams['status'] ||
+                        Auth::user()->hasPermission("users_{$permissionsParams['status']}_add") === false
+                    ) {
+                        abort(403, 'Нет права: ' . "users_{$permissionsParams['status']}_add");
+                    }
+
                     $newUser = User::create($basicParams + [
                         'city_id' => 0,
                         'password' => Hash::make($password = random_int(100000, 999999)),
@@ -110,7 +124,7 @@ class UsersService
      */
     public static function getOrFail(array $array)
     {
-        return User::findOrFail($array['id']);
+        return self::checkRoleAndPermission($array['id'], 'view') ? User::findOrFail($array['id']) : false;
     }
 
     /**
@@ -121,14 +135,32 @@ class UsersService
      */
     public static function destroy(int $id): bool
     {
-        $user = Auth::user();
-        $role = self::getRoleWithPermissions(['id' => $user->id]);
+        return self::checkRoleAndPermission($id, 'delete') ? User::find($id)->delete() : false;
+    }
 
-        if (!isset($role->status) && !$user->hasPermission("users_{$role->status}_delete") && Auth::user()->id == $id) {
-            abort(403, 'Нет права: ' . "users_{$role->status}_delete");
+    /**
+     * Проверяет наличие должности, право на действие(action) у авторизированного пользователя
+     *
+     * @param $id
+     * @param $action
+     * @return mixed
+     */
+    public static function checkRoleAndPermission($id, $action)
+    {
+        $role = self::getRoleWithPermissions(['id' => $id]);
+        $permission = isset($role->status) ? "users_{$role->status}_$action" : null;
+
+        if (!User::isRoot()) {
+            if (!isset($permission)) {
+                abort(403, 'Пользователь не имеет должности');
+            } elseif (!Auth::user()->hasPermission($permission)) {
+                abort(403, "Нет права: $permission");
+            } elseif ($action == 'delete' && (Auth::user()->id == $id || User::isRoot($id))) {
+                abort(403, "Запрещено");
+            }
         }
 
-        return User::find($id)->delete();
+        return true;
     }
 
     /**
