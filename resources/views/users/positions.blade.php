@@ -23,9 +23,12 @@
             <div class="col-auto lh-1">
                 <h5 class="d-inline-block fw-normal align-middle m-0">Должности</h5>
             </div>
-            <div class="col text-end">
-                <a href="{{ route('positions.create') }}" class="btn btn-outline-primary py-0">Новая должность</a>
-            </div>
+
+            @permission('users_position_create')
+                <div class="col text-end">
+                    <a href="{{ route('positions.create') }}" class="btn btn-outline-primary py-0">Новая должность</a>
+                </div>
+            @endpermission
         </div>
 
         <div class="row">
