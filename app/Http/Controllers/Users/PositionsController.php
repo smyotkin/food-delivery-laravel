@@ -70,7 +70,7 @@ class PositionsController extends Controller
 
         return view('users/position', [
             'role' => $role,
-            'role_permissions' => $role->permissions->pluck('slug')->toArray(),
+            'role_permissions' => !empty($role) ? $role->permissions->pluck('slug')->toArray() : [],
             'statuses' => PositionsService::statuses,
             'permissions' => Permission::orderBy('group', 'desc')->get(),
         ])->render();
