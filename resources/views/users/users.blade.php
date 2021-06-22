@@ -28,7 +28,9 @@
                 </h5>
             </div>
             <div class="col text-end">
-                <a href="{{ route('users.create') }}" class="btn btn-outline-primary py-0">Новый пользователь</a>
+                @anyPermission('users_employee_add|users_specialist_add|users_head_add|users_owner_add')
+                    <a href="{{ route('users.create') }}" class="btn btn-outline-primary py-0">Новый пользователь</a>
+                @endanyPermission
             </div>
         </div>
 
