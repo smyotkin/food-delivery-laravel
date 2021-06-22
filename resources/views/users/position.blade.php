@@ -14,9 +14,20 @@
                 </div>
             </div>
             <div class="col text-end lh-base">
-                <p class="mb-1">
-                    <a href="javascript:" onclick="event.preventDefault(); $('#position_form').submit();" id="save" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
-                </p>
+                @if (isset($role))
+                    @permission('users_position_modify')
+                        <p class="mb-1">
+                            <a href="javascript:" onclick="event.preventDefault(); $('#position_form').submit();" id="save" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                        </p>
+                    @endpermission
+                @else
+                    @permission('users_position_create')
+                        <p class="mb-1">
+                            <a href="javascript:" onclick="event.preventDefault(); $('#position_form').submit();" id="save" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                        </p>
+                    @endpermission
+                @endif
+
                 @if (isset($role))
                     <p class="mb-0 text-muted">
                         @php ($created_at = Date::parse($role->created_at))
@@ -51,7 +62,7 @@
                 @method(isset($role) ? 'patch' : 'post')
                 @csrf
 
-                <div class="row g-3">
+                <fieldset class="row g-3" {{ isset($role) && !auth()->user()->hasPermission('users_position_modify') ? 'disabled' : '' }}>
                     <div class="col-5">
                         <div class="row g-3">
                             @if (isset($role))
@@ -127,7 +138,7 @@
                             </div>
                         </div>
                     </div>
-                </div>
+                </fieldset>
             </form>
 
             @if (isset($role))
