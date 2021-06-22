@@ -89,20 +89,24 @@
                                 </div>
                             </div>
 
-                            <div class="col-12">
-                                <div class="form-check mt-1">
-                                    <input class="form-check-input" type="checkbox" id="is_custom_permissions" name="is_custom_permissions" {{ !empty($user->is_custom_permissions) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_custom_permissions">Персонализированные права</label>
+                            @permission('users_modes_modify')
+                                <div class="col-12">
+                                    <div class="form-check mt-1">
+                                        <input class="form-check-input" type="checkbox" id="is_custom_permissions" name="is_custom_permissions" {{ !empty($user->is_custom_permissions) ? 'checked' : '' }}>
+                                        <label class="form-check-label" for="is_custom_permissions">Персонализированные права</label>
+                                    </div>
                                 </div>
-                            </div>
+                            @endpermission
                         </div>
                     </div>
 
-                    <div class="col-7" id="permissions">
-                        @if (!empty($role))
-                            @include('users/permissions-table')
-                        @endif
-                    </div>
+                    @permission('users_modes_modify')
+                        <div class="col-7" id="permissions">
+                            @if (!empty($role))
+                                @include('users/permissions-table')
+                            @endif
+                        </div>
+                    @endpermission
                 </div>
             </form>
 
