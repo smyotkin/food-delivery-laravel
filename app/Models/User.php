@@ -175,13 +175,15 @@ class User extends Authenticatable
         return str_replace(['+', ' ', '-'], '', $string);
     }
 
+    /**
+     * Если передан параметр проверяет это Root-пользователь или нет, в ином случае всегда проверяет авторизованного
+     * пользователя
+     *
+     * @param null $id
+     * @return bool
+     */
     public static function isRoot($id = null)
     {
         return !empty($id) ? User::find($id)->id === 1 : Auth::user()->id === 1;
-    }
-
-    public static function notRoot()
-    {
-        return !self::isRoot();
     }
 }
