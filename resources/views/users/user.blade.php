@@ -111,7 +111,7 @@
                     <label class="form-label fw-bold">Управление</label>
 
                     <div class="text-center">
-                        @if (isset($role->status) && Auth::user()->id != $user->id)
+                        @if (isset($role->status) && (Auth::user()->id != $user->id && !$user::isRoot($user->id)))
                             @permission('users_' . $role->status . '_delete')
                                 <form action="{{ route('users.destroy', ['user' => $user->id]) }}" id="delete_user" method="post">
                                     @method('delete')
