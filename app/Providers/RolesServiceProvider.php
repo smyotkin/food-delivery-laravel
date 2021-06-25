@@ -44,18 +44,19 @@ class RolesServiceProvider extends ServiceProvider
             return "<?php endif; ?>";
         });
 
+        /**
+         * Проверяет наличие любого из переданных прав (разделение через прямой слеш |)
+         */
         Blade::if('anyPermission', function ($permissions) {
             $permissions = explode('|', $permissions);
-            $hasPermission = false;
 
             foreach ($permissions as $permission) {
                 if (auth()->user()->hasPermission($permission) || auth()->user()->isRoot()) {
-                    $hasPermission = true;
-                    break;
+                    return true;
                 }
             }
 
-            return $hasPermission;
+            return false;
         });
     }
 }
