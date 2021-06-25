@@ -117,7 +117,35 @@ class User extends Authenticatable
         'registered_at',
         'online',
         'status',
+        'view_rules',
     ];
+
+    /**
+     * Получение массива всех прав пользователя с меткой view (например users_employee_view и тд.)
+     *
+     * @return array
+     */
+    public function getViewRulesAttribute()
+    {
+        $onlyViewRules = !empty($this->permissions) ? $this->permissions->filter(function ($item) {
+            return $item->group == 'Пользователи' && preg_match("/users\_(.*)\_view/m", $item);
+        })->pluck('slug')->toArray() : [];
+
+        return !empty($onlyViewRules) ? $onlyViewRules : [];
+    }
+
+    /**
+     * Получение массива доступных статусов пользователя
+     *
+     * @return array
+     */
+    public function availableStatuses() {
+        $availableStatuses = collect($this->view_rules)->map(function ($slug) {
+            return str_replace(['users_', '_view'], '', $slug);
+        });
+
+        return $availableStatuses->toArray();
+    }
 
     public function getStatusAttribute()
     {
