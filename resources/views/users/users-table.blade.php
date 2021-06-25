@@ -3,7 +3,11 @@
         <tr class="{{ $user->online == 'online' ? 'fw-bold' : '' }} {{ $user->is_active == 0 ? 'text-muted' : '' }}" data-page="{{ $data->currentPage() }}">
             <td>
                 @permission('users_' . $user->status . '_view')
-                    <a href="users/{{ $user->id }}" class="text-decoration-none {{ $user->is_active == 0 ? 'link-secondary' : '' }}">{{ $user->full_name }}</a>
+                    @if (!$user->isRoot($user->id) || $user->isRoot())
+                        <a href="users/{{ $user->id }}" class="text-decoration-none {{ $user->is_active == 0 ? 'link-secondary' : '' }}">{{ $user->full_name }}</a>
+                    @else
+                        {{ $user->full_name }}
+                    @endif
                 @else_permission
                     {{ $user->full_name }}
                 @endpermission
