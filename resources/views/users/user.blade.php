@@ -14,9 +14,20 @@
                 </div>
             </div>
             <div class="col text-end lh-base">
-                <p class="mb-1">
-                    <a href="javascript:" onclick="event.preventDefault(); $('#user_form').submit();" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
-                </p>
+                @if (isset($user))
+                    @permission("users_{$user->status}_modify")
+                        <p class="mb-1">
+                            <a href="javascript:" onclick="event.preventDefault(); $('#user_form').submit();" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                        </p>
+                    @endpermission
+                @else
+                    @anyPermission('users_employee_add|users_specialist_add|users_head_add|users_owner_add')
+                        <p class="mb-1">
+                            <a href="javascript:" onclick="event.preventDefault(); $('#user_form').submit();" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                        </p>
+                    @endanyPermission
+                @endif
+
                 @isset($user)
                     <p class="mb-0 text-muted">
                         @php ($created_at = Date::parse($user->created_at))
@@ -52,7 +63,7 @@
                 @method(isset($user) ? 'patch' : 'post')
                 @csrf
 
-                <div class="row g-3">
+                <fieldset class="row g-3" {{ isset($user) && !auth()->user()->hasPermission("users_{$user->status}_modify") ? 'disabled' : '' }}>
                     <div class="col-5">
                         <div class="row g-3">
                             @isset($user)
@@ -107,7 +118,7 @@
                             @endif
                         </div>
                     @endpermission
-                </div>
+                </fieldset>
             </form>
 
             @if (isset($user))
