@@ -51,7 +51,7 @@
 
                             <button id="delete" class="text-danger text-sm pt-2">Удалить должность</button>
                         </form>
-                        @endpermission
+                    @endpermission
                 @endif
             </div>
         </div>
@@ -168,6 +168,5 @@
                 }
             });
         });
-
     </script>
 </x-app-layout>
