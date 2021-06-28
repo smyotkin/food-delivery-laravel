@@ -43,6 +43,15 @@
                             Обновлено: {{ $updated_at->format( now()->year == $updated_at->year ? 'j F, H:i' : 'j F Y') }}
                         </small>
                     </p>
+
+                    @permission('users_position_delete')
+                        <form action="{{ route('positions.destroy', ['position' => $role->id]) }}" method="post" id="delete_position">
+                            @method('delete')
+                            @csrf
+
+                            <button id="delete" class="text-danger text-sm pt-2">Удалить должность</button>
+                        </form>
+                        @endpermission
                 @endif
             </div>
         </div>
@@ -140,23 +149,25 @@
                     </div>
                 </fieldset>
             </form>
-
-            @if (isset($role))
-                <div class="col-2">
-                    <label class="form-label fw-bold">Управление</label>
-
-                    <div class="text-center">
-                        @permission('users_position_delete')
-                            <form action="{{ route('positions.destroy', ['position' => $role->id]) }}" method="post">
-                                @method('delete')
-                                @csrf
-
-                                <button onclick="return confirm('Удалить?')" class="btn btn-sm btn-danger w-100 py-2">Удалить должность</button>
-                            </form>
-                        @endpermission
-                    </div>
-                </div>
-            @endif
         </div>
     </div>
+
+    <script>
+        $('#delete').on('click', function (e) {
+            e.preventDefault();
+
+            swal({
+                dangerMode: true,
+                title: 'Вы уверены?',
+                text: 'Данная запись будет удалена',
+                icon: 'warning',
+                buttons: ['Отмена', 'Да, я уверен!']
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    $('#delete_position').submit();
+                }
+            });
+        });
+
+    </script>
 </x-app-layout>
