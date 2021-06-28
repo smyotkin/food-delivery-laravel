@@ -45,6 +45,18 @@
                             {{ $updated_at->format( now()->year == $updated_at->year ? 'j F, H:i' : 'j F Y') }}
                         </small>
                     </p>
+
+                    @if ((isset($role->status) && (Auth::user()->id != $user->id && !$user::isRoot($user->id))) || ($user::isRoot() && Auth::user()->id != $user->id))
+                        @php ($status = empty($role->status) && $user::isRoot() ? 'admin' : $role->status)
+                        @permission("users_{$status}_delete")
+                            <form action="{{ route('users.destroy', ['user' => $user->id]) }}" id="delete_user" method="post" id="delete_user">
+                                @method('delete')
+                                @csrf
+
+                                <button id="delete" class="text-danger text-sm pt-2">Удалить пользователя</button>
+                            </form>
+                        @endpermission
+                    @endif
                 @endisset
             </div>
         </div>
@@ -120,25 +132,6 @@
                     @endpermission
                 </fieldset>
             </form>
-
-            @if (isset($user))
-                <div class="col-2">
-                    <label class="form-label fw-bold">Управление</label>
-
-                    <div class="text-center">
-                        @if (isset($role->status) && (Auth::user()->id != $user->id && !$user::isRoot($user->id)))
-                            @permission('users_' . $role->status . '_delete')
-                                <form action="{{ route('users.destroy', ['user' => $user->id]) }}" id="delete_user" method="post">
-                                    @method('delete')
-                                    @csrf
-
-                                    <button class="btn btn-sm btn-danger w-100 py-2" onclick="return confirm('Удалить?')">Удалить пользователя</button>
-                                </form>
-                            @endpermission
-                        @endif
-                    </div>
-                </div>
-            @endif
         </div>
     </div>
 
@@ -185,6 +178,22 @@
                     }
                 });
             }
+        });
+
+        $('#delete').on('click', function (e) {
+            e.preventDefault();
+
+            swal({
+                dangerMode: true,
+                title: 'Вы уверены?',
+                text: 'Данная запись будет удалена',
+                icon: 'warning',
+                buttons: ['Отмена', 'Да, я уверен!']
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    $('#delete_user').submit();
+                }
+            });
         });
     </script>
 </x-app-layout>
