@@ -125,7 +125,7 @@
 
                     @permission('users_modes_modify')
                         <div class="col-7" id="permissions">
-                            @if (!empty($role))
+                            @if (!empty($role) || (isset($user) && $user::isRoot()))
                                 @include('users/permissions-table')
                             @endif
                         </div>
