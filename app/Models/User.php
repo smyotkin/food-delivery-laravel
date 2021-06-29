@@ -117,18 +117,18 @@ class User extends Authenticatable
         'registered_at',
         'online',
         'status',
-        'view_rules',
     ];
 
     /**
      * Получение массива всех прав пользователя с меткой view (например users_employee_view и тд.)
      *
+     * @param string $type
      * @return array
      */
-    public function getViewRulesAttribute()
+    public function getUsersRulesByType($type = 'view')
     {
-        $onlyViewRules = !empty($this->permissions) ? $this->permissions->filter(function ($item) {
-            return $item->group == 'Пользователи' && preg_match("/users\_(.*)\_view/m", $item);
+        $onlyViewRules = !empty($this->permissions) ? $this->permissions->filter(function ($item) use ($type) {
+            return $item->group == 'Пользователи' && preg_match("/users\_(.*)\_" . $type . "/m", $item);
         })->pluck('slug')->toArray() : [];
 
         return !empty($onlyViewRules) ? $onlyViewRules : [];
@@ -137,11 +137,12 @@ class User extends Authenticatable
     /**
      * Получение массива доступных статусов пользователя
      *
+     * @param string $type
      * @return array
      */
-    public function availableStatuses() {
-        $availableStatuses = collect($this->view_rules)->map(function ($slug) {
-            return str_replace(['users_', '_view'], '', $slug);
+    public function availableStatusesByType($type = 'view') {
+        $availableStatuses = collect($this->getUsersRulesByType($type))->map(function ($slug) use ($type) {
+            return str_replace(['users_', '_' . $type], '', $slug);
         });
 
         return $availableStatuses->toArray();
