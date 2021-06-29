@@ -128,6 +128,7 @@ class UsersController extends Controller
     public function getAjax(Request $request): string
     {
         return view('users/users-table', [
+            'statuses' => PositionsService::statuses,
             'data' => UsersService::find($request->toArray()),
             'roles' => PositionsService::find(null, false),
         ])->render();

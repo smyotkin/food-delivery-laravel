@@ -13,6 +13,7 @@
                 @endpermission
             </td>
             <td>{{ $user->phone_formatted }}</td>
+            <td>{{ isset($user->roles[0]->status) ? $statuses[$user->roles[0]->status]['name'] : '---' }}</td>
             <td>{{ $user->roles[0]->name ?? '---' }}</td>
             <td>{{ $user->registered_at }}</td>
             <td>{{ $user->last_page }}</td>
