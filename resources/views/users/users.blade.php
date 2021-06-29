@@ -41,6 +41,7 @@
                         <tr class="fw-light bg-lightgray table-header">
                             <td class="border-0">Имя</td>
                             <td class="border-0">Телефон</td>
+                            <td class="border-0">Статус</td>
                             <td class="border-0">Должность</td>
                             <td class="border-0">Регистрация</td>
                             <td class="border-0">Страница</td>
