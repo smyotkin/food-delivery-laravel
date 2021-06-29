@@ -57,7 +57,7 @@ class UsersController extends Controller
             'is_custom_permissions' => $is_custom_permissions,
             'role_permissions' => $role_permissions,
             'current_permissions' => $current_permissions,
-            'available_statuses' => Auth::user()->availableStatuses(),
+            'available_statuses' => Auth::user()->availableStatusesByType('modify'),
         ])->render();
     }
 
@@ -72,7 +72,7 @@ class UsersController extends Controller
             'statuses' => PositionsService::statuses,
             'positions' => PositionsService::find(['status' => old('status') ?? $role->status ?? '']),
             'permissions' => Permission::orderBy('group', 'desc')->get(),
-            'available_statuses' => Auth::user()->availableStatuses(),
+            'available_statuses' => Auth::user()->availableStatusesByType('add'),
         ])->render();
     }
 
