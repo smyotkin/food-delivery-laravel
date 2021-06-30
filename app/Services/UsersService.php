@@ -11,6 +11,20 @@ use Illuminate\Support\Facades\Auth;
 
 class UsersService
 {
+    public const timezones = [
+        'Europe/Kaliningrad' => 'Калининградское время',
+        'Europe/Moscow' => 'Московское время',
+        'Europe/Samara' => 'Самарское время',
+        'Asia/Yekaterinburg' => 'Екатеринбургское время',
+        'Asia/Omsk' => 'Омское время',
+        'Asia/Krasnoyarsk' => 'Красноярское время',
+        'Asia/Irkutsk' => 'Иркутское время',
+        'Asia/Yakutsk' => 'Якутское время',
+        'Asia/Vladivostok' => 'Владивостокское время',
+        'Asia/Magadan' => 'Магаданское время',
+        'Asia/Kamchatka' => 'Камчатское время',
+    ];
+
     /**
      * Создание или редактирование(если указан id) пользователя
      *
@@ -23,7 +37,7 @@ class UsersService
     {
         try {
             $basicParams = collect($array)
-                ->only(['first_name', 'last_name', 'phone', 'is_active', 'is_custom_permissions'])
+                ->only(['first_name', 'last_name', 'phone', 'is_active', 'is_custom_permissions', 'timezone'])
                 ->all();
 
             $permissionsParams = collect($array)
@@ -53,7 +67,6 @@ class UsersService
                     }
 
                     Log::info("UPDATE_USER: id({$user->id})");
-
                 } else {
                     if (
                         Role::find($permissionsParams['position_id'])->status != $permissionsParams['status'] ||
@@ -80,6 +93,29 @@ class UsersService
             });
         } catch (\Exception $e) {
             Log::info("CREATE_OR_UPDATE_ERROR: {$e->getMessage()}");
+            abort(500);
+        }
+    }
+
+    public static function updateProfile(?array $array = null): void
+    {
+        try {
+            $basicParams = collect($array)
+                ->only(['timezone', 'password'])
+                ->all();
+
+            DB::transaction(function() use ($basicParams) {
+                if ($user = Auth::user()) {
+                    $user->update($basicParams);
+                    $user->saveOrFail();
+
+                    Log::info("UPDATE_USER: id({$user->id})");
+                } else {
+                    return false;
+                }
+            });
+        } catch (\Exception $e) {
+            Log::info("UPDATE_PROFILE_ERROR: {$e->getMessage()}");
             abort(500);
         }
     }
