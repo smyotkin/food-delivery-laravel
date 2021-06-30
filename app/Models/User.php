@@ -88,6 +88,7 @@ class User extends Authenticatable
         'password',
         'phone',
         'last_seen',
+        'timezone',
         'is_active',
         'is_custom_permissions',
     ];
