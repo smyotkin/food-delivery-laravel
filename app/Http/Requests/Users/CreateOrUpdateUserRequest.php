@@ -50,6 +50,7 @@ class CreateOrUpdateUserRequest extends FormRequest
             'phone' => 'required|digits:11',
             'status' => 'required|in:owner,head,specialist,employee',
             'permissions' => 'array|exists:permissions,slug',
+            'timezone' => 'string',
         ]);
 
         switch ($this->method()) {
