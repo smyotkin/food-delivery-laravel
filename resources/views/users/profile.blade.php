@@ -10,13 +10,13 @@
             <div class="row px-5">
                 <div class="col d-flex align-items-center">
                     <div class="info">
-                        <h4>{{ $user->first_name ?? 'Имя' }} {{ $user->last_name ?? 'Фамилия' }}</h4>
+                        <h4>{{ $user->first_name }} {{ $user->last_name }}</h4>
                         <h6 class="text-muted fw-normal mb-0">{{ $user->phoneNumber($user->phone) }}</h6>
                     </div>
                 </div>
                 <div class="col">
-                    <p class="fw-bold mb-0">Статус</p>
-                    <p class="mb-0">-</p>
+                    <p class="fw-bold mb-0">Должность</p>
+                    <p class="mb-0">{{ $role->name ?? '---' }}</p>
                 </div>
                 <div class="col">
                     <p class="fw-bold mb-0">Регистрация</p>
@@ -36,24 +36,57 @@
     <div class="container-fluid mb-5">
         <div class="px-5 border-bottom border-gray mb-4">
             <div class="row px-5">
-                <div class="col-4">
+                <div class="col-3">
                     <h4 class="fw-normal">Права доступа</h4>
                 </div>
-                <div class="col-4">
-                    <div class="row">
-                        <div class="col d-flex align-items-center">
-                            <img src="/img/callcenter-icon.png" alt="" class="h-25 mh-25 rounded me-2">
-                            <strong>Колл-центр</strong>
-                        </div>
-                        <div class="col d-flex align-items-center">Чтение и запись</div>
-                    </div>
+
+                <div class="col-7">
+                    @php ($previousGroupValue = '')
+                    @php ($nextGroupValue = '')
+
+                    @foreach($current_permissions as $permission)
+                        @php ($nextGroupValue =  isset($current_permissions[$loop->index + 1]) ? $current_permissions[$loop->index + 1]->group : null)
+
+                        @if ($permission->group != $previousGroupValue)
+                            <div class="row mb-2">
+                                <div class="col-5">
+                                    @php ($iconPath = "img/{$permission->group_slug}-icon.png")
+
+                                    <div class="row">
+                                        <div class="col-auto">
+                                            <img src="{{ url(file_exists($iconPath) ? $iconPath : "img/settings-icon.png") }}" alt="" class="profile-permission_icon">
+                                        </div>
+                                        <div class="col d-flex align-items-center">
+                                            <strong class="fs-5">{{ $permission->group }}</strong>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="col-7">
+                                    <ul class="list-group list-group-flush">
+                        @endif
+
+                        <li class="list-group-item">{{ $permission->name }}</li>
+
+                        @if ($permission->group != $nextGroupValue || $loop->last)
+                                    </ul>
+                                </div>
+                            </div>
+
+                            @if (!$loop->last)
+                                <hr class="bg-secondary">
+                            @endif
+                        @endif
+
+                        @php ($previousGroupValue = $permission->group)
+                    @endforeach
                 </div>
             </div>
         </div>
 
         <div class="px-5 border-bottom border-gray mb-4">
             <div class="row px-5">
-                <div class="col-4">
+                <div class="col-3">
                     <h4 class="fw-normal">Доступ к данным</h4>
                 </div>
                 <div class="col-6">
@@ -64,7 +97,7 @@
 
         <div class="px-5 border-bottom border-gray mb-4">
             <div class="row px-5">
-                <div class="col-4">
+                <div class="col-3">
                     <h4 class="fw-normal">Пароль</h4>
                 </div>
                 <div class="col-4">
@@ -75,7 +108,7 @@
 
         <div class="px-5">
             <div class="row px-5">
-                <div class="col-4">
+                <div class="col-3">
                     <a href="{{ route('logout') }}" class="text-decoration-none">Выйти из системы</a>
                 </div>
                 <div class="col-4">
