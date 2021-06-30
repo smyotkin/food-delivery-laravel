@@ -38,8 +38,9 @@ Route::middleware(['auth'])->group(function () {
             ]);
         });
 
-        Route::get('/profile', [ProfileController::class, 'index'])
-            ->name('profile');
+        Route::resource('profile', ProfileController::class)->only([
+            'index', 'update'
+        ]);
     });
 });
 
