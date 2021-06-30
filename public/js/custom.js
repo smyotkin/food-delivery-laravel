@@ -19,9 +19,6 @@ function checkUserForm() {
     if ($('#last_name').val().length < 2)
         return;
 
-    // if (!phonePreg.test(userPhone.val()))
-    //     return;
-
     $('#save_user').removeClass('disabled btn-outline-secondary').addClass('btn-outline-primary');
 }
 
