@@ -34,8 +34,24 @@ class Permission extends Model
         'slug',
     ];
 
+    protected $appends = [
+        'group_slug',
+    ];
+
+    /**
+     * Возвращает первое слово из slug (напр. callcenter_order_view - вернет callcenter)
+     *
+     * @return mixed|string
+     */
+    public function getGroupSlugAttribute()
+    {
+        return explode('_', $this->slug)[0];
+    }
+
     public function roles()
     {
         return $this->belongsToMany(Role::class, 'roles_permissions'); // ->withDefault()
     }
+
+
 }
