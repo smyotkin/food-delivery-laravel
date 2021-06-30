@@ -27,17 +27,45 @@
                 </div>
                 <div class="col">
                     <p class="fw-bold mb-0">Часовой пояс</p>
-                    <p class="mb-0">Московское время</p>
+                    <button type="button" class="btn-link text-decoration-none" data-bs-toggle="modal" data-bs-target="#exampleModal">{{ $timezones[$user->timezone] }}</button>
+
+                    <div class="modal fade" id="exampleModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                        <div class="modal-dialog modal-dialog-centered">
+                            <form action="{{ route('profile.update', ['profile' => $user]) }}" class="modal-content" method="post">
+                                @method('patch')
+                                @csrf
+
+                                <div class="modal-header">
+                                    <h5 class="modal-title" id="exampleModalLabel"><strong>Изменить часовой пояс</strong></h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="list-group">
+                                        @foreach($timezones as $timezone => $title)
+                                            <label class="list-group-item list-group-item-action">
+                                                <input class="form-check-input me-1" name="timezone" type="radio" value="{{ $timezone }}" {{ !empty($user->timezone) && $user->timezone == $timezone ? 'checked' : '' }}>
+                                                {{ $title }}
+                                            </label>
+                                        @endforeach
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Отменить</button>
+                                    <button type="submit" class="btn btn-primary">Сохранить</button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 
     <div class="container-fluid mb-5">
-        <div class="px-5 border-bottom border-gray mb-4">
+        <div class="px-5 border-bottom border-gray pt-2 pb-4">
             <div class="row px-5">
                 <div class="col-3">
-                    <h4 class="fw-normal">Права доступа</h4>
+                    <h4 class="fw-normal mb-0">Права доступа</h4>
                 </div>
 
                 <div class="col-7">
@@ -84,32 +112,48 @@
             </div>
         </div>
 
-        <div class="px-5 border-bottom border-gray mb-4">
+        <div class="px-5 border-bottom border-gray py-4">
             <div class="row px-5">
                 <div class="col-3">
-                    <h4 class="fw-normal">Доступ к данным</h4>
+                    <h4 class="fw-normal mb-0">Доступ к данным</h4>
                 </div>
                 <div class="col-6">
-
+                    <p class="mb-0 text-muted">Пусто</p>
                 </div>
             </div>
         </div>
 
-        <div class="px-5 border-bottom border-gray mb-4">
+        <div class="px-5 border-bottom border-gray py-4">
             <div class="row px-5">
                 <div class="col-3">
-                    <h4 class="fw-normal">Пароль</h4>
+                    <h4 class="fw-normal mb-0">Пароль</h4>
                 </div>
                 <div class="col-4">
-                    <a href="javascript:" class="text-decoration-none">Изменить пароль...</a>
+                    <button class="btn btn-link px-0 text-decoration-none" id="change_password">Изменить пароль...</button>
+
+                    <form action="{{ route('profile.update', ['profile' => $user]) }}" method="post" class="d-none" id="change_password-form">
+                        @method('patch')
+                        @csrf
+
+                        <input type="password" name="password" value="" placeholder="Новый пароль">
+                        <button class="btn btn-link text-decoration-none disabled" type="submit">Сохранить</button>
+
+                        <p class="text-sm mt-3 text-muted">Введите новый пароль, минимум шесть символов. <br> Пароль будет выслан на указанный номер телефона</p>
+                    </form>
                 </div>
             </div>
         </div>
 
-        <div class="px-5">
+        <div class="px-5 py-4">
             <div class="row px-5">
                 <div class="col-3">
-                    <a href="{{ route('logout') }}" class="text-decoration-none">Выйти из системы</a>
+                    <form method="POST" action="{{ route('logout') }}">
+                        @csrf
+
+                        <a href="route('logout')" onclick="" class="text-decoration-none logout-link">
+                            {{ __('Выйти из системы') }}
+                        </a>
+                    </form>
                 </div>
                 <div class="col-4">
                     @php ($updated_at = Date::parse($user->updated_at))
@@ -119,4 +163,56 @@
             </div>
         </div>
     </div>
+
+    <script>
+        let changePwdForm = $('#change_password-form');
+        let changePwdButton = $('#change_password-form button[type=submit]');
+
+        $(document).ready(function() {
+            $('#change_password').on('click', function (e) {
+                $(this).hide();
+                $('#change_password-form').removeClass('d-none');
+            });
+        });
+
+        $('#change_password-form :input').on('keyup change', function() {
+            if ($(this).val().length < 6)
+                return changePwdButton.addClass('disabled');
+
+            changePwdButton.removeClass('disabled');
+        });
+
+        changePwdButton.on('click', function (e) {
+            e.preventDefault();
+
+            swal({
+                dangerMode: true,
+                title: 'Вы уверены?',
+                text: 'Что хотите изменить пароль',
+                icon: 'warning',
+                buttons: ['Отмена', 'Да, я уверен!']
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    changePwdForm.submit();
+                }
+            });
+        });
+
+        $('.logout-link').on('click', function (e) {
+            e.preventDefault();
+            let thisButton = $(this);
+
+            swal({
+                dangerMode: true,
+                title: 'Вы уверены?',
+                text: 'Что хотите выйти',
+                icon: 'warning',
+                buttons: ['Отмена', 'Да, я уверен!']
+            }).then(function(isConfirm) {
+                if (isConfirm) {
+                    thisButton.closest('form').submit();
+                }
+            });
+        });
+    </script>
 </x-app-layout>
