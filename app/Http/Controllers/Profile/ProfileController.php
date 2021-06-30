@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Profile;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Users\UpdateProfileRequest;
 use App\Models\Permission;
 use App\Services\UsersService;
 use Illuminate\Http\Request;
@@ -35,7 +36,23 @@ class ProfileController extends Controller
         return view('users/profile', [
             'user' => $user,
             'role' => $role,
+            'timezones' => UsersService::timezones,
             'current_permissions' => $filteredPermissions,
         ])->render();
+    }
+
+    /**
+     * Обновление данных профиля
+     *
+     * @param UpdateProfileRequest $request
+     * @return \Illuminate\Http\RedirectResponse
+     * @throws \Exception
+     * @throws \Throwable
+     */
+    public function update(UpdateProfileRequest $request): \Illuminate\Http\RedirectResponse
+    {
+        UsersService::updateProfile($request->validated());
+
+        return redirect()->route('profile.index');
     }
 }
