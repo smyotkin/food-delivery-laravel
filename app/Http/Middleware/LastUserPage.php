@@ -23,9 +23,10 @@ class LastUserPage
         if (Auth::check()) {
             Cache::put('user-last-page-' . Auth::user()->id, $request->getPathInfo());
 
-            User::where('id', Auth::user()->id)->update([
-                'last_page' => $request->getPathInfo(),
-            ]);
+            $user = Auth::user();
+            $user->last_page = $request->getPathInfo();
+            $user->timestamps = false;
+            $user->save();
         }
 
         return $next($request);
