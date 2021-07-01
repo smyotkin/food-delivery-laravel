@@ -1,26 +1,10 @@
 $(document).ready(function () {
-    $('.ru-phone_format').mask("+7 999 999-99-99");
+    $('.ru-phone_format').mask("+7 999 999-99-99", {autoclear: false});
 
-    $('.update_user :input').on('keyup change', function() {
-        checkUserForm();
-    });
-
-    $('.update_position :input').on('keyup change', function() {
+    $('body').on('keyup change', '.update_position :input', function() {
         checkPositionForm();
     });
 });
-
-function checkUserForm() {
-    $('#save_user').addClass('disabled btn-outline-secondary');
-
-    if ($('#first_name').val().length < 2)
-        return;
-
-    if ($('#last_name').val().length < 2)
-        return;
-
-    $('#save_user').removeClass('disabled btn-outline-secondary').addClass('btn-outline-primary');
-}
 
 function checkPositionForm() {
     $('#save').addClass('disabled btn-outline-secondary');

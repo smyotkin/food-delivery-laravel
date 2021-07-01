@@ -16,14 +16,14 @@
             <div class="col text-end lh-base">
                 @if (isset($user))
                     @permission("users_{$user->status}_modify")
-                        <p class="mb-1">
-                            <a href="javascript:" onclick="event.preventDefault(); $('#user_form').submit();" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                        <p class="mb-2">
+                            <a href="javascript:" onclick="" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
                         </p>
                     @endpermission
                 @else
                     @anyPermission('users_employee_add|users_specialist_add|users_head_add|users_owner_add')
-                        <p class="mb-1">
-                            <a href="javascript:" onclick="event.preventDefault(); $('#user_form').submit();" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                        <p class="mb-2">
+                            <a href="javascript:" onclick="" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
                         </p>
                     @endanyPermission
                 @endif
@@ -62,82 +62,73 @@
         </div>
     </div>
 
+
     <div class="container-fluid px-5 mb-5">
-        <div class="row">
-            <div class="col">
-                <!-- Validation Errors -->
-                <x-auth-validation-errors class="mb-4" :errors="$errors" />
-            </div>
+        <div class="col-auto my-4 d-flex align-items-center" id="preloader">
+            <div class="spinner-border text-secondary mr-4" role="status" style="width: 3rem; height: 3rem;"></div>
+            <strong class="text-muted">Загрузка...</strong>
         </div>
 
-        <div class="row">
-            <form method="post" action="{{ isset($user) ? route('users.update', ['user' => $user]) : route('users.store') }}" id="user_form" class="col-10 update_user">
-                @method(isset($user) ? 'patch' : 'post')
-                @csrf
-
-                <fieldset class="row g-3" {{ isset($user) && !auth()->user()->hasPermission("users_{$user->status}_modify") ? 'disabled' : '' }}>
-                    <div class="col-5">
-                        <div class="row g-3">
-                            @isset($user)
-                                <input type="hidden" name="id" value="{{ $user->id }}">
-                            @endisset
-
-                            <div class="col-6">
-                                <label for="first_name" class="form-label fw-bold">Имя</label>
-                                <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ old('first_name') ?? $user->first_name ?? '' }}" placeholder="Имя">
-                            </div>
-
-                            <div class="col-6">
-                                <label for="last_name" class="form-label fw-bold">Фамилия</label>
-                                <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ old('last_name') ?? $user->last_name ?? '' }}" placeholder="Фамилия">
-                            </div>
-
-                            <div class="col-12">
-                                <label for="phone" class="form-label fw-bold">Мобильный телефон</label>
-                                <input type="text" class="form-control rounded-0 ru-phone_format" id="phone" name="phone" value="{{ old('phone') ?? $user->phone_formatted ?? '' }}" placeholder="+7 555 555-55-55">
-                            </div>
-
-                            <div class="col-12">
-                                @include('users/statuses-select')
-                            </div>
-
-                            <div class="col-12">
-                                @include('users/positions-select')
-                            </div>
-
-                            <div class="col-12">
-                                <div class="form-check mt-1">
-                                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {{ !empty($user->is_active) || !isset($user) ? 'checked' : '' }}>
-                                    <label class="form-check-label" for="is_active">Учетная запись активна</label>
-                                </div>
-                            </div>
-
-                            @permission('users_modes_modify')
-                                <div class="col-12">
-                                    <div class="form-check mt-1">
-                                        <input class="form-check-input" type="checkbox" id="is_custom_permissions" name="is_custom_permissions" {{ !empty($user->is_custom_permissions) ? 'checked' : '' }}>
-                                        <label class="form-check-label" for="is_custom_permissions">Персонализированные права</label>
-                                    </div>
-                                </div>
-                            @endpermission
-                        </div>
-                    </div>
-
-                    @permission('users_modes_modify')
-                        <div class="col-7" id="permissions">
-                            @if (!empty($role) || (isset($user) && $user::isRoot()))
-                                @include('users/permissions-table')
-                            @endif
-                        </div>
-                    @endpermission
-                </fieldset>
-            </form>
-        </div>
+        <div id="formAjax"></div>
     </div>
 
     <script>
         $(document).ready(function() {
-            $("#status").on('change', function() {
+            $.ajax({
+                url: '{{ route('users.getUserFormAjax') }}',
+                type: 'GET',
+                data: {
+                    action: '{{ isset($user) ? 'show' : 'create' }}',
+                    {{ isset($user) ? 'id: ' . $user->id : '' }}
+                },
+                beforeSend: function () {
+                    $('#preloader').removeClass('d-none');
+                },
+                complete: function() {
+                    $('#preloader').addClass('d-none');
+                },
+                success: function (data) {
+                    $('#formAjax').html(data);
+                    $('.ru-phone_format').mask("+7 999 999-99-99", {
+                        autoclear: false,
+                    });
+                }
+            });
+
+            $('body').on('click', '#save_user', function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    url: $('#user_form').prop('action'),
+                    type: 'POST',
+                    // dataType:'json',
+                    data: $('#user_form').serialize(),
+                    beforeSend: function () {
+                        $('#preloader').removeClass('d-none');
+                    },
+                    complete: function() {
+                        $('#preloader').addClass('d-none');
+                    },
+                    success: function (data) {
+                        if (JSON.parse(data).success) {
+                            window.location.replace('/users');
+                        }
+                    },
+                    error: function (response) {
+                        if (response.responseJSON.errors.phone) {
+                            $('#phone').addClass('is-invalid');
+                            $('#phone + .invalid-feedback').remove();
+                            $('#phone').parent().append('<div class="invalid-feedback text-sm">' + response.responseJSON.errors.phone[0] + '</div>');
+                        }
+                    }
+                });
+            });
+
+            $('body').on('keyup change', '.update_user input, .update_user select', function() {
+                checkUserForm();
+            });
+
+            $('body').on('change', '#status', function() {
                 $.ajax({
                     type: 'GET',
                     data: {
@@ -154,11 +145,11 @@
                 });
             });
 
-            $("#position").on('change', function() {
+            $('body').on('change', '#position', function() {
                 getPermissionsCheckedAjax($(this), $("#is_custom_permissions"));
             });
 
-            $("#is_custom_permissions").on('change', function() {
+            $('body').on('change', '#is_custom_permissions', function() {
                 if ($('#position').val() > 0) {
                     getPermissionsCheckedAjax($('#position'), $(this));
                 }
@@ -180,7 +171,49 @@
             }
         });
 
-        $('#delete').on('click', function (e) {
+        function checkUserForm() {
+            let isValid = true;
+            $('#user_form input, #user_form select').removeClass('is-invalid');
+
+            $('#save_user').addClass('disabled btn-outline-secondary');
+
+            if ($('#first_name').val().length < 2) {
+                $('#first_name').addClass('is-invalid');
+
+                isValid = false;
+            }
+
+            if ($('#last_name').val().length < 2) {
+                $('#last_name').addClass('is-invalid');
+
+                isValid = false;
+            }
+
+            let phoneValidation = new RegExp(/\+7\s\d{3}\s\d{3}\-\d{2}\-\d{2}/gm);
+
+            if (!phoneValidation.test($('#phone').val())) {
+                $('#phone').addClass('is-invalid');
+
+                isValid = false;
+            }
+
+            if ($('#status').val() === null) {
+                $('#status').addClass('is-invalid');
+
+                isValid = false;
+            }
+
+            if ($('#position').val() === null) {
+                $('#position').addClass('is-invalid');
+
+                isValid = false;
+            }
+
+            if (isValid)
+                $('#save_user').removeClass('disabled btn-outline-secondary').addClass('btn-outline-primary');
+        }
+
+        $('body').on('click', '#delete', function (e) {
             e.preventDefault();
 
             swal({
