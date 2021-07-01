@@ -80,30 +80,34 @@ class UsersController extends Controller
      * Редактирование пользователя
      *
      * @param CreateOrUpdateUserRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return string
      * @throws \Exception
      * @throws \Throwable
      */
-    public function update(CreateOrUpdateUserRequest $request): \Illuminate\Http\RedirectResponse
+    public function update(CreateOrUpdateUserRequest $request): string
     {
         UsersService::createOrUpdate($request->validated());
 
-        return redirect()->route('users.index');
+        return json_encode([
+            'success' => true,
+        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
      * Создание нового пользователя
      *
      * @param CreateOrUpdateUserRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return string
      * @throws \Exception
      * @throws \Throwable
      */
-    public function store(CreateOrUpdateUserRequest $request): \Illuminate\Http\RedirectResponse
+    public function store(CreateOrUpdateUserRequest $request): string
     {
         UsersService::createOrUpdate($request->validated());
 
-        return redirect()->route('users.index');
+        return json_encode([
+            'success' => true,
+        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -132,6 +136,40 @@ class UsersController extends Controller
             'data' => UsersService::find($request->toArray()),
             'roles' => PositionsService::find(null, false),
         ])->render();
+    }
+
+    public function getUserFormAjax(Request $request): string
+    {
+        $role = UsersService::getRoleWithPermissions(['id' => $request->id]);
+        $returnedData = [
+            'statuses' => PositionsService::statuses,
+            'positions' => PositionsService::find(['status' => old('status') ?? $role->status ?? '']),
+            'permissions' => Permission::orderBy('group', 'desc')->get(),
+            'available_statuses' => Auth::user()->availableStatusesByType('add'),
+        ];
+
+        if ($request->action == 'show') {
+            $user = UsersService::getOrFail(['id' => $request->id]);
+            $role = UsersService::getRoleWithPermissions(['id' => $request->id]);
+            $role_permissions = !empty($role) ? $role->permissions->pluck('slug')->toArray() : [];
+
+            if ($is_custom_permissions = !empty($user->is_custom_permissions)) {
+                $current_permissions = UsersService::getPermissions(['id' => $request->id])->pluck('slug')->toArray();
+            } else {
+                $current_permissions = $role_permissions;
+            }
+
+            $returnedData = $returnedData + [
+                'user' => $user,
+                'role' => $role,
+                'is_custom_permissions' => $is_custom_permissions,
+                'role_permissions' => $role_permissions,
+                'current_permissions' => $current_permissions,
+                'available_statuses' => Auth::user()->availableStatusesByType('modify'),
+            ];
+        }
+
+        return view('users/user-form', $returnedData)->render();
     }
 
     /**

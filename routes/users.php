@@ -13,6 +13,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/getAjax', [UsersController::class, 'getAjax'])
         ->name('users/getAjax');
 
+    Route::get('/users/getUserFormAjax', [UsersController::class, 'getUserFormAjax'])
+        ->name('users.getUserFormAjax');
+
     Route::get('/users/positions/getAjax', [PositionsController::class, 'getAjax'])
         ->name('positions.getAjax');
 
