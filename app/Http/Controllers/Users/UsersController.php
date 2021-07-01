@@ -138,6 +138,12 @@ class UsersController extends Controller
         ])->render();
     }
 
+    /**
+     * Возвращает форму пользователя(принимает $action - show(все данные) или create(пусто)), для AJAX
+     *
+     * @param Request $request
+     * @return string
+     */
     public function getUserFormAjax(Request $request): string
     {
         $role = UsersService::getRoleWithPermissions(['id' => $request->id]);
