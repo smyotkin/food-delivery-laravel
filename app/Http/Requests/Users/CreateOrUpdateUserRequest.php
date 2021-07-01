@@ -47,7 +47,7 @@ class CreateOrUpdateUserRequest extends FormRequest
             'last_name' => 'required|string|max:255',
             'is_active' => 'boolean',
             'is_custom_permissions' => 'boolean',
-            'phone' => 'required|digits:11',
+            'phone' => "required|digits:11|unique:users,phone,{$this->id}",
             'status' => 'required|in:owner,head,specialist,employee',
             'permissions' => 'array|exists:permissions,slug',
             'timezone' => 'string',
@@ -57,7 +57,6 @@ class CreateOrUpdateUserRequest extends FormRequest
             case 'POST': {
                 return $rules->merge([
                     'id' => 'integer|exists:users,id',
-                    'phone' => 'required|digits:11|unique:users,phone',
                 ])->all();
             }
             case 'PUT':
