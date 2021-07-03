@@ -16,14 +16,14 @@
             <div class="col text-end lh-base">
                 @if (isset($role))
                     @permission('users_position_modify')
-                        <p class="mb-1">
-                            <a href="javascript:" onclick="event.preventDefault(); $('#position_form').submit();" id="save" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                        <p class="mb-2">
+                            <a href="javascript:" id="save" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
                         </p>
                     @endpermission
                 @else
                     @permission('users_position_create')
-                        <p class="mb-1">
-                            <a href="javascript:" onclick="event.preventDefault(); $('#position_form').submit();" id="save" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                        <p class="mb-2">
+                            <a href="javascript:" id="save" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
                         </p>
                     @endpermission
                 @endif
@@ -59,100 +59,80 @@
 
 
     <div class="container-fluid px-5 mb-5">
-        <div class="row">
-            <div class="col">
-                <!-- Validation Errors -->
-                <x-auth-validation-errors class="mb-4" :errors="$errors" />
-            </div>
+        <div class="col-auto my-4 d-flex align-items-center" id="preloader">
+            <div class="spinner-border text-secondary mr-4" role="status" style="width: 3rem; height: 3rem;"></div>
+            <strong class="text-muted">Загрузка...</strong>
         </div>
 
-        <div class="row">
-            <form method="post" action="{{ isset($role) ? route('positions.update', ['position' => $role]) : route('positions.store') }}" id="position_form" class="col-10 update_position">
-                @method(isset($role) ? 'patch' : 'post')
-                @csrf
-
-                <fieldset class="row g-3" {{ isset($role) && !auth()->user()->hasPermission('users_position_modify') ? 'disabled' : '' }}>
-                    <div class="col-5">
-                        <div class="row g-3">
-                            @if (isset($role))
-                                <input type="hidden" name="id" value="{{ $role->id }}">
-                            @endif
-
-                            <div class="col-12">
-                                <label for="name" class="form-label fw-bold">Название</label>
-                                <input type="text" class="form-control rounded-0" id="name" name="name" value="{{ $role->name ?? '' }}" placeholder="Название">
-                            </div>
-
-                            <div class="col-12">
-                                <label for="slug" class="form-label fw-bold">Метка</label>
-                                <input type="text" class="form-control rounded-0" id="slug" name="slug" value="{{ $role->slug ?? '' }}" placeholder="Метка (латиницей с нижним подчеркиванием)">
-                            </div>
-
-                            <div class="col-12">
-                                <label for="status" class="form-label fw-bold">Статус</label>
-                                <select class="form-select" id="status" name="status" required>
-                                    <option disabled selected>Ничего не выбрано</option>
-                                    @foreach ($statuses as $key => $status)
-                                        <option value="{{ $key }}" {{ isset($role->status) && $role->status == $key ? 'selected' : '' }}>{{ $status['name'] }}</option>
-                                    @endforeach
-                                </select>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="col-7">
-                        <div class="row g-3">
-                            <div class="col-12">
-                                <label class="form-label fw-bold">Права</label>
-
-                                <table class="table table-sm align-middle">
-                                    <thead>
-                                        <tr class="bg-lightgray">
-                                            <th class="text-start px-4" scope="col"></th>
-                                            <th scope="col">Название</th>
-                                            <th scope="col">Метка</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        @php ($previousGroupValue = '')
-
-                                        @foreach ($permissions as $permission)
-                                            @if ($permission->group != $previousGroupValue)
-                                                <tr>
-                                                    <td></td>
-                                                    <td colspan="2" class="py-3">
-                                                        <strong>{{ $permission->group }}</strong>
-                                                    </td>
-                                                </tr>
-                                            @endif
-
-                                            <tr class="bg-light">
-                                                <td class="text-center">
-                                                    <input class="form-check-input permission" type="checkbox" name="permissions[]" value="{{ $permission->slug }}" id="{{ $permission->slug }}" {{ isset($role_permissions) && in_array($permission->slug, $role_permissions) ? 'checked' : '' }}>
-                                                </td>
-                                                <td>
-                                                    <label class="form-check-label" for="{{ $permission->slug }}">
-                                                        {{ $permission->name }}
-                                                    </label>
-                                                </td>
-                                                <td>
-                                                    {{ $permission->slug }}
-                                                </td>
-                                            </tr>
-
-                                            @php ($previousGroupValue = $permission->group)
-                                        @endforeach
-                                    </tbody>
-                                </table>
-                            </div>
-                        </div>
-                    </div>
-                </fieldset>
-            </form>
-        </div>
+        <div id="formAjax"></div>
     </div>
 
     <script>
+        $.ajaxSetup({
+            beforeSend: function () {
+                $('#preloader').removeClass('d-none');
+            },
+            complete: function() {
+                $('#preloader').addClass('d-none');
+            },
+        });
+
+        $(document).ready(function() {
+            $.ajax({
+                url: '{{ route('positions.getFormAjax') }}',
+                type: 'GET',
+                data: {
+                    action: '{{ isset($role) ? 'show' : 'create' }}',
+                    {{ isset($role) ? 'id: ' . $role->id : '' }}
+                },
+                success: function (data) {
+                    $('#formAjax').html(data);
+                }
+            });
+        });
+
+        $('body').on('click', '#save', function(event) {
+            event.preventDefault();
+
+            $.ajax({
+                url: $('#position_form').prop('action'),
+                type: 'POST',
+                data: $('#position_form').serialize(),
+                success: function (data) {
+                    if (JSON.parse(data).success) {
+                        window.location.replace('{{ route('positions.index') }}');
+                    }
+                },
+                error: function (response) {
+                    if (response.responseJSON.errors.slug) {
+                        $('#slug').addClass('is-invalid');
+                        $('#slug + .invalid-feedback').remove();
+                        $('#slug').parent().append('<div class="invalid-feedback text-sm">' + response.responseJSON.errors.slug[0] + '</div>');
+                    }
+
+                    if (response.responseJSON.errors.permissions) {
+                        $('#permissions').addClass('alert-danger validation-error');
+                    }
+                }
+            });
+        });
+
+        $('body').on('keyup change', '.update_position input, .update_position select', function() {
+            $('#position_form input, #position_form select, #permissions').removeClass('is-invalid validation-error alert-danger');
+
+            $('#save').addClass('disabled btn-outline-secondary');
+
+            let fields = {
+                'name': validateField($('#name').val().length < 2, $('#name')),
+                'slug': validateField($('#slug').val().length < 2, $('#slug')),
+                'status': validateField($('#status').val() === null, $('#status')),
+                'permissions': validateField($('input[name="permissions[]"]:checked').length <= 0, $('#permissions'), 'validation-error alert-danger'),
+            };
+
+            if (checkValidation(fields))
+                $('#save').removeClass('disabled btn-outline-secondary').addClass('btn-outline-primary');
+        });
+
         $('#delete').on('click', function (e) {
             e.preventDefault();
 
