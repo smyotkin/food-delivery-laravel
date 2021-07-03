@@ -26,7 +26,7 @@ class CreateOrUpdatePositionRequest extends FormRequest
         $rules = collect([
             'id' => 'required|integer|exists:roles,id',
             'name' => 'required|string|max:255',
-            'slug' => 'required|string|max:255',
+            'slug' => "required|string|max:255|unique:roles,slug,{$this->id}",
             'status' => 'required|in:owner,head,specialist,employee',
             'permissions' => 'required|array|exists:permissions,slug',
         ]);
@@ -35,7 +35,6 @@ class CreateOrUpdatePositionRequest extends FormRequest
             case 'POST': {
                 return $rules->merge([
                     'id' => 'integer|exists:roles,id',
-                    'slug' => 'required|string|max:255|unique:roles,slug',
                 ])->all();
             }
             case 'PUT':
