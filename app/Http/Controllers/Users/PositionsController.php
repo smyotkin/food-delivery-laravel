@@ -47,15 +47,17 @@ class PositionsController extends Controller
      * Создание новой должности
      *
      * @param CreateOrUpdatePositionRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return string
      * @throws \Exception
      * @throws \Throwable
      */
-    public function store(CreateOrUpdatePositionRequest $request): \Illuminate\Http\RedirectResponse
+    public function store(CreateOrUpdatePositionRequest $request): string
     {
         PositionsService::createOrUpdate($request->validated());
 
-        return redirect()->route('positions.index');
+        return json_encode([
+            'success' => true,
+        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -80,15 +82,17 @@ class PositionsController extends Controller
      * Редактирование\обновление должности
      *
      * @param CreateOrUpdatePositionRequest $request
-     * @return \Illuminate\Http\RedirectResponse
+     * @return string
      * @throws \Throwable
      * @throws \Exception
      */
-    public function update(CreateOrUpdatePositionRequest $request): \Illuminate\Http\RedirectResponse
+    public function update(CreateOrUpdatePositionRequest $request): string
     {
         PositionsService::createOrUpdate($request->validated());
 
-        return redirect()->route('positions.index');
+        return json_encode([
+            'success' => true,
+        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -142,6 +146,30 @@ class PositionsController extends Controller
         return view('users/permissions-table', [
             'data' => PositionsService::getWithPermissions($request->input()),
         ])->render();
+    }
+
+    /**
+     * Возвращает форму должности(принимает $action - show(все данные) или create(пусто)), для AJAX
+     *
+     * @param Request $request
+     * @return string
+     */
+    public function getFormAjax(Request $request): string
+    {
+        $returnedData = [
+            'statuses' => PositionsService::statuses,
+            'permissions' => Permission::orderBy('group', 'desc')->get(),
+        ];
+
+        if ($request->action == 'show') {
+            $role = PositionsService::getWithPermissions(['id' => $request->id]);
+            $returnedData = $returnedData + [
+                'role' => $role,
+                'role_permissions' => !empty($role) ? $role->permissions->pluck('slug')->toArray() : [],
+            ];
+        }
+
+        return view('users/position-form', $returnedData)->render();
     }
 
     /**
