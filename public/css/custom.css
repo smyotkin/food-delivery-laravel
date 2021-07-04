@@ -54,3 +54,8 @@ img {
 .validation-error .text-error {
     display: table-caption;
 }
+
+.btn-link.disabled,
+.btn-link:disabled {
+    cursor: default;
+}
