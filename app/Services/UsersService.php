@@ -101,12 +101,15 @@ class UsersService
     {
         try {
             $basicParams = collect($array)
-                ->only(['timezone', 'password'])
-                ->all();
+                ->only(['timezone', 'password']);
 
             DB::transaction(function() use ($basicParams) {
                 if ($user = Auth::user()) {
-                    $user->update($basicParams);
+                    if (isset($basicParams['password'])) {
+                        $basicParams['password'] = Hash::make($basicParams['password']);
+                    }
+
+                    $user->update($basicParams->all());
                     $user->saveOrFail();
 
                     Log::info("UPDATE_USER: id({$user->id})");
