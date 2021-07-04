@@ -22,6 +22,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/positions/getAjax', [PositionsController::class, 'getAjax'])
         ->name('positions.getAjax');
 
+    Route::get('/profile/getAjax', [ProfileController::class, 'getAjax'])
+        ->name('profile.getAjax');
+
     Route::get('/users/positions/getAjaxByStatus', [PositionsController::class, 'getAjaxByStatus'])
         ->name('positions.getAjaxByStatus');
 
