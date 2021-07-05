@@ -433,8 +433,6 @@ class PermissionsSeeder extends Seeder
         ];
 
         foreach($array as $row) {
-            $row = trim($row);
-
             Permission::updateOrCreate(
                 [
                     'slug' => $row['slug']
