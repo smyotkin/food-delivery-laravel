@@ -137,14 +137,16 @@
             $('body').on('click', '#delete', function (e) {
                 e.preventDefault();
 
-                swal({
+                Swal.fire({
                     dangerMode: true,
                     title: 'Вы уверены?',
                     text: 'Данная запись будет удалена',
                     icon: 'warning',
-                    buttons: ['Отмена', 'Да, я уверен!']
-                }).then(function(isConfirm) {
-                    if (isConfirm) {
+                    confirmButtonText: 'Да, я уверен!',
+                    cancelButtonText: 'Отмена',
+                    showCancelButton: true,
+                }).then((result) => {
+                    if (result.isConfirmed) {
                         $.ajax({
                             url: $('#delete_position').prop('action'),
                             type: 'POST',
@@ -156,12 +158,14 @@
                                 if (response.status === 500) {
                                     $('#delete').remove();
 
-                                    swal({
+                                    Swal.fire({
                                         dangerMode: true,
                                         title: 'Внимание!',
                                         text: response.responseJSON.message,
                                         icon: 'warning',
-                                        buttons: 'Закрыть'
+                                        cancelButtonText: 'Закрыть',
+                                        showCancelButton: true,
+                                        showConfirmButton: false,
                                     });
                                 }
                             }

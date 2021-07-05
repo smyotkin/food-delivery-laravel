@@ -101,7 +101,6 @@
                 $.ajax({
                     url: $('#user_form').prop('action'),
                     type: 'POST',
-                    // dataType:'json',
                     data: $('#user_form').serialize(),
                     beforeSend: function () {
                         $('#preloader').removeClass('d-none');
@@ -118,7 +117,9 @@
                         if (response.responseJSON.errors.phone) {
                             $('#phone').addClass('is-invalid');
                             $('#phone + .invalid-feedback').remove();
-                            $('#phone').parent().append('<div class="invalid-feedback text-sm">' + response.responseJSON.errors.phone[0] + '</div>');
+                            $('#phone').parent().append(
+                                '<div class="invalid-feedback text-sm">' + response.responseJSON.errors.phone[0] + '</div>'
+                            );
                         }
                     }
                 });
@@ -216,14 +217,16 @@
         $('body').on('click', '#delete', function (e) {
             e.preventDefault();
 
-            swal({
+            Swal.fire({
                 dangerMode: true,
                 title: 'Вы уверены?',
                 text: 'Данная запись будет удалена',
                 icon: 'warning',
-                buttons: ['Отмена', 'Да, я уверен!']
-            }).then(function(isConfirm) {
-                if (isConfirm) {
+                confirmButtonText: 'Да, я уверен!',
+                cancelButtonText: 'Отмена',
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
                     $('#delete_user').submit();
                 }
             });

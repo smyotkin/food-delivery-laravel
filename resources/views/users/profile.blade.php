@@ -138,14 +138,16 @@
         $('body').on('click', '#change_password-submit', function (e) {
             e.preventDefault();
 
-            swal({
+            Swal.fire({
                 dangerMode: true,
                 title: 'Вы уверены?',
                 text: 'Что хотите изменить пароль',
                 icon: 'warning',
-                buttons: ['Отмена', 'Да, я уверен!']
-            }).then(function(isConfirm) {
-                if (isConfirm) {
+                confirmButtonText: 'Да, я уверен!',
+                cancelButtonText: 'Отмена',
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
                     $.ajax({
                         url: $('.change_password-form').prop('action'),
                         type: 'POST',
@@ -174,14 +176,16 @@
             e.preventDefault();
             let thisButton = $(this);
 
-            swal({
+            Swal.fire({
                 dangerMode: true,
                 title: 'Вы уверены?',
                 text: 'Что хотите выйти',
                 icon: 'warning',
-                buttons: ['Отмена', 'Да, я уверен!']
-            }).then(function(isConfirm) {
-                if (isConfirm) {
+                confirmButtonText: 'Да, я уверен!',
+                cancelButtonText: 'Отмена',
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
                     thisButton.closest('form').submit();
                 }
             });

@@ -21,7 +21,7 @@
         <script src="{{ asset('js/bootstrap.min.js') }}"></script>
         <script src="{{ asset('js/jquery.min.js') }}"></script>
         <script src="{{ asset('js/jquery.maskedinput.min.js') }}"></script>
-        <script src="{{ asset('js/sweetalert.min.js') }}"></script>
+        <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
         <script src="{{ asset('js/custom.js') }}"></script>
     </head>
     <body class="font-sans antialiased">
