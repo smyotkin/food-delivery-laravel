@@ -114,7 +114,7 @@
                         }
                     },
                     error: function (response) {
-                        if (response.responseJSON.errors.phone) {
+                        if (typeof(response.responseJSON.errors) != 'undefined') {
                             $('#phone').addClass('is-invalid');
                             $('#phone + .invalid-feedback').remove();
                             $('#phone').parent().append(
