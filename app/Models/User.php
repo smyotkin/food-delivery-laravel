@@ -62,14 +62,19 @@ class User extends Authenticatable
     use HasRolesAndPermissions;
     use Notifiable;
 
+    public function routeNotificationForSmscru()
+    {
+        return $this->phone;
+    }
+
     public function permissions()
     {
-        return $this->belongsToMany(Permission::class, 'users_permissions'); // ->withDefault()
+        return $this->belongsToMany(Permission::class, 'users_permissions');
     }
 
     public function roles()
     {
-        return $this->belongsToMany(Role::class, 'users_roles'); // ->withDefault()
+        return $this->belongsToMany(Role::class, 'users_roles');
     }
 
     protected $perPage = 100;
