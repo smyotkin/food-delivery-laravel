@@ -63,3 +63,5 @@ npm-debug.log
 yarn-error.log
 composer.lock
 package-lock.json
+/ssh_key
+/ssh_key.pub
