@@ -8,6 +8,9 @@ use Illuminate\Support\Facades\DB;
 use App\Models\User;
 use App\Models\Role;
 use Illuminate\Support\Facades\Auth;
+use App\Notifications\SmsCenter;
+use Illuminate\Support\Facades\Notification;
+use NotificationChannels\SmscRu\SmscRuChannel;
 
 class UsersService
 {
@@ -80,6 +83,12 @@ class UsersService
                         'password' => Hash::make($password = random_int(100000, 999999)),
                     ]);
 
+                    if ($newUser) {
+                        $newUser->notify(new SmsCenter([
+                            'password' => $password
+                        ]));
+                    }
+
                     DB::table('users_roles')->insert([
                         'user_id' => $newUser->id,
                         'role_id' => $permissionsParams['position_id'],
@@ -105,7 +114,9 @@ class UsersService
 
             DB::transaction(function() use ($basicParams) {
                 if ($user = Auth::user()) {
-                    if (isset($basicParams['password'])) {
+                    $password = $basicParams['password'] ?? false;
+
+                    if ($password) {
                         $basicParams['password'] = Hash::make($basicParams['password']);
                     }
 
@@ -189,17 +200,19 @@ class UsersService
         $role = self::getRoleWithPermissions(['id' => $id]);
         $permission = isset($role->status) ? "users_{$role->status}_$action" : null;
 
-        if (!User::isRoot()) {
-            if (!isset($permission)) {
-                abort(403, 'Пользователь не имеет должности');
-            } elseif (!Auth::user()->hasPermission($permission)) {
-                abort(403, "Нет права: $permission");
-            } elseif ($action == 'delete' && (Auth::user()->id == $id || User::isRoot($id))) {
-                abort(403, "Запрещено");
-            }
+        if (Auth::user()->id == $id || User::isRoot()) {
+            return true;
         }
 
-        return true;
+        if (!isset($permission)) {
+            abort(403, 'Пользователь не имеет должности');
+        } elseif (!Auth::user()->hasPermission($permission)) {
+            abort(403, "Нет права: $permission");
+        } elseif ($action == 'delete' && (Auth::user()->id == $id || User::isRoot($id))) {
+            abort(403, "Запрещено");
+        }
+
+        return false;
     }
 
     /**
