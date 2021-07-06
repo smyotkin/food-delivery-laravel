@@ -8,7 +8,7 @@
             @php ($previousGroupValue = '')
             @php ($nextGroupValue = '')
 
-            @foreach($current_permissions as $permission)
+            @forelse($current_permissions as $permission)
                 @php ($nextGroupValue =  isset($current_permissions[$loop->index + 1]) ? $current_permissions[$loop->index + 1]->group : null)
 
                 @if ($permission->group != $previousGroupValue)
@@ -43,7 +43,9 @@
                 @endif
 
                 @php ($previousGroupValue = $permission->group)
-            @endforeach
+            @empty
+                <p class="mb-0 text-muted">Пусто</p>
+            @endforelse
         </div>
     </div>
 </div>
