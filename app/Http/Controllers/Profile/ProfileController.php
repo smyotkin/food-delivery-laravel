@@ -21,6 +21,7 @@ class ProfileController extends Controller
     {
         return view('users/profile', [
             'user' => UsersService::getOrFail(['id' => Auth::user()->id]),
+            'role' => UsersService::getRoleWithPermissions(['id' => Auth::user()->id]),
             'timezones' => UsersService::timezones,
         ])->render();
     }
