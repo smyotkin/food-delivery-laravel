@@ -49,7 +49,7 @@
                     @if ((isset($role->status) && (Auth::user()->id != $user->id && !$user::isRoot($user->id))) || ($user::isRoot() && Auth::user()->id != $user->id))
                         @php ($status = empty($role->status) && $user::isRoot() ? 'admin' : $role->status)
                         @permission("users_{$status}_delete")
-                            <form action="{{ route('users.destroy', ['user' => $user->id]) }}" id="delete_user" method="post" id="delete_user">
+                            <form action="{{ route('users.destroy', ['user' => $user->id]) }}" id="delete_user" method="post">
                                 @method('delete')
                                 @csrf
 
