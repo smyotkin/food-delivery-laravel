@@ -1,36 +1,153 @@
 <x-guest-layout>
     <x-auth-card>
         <x-slot name="logo">
-            <a href="/">
-                <x-application-logo class="w-20 h-20 fill-current text-gray-500" />
+            <a href="/" class="text-decoration-none text-dark">
+                <h2 class="fw-bold">Ferone</h2>
             </a>
         </x-slot>
-
-        <div class="mb-4 text-sm text-gray-600">
-            {{ __('Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.') }}
-        </div>
 
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
+        @if (request()->failed)
+            <div class="alert alert-danger text-sm" role="alert">
+                Сессия закончилась или никогда и не существовала
+            </div>
+        @endif
+
         <!-- Validation Errors -->
         <x-auth-validation-errors class="mb-4" :errors="$errors" />
 
-        <form method="POST" action="{{ route('password.email') }}">
+        <form method="post" action="{{ isset($phone) ? route('password.store', ['phone' => $phone]) : route('password.request') }}">
+            @method(isset($phone) ? 'put' : 'get')
             @csrf
 
-            <!-- Email Address -->
             <div>
-                <x-label for="email" :value="__('Email')" />
+                <x-label for="phone" :value="__('Phone')" />
 
-                <x-input id="email" class="block mt-1 w-full" type="email" name="email" :value="old('email')" required autofocus />
+                <input type="text" id="phone" name="phone" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block mt-1 w-full ru-phone_format {{ isset($phone) ? 'disabled:opacity-50' : '' }}" value="{{ old('phone') ?? $phone ?? '' }}" placeholder="Мобильный телефон" required autofocus {{ isset($phone) ? 'readonly' : '' }}>
             </div>
 
-            <div class="flex items-center justify-end mt-4">
-                <x-button>
-                    {{ __('Email Password Reset Link') }}
-                </x-button>
-            </div>
+            @if (isset($phone) && $attempts > 0)
+                <div class="mt-3">
+                    <label for="pin" class="block font-medium text-sm text-gray-700">
+                        {{ __('Pin') }}
+                    </label>
+
+                    <div class="row mt-1">
+                        <div class="col">
+                            <input type="text" id="pin" name="pin" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block w-full pin_format {{ !$last_active_entry ? 'disabled:opacity-50' : '' }}" value="{{ old('pin') ?? '' }}" placeholder="Пин-код из СМС" required autofocus {{ !$last_active_entry ? 'disabled' : '' }} onFocus="this.selectionStart = this.selectionEnd = this.value.length;">
+                        </div>
+                        <div class="col text-center">
+                            <button class="btn btn-outline-secondary w-100 h-100 disabled" id="send_sms">
+                                <span id="timer">
+                                    {{ $pin_activity_time != '00:00' ? $pin_activity_time : 'Отправить код' }}
+                                </span>
+                            </button>
+                        </div>
+                    </div>
+
+                    @if ($last_active_entry)
+                        <div class="row">
+                            <div class="col">
+                                <div class="alert alert-secondary text-xs mt-2 mb-0 py-2" role="alert">
+                                    Вам было отправлено СМС-сообщение на номер {{ $phone }}. Код активен до {{ Date::parse($pin_ended)->format('H:i') }} (по МСК).
+                                </div>
+                            </div>
+                        </div>
+                    @endif
+                </div>
+
+                <div class="mt-3 {{ !$last_active_entry ? 'd-none' : '' }}">
+                    <x-label for="newPassword" :value="__('New Password')" />
+
+                    <input type="password" id="newPassword" name="new_password" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block mt-1 w-full" value="" placeholder="Новый пароль" required autofocus>
+                </div>
+            @endif
+
+            @if (isset($attempts) && $attempts == 0)
+                <div class="row">
+                    <div class="col">
+                        <div class="alert alert-secondary text-sm mt-4 mb-0 py-1 text-center" role="alert">
+                            У Вас больше не осталось попыток отправить СМС сегодня, попробуйте завтра.
+                        </div>
+                    </div>
+                </div>
+            @endif
+
+            @if (isset($phone) && $attempts > 0 || !isset($phone))
+                <div class="text-center mt-4">
+                    <button type="submit" class="btn btn-outline-dark">Восстановить пароль</button>
+                </div>
+            @endif
         </form>
+
+        @if (isset($phone))
+        <form action="{{ route('password.pin', ['phone' => $phone]) }}" id="send_sms_form" method="post">
+            @csrf
+
+            <input type="hidden" name="phone" value="{{ $phone }}">
+        </form>
+        @endif
+
+        <script>
+            @if (isset($pin_ended))
+            CountDownTimer(new Date({{ Date::parse($pin_ended)->timestamp }} * 1000), $('#timer'));
+            @endif
+
+            $(document).ready(function () {
+                $('.pin_format').mask("9999", {autoclear: false});
+            });
+
+            $('body').on('click', '#send_sms', function(event) {
+                event.preventDefault();
+
+                $.ajax({
+                    url: $('#send_sms_form').prop('action'),
+                    type: 'POST',
+                    data: $('#send_sms_form').serialize(),
+                    success: function (data) {
+                        if (JSON.parse(data).success) {
+                        //     window.location.replace('/users');
+                            window.location.reload(true);
+                        }
+                    },
+                });
+            });
+
+            function CountDownTimer(dt, element)
+            {
+                let end = new Date(dt);
+
+                let _second = 1000;
+                let _minute = _second * 60;
+                let _hour = _minute * 60;
+                let timer;
+
+                function showRemaining() {
+                    let now = new Date();
+                    let distance = end - now;
+
+                    if (distance < 0) {
+                        clearInterval(timer);
+                        element
+                            .parent()
+                            .removeClass('disabled btn-outline-secondary')
+                            .addClass('btn-outline-primary')
+                            .attr('disabled', false)
+                            .text('Отправить код');
+
+                        return;
+                    }
+
+                    let minutes = Math.floor((distance % _hour) / _minute);
+                    let seconds = Math.floor((distance % _minute) / _second);
+
+                    element.text((minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds));
+                }
+
+                timer = setInterval(showRemaining, 1000);
+            }
+        </script>
     </x-auth-card>
 </x-guest-layout>
