@@ -39,7 +39,7 @@ class SmsCenter extends Notification
 
     public function toSmscRu($notifiable)
     {
-        $msg = $this->data['custom_msg'] ?? 'Пароль: ';
+        $msg = $this->data['msg'] ?? 'Пароль: ';
         $password = $this->data['password'] ?? '';
 
         return SmscRuMessage::create($msg . $password);
