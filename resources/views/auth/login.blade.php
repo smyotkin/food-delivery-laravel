@@ -7,6 +7,12 @@
         <!-- Session Status -->
         <x-auth-session-status class="mb-4" :status="session('status')" />
 
+        @if (request()->password_reset_success)
+            <div class="alert alert-success text-sm" role="alert">
+                {{ request()->password_reset_success }}
+            </div>
+        @endif
+
         <!-- Validation Errors -->
         <x-auth-validation-errors class="mb-4" :errors="$errors" />
 
