@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Auth;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Users\PasswordResetRequest;
 use App\Models\User;
+use App\Notifications\SmsCenter;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -21,9 +22,12 @@ class PasswordResetLinkController extends Controller
      *
      * @param PasswordResetRequest $request
      * @return \Illuminate\Http\RedirectResponse|string
+     * @throws \Exception
      */
     public function create(PasswordResetRequest $request)
     {
+        $this->checkActiveEntries();
+
         return !empty($request->phone) ?
             redirect()->route('password.phone', [
                 'phone' => $request->phone,
@@ -41,7 +45,7 @@ class PasswordResetLinkController extends Controller
     {
         self::$userPhone = $request->phone;
 
-        $this->checkLastEntry();
+        $this->checkActiveEntries();
 
         $todayEntries = $this->getTodayEntries();
         $lastActiveEntry = $this->getlastActiveEntry();
@@ -59,24 +63,17 @@ class PasswordResetLinkController extends Controller
     }
 
     /**
-     * Проверяет срок действия последней записи за сутки и при истечении срока меняет статус is_active на 0
+     * Проверяет срок действия активных записей и при истечении срока меняет статус is_active на 0
      *
      * @return bool|object
      * @throws \Exception
      */
-    public function checkLastEntry()
+    public function checkActiveEntries()
     {
-        if (!empty($lastActiveEntry = $this->getLastActiveEntry())) {
-            $endPinTime = Carbon::createFromTimeString($lastActiveEntry->created_at)->addMinutes(5);
-
-            if (Carbon::now()->between($lastActiveEntry->created_at, $endPinTime) === false) {
-                return DB::table('sent_pin')
-                    ->where('id', $lastActiveEntry->id)
-                    ->update(['is_active' => 0]);
-            }
-        }
-
-        return false;
+        return DB::table('sent_pin')
+                ->where('is_active', 1)
+                ->whereRaw('DATE_ADD(`created_at`, INTERVAL ' . self::$pinLifetimeMinutes . ' MINUTE) < \'' . Carbon::now() . '\'')
+                ->update(['is_active' => 0]);
     }
 
     /**
@@ -88,7 +85,7 @@ class PasswordResetLinkController extends Controller
      */
     public function insertPinOrFail()
     {
-        $this->checkLastEntry();
+        $this->checkActiveEntries();
 
         $todayEntries = $this->getTodayEntries();
         $lastEntry = !empty($todayEntries) ? $todayEntries->first() : null;
@@ -116,7 +113,7 @@ class PasswordResetLinkController extends Controller
     {
         self::$userPhone = $request->phone;
 
-        $this->checkLastEntry();
+        $this->checkActiveEntries();
 
         if ($pin = $this->insertPinOrFail()) {
             $user = User::where('phone', $request->phone)->first();
@@ -193,7 +190,7 @@ class PasswordResetLinkController extends Controller
     {
         self::$userPhone = $request->phone;
 
-        $this->checkLastEntry();
+        $this->checkActiveEntries();
 
         if (!empty($this->getLastActiveEntry())) {
             $user = User::where('phone', $request->phone)->first();
