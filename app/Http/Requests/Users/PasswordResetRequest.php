@@ -3,8 +3,8 @@
 namespace App\Http\Requests\Users;
 
 use Illuminate\Foundation\Http\FormRequest;
-use App\Models\User;
 use Illuminate\Support\Facades\Route;
+use App\Models\User;
 
 class PasswordResetRequest extends FormRequest
 {
@@ -53,7 +53,7 @@ class PasswordResetRequest extends FormRequest
                 return [
                     'phone' => 'required|exists:users,phone',
                     'pin' => 'required|digits:4|exists:sent_pin,pin_code',
-                    'new_password' => 'required',
+                    'new_password' => 'required|min:6',
                 ];
             }
             default:
