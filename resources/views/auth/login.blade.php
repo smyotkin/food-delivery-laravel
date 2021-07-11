@@ -9,7 +9,7 @@
 
         @if (request()->password_reset_success)
             <div class="alert alert-success text-sm" role="alert">
-                {{ request()->password_reset_success }}
+                Пароль успешно изменен!
             </div>
         @endif
 
