@@ -4,14 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\PasswordResetRequest;
-use App\Models\User;
-use App\Notifications\SmsCenter;
-use Carbon\Carbon;
-use Exception;
 use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Hash;
+use Carbon\Carbon;
 use App\Services\PasswordResetsService;
+use Exception;
 
 class PasswordResetLinkController extends Controller
 {
@@ -77,14 +73,10 @@ class PasswordResetLinkController extends Controller
     public function sendSmsAjax(PasswordResetRequest $request)
     {
         if ($pin = PasswordResetsService::insertPinOrFail($request->phone)) {
-            if (PasswordResetsService::$sendSms) {
-                $user = User::where('phone', $request->phone)->first();
-
-                $user->notify(new SmsCenter([
-                    'msg' => "Код для восстановления:\n",
-                    'password' => $pin,
-                ]));
-            }
+            PasswordResetsService::sendPinViaSms([
+                'phone' => $request->phone,
+                'pin' => $pin,
+            ]);
 
             return json_encode([
                 'success' => true,
@@ -109,26 +101,13 @@ class PasswordResetLinkController extends Controller
             $pinValidate = PasswordResetsService::checkPinAttempt($lastActiveEntry, $request);
 
             if ($pinValidate === true) {
-                $user = User::where('phone', $request->phone)->first();
-
-                $user->update([
-                    'password' => Hash::make($request->new_password),
+                $updateUserPassword = PasswordResetsService::updateUserPassword([
+                    'phone' => $request->phone,
+                    'new_password' => $request->new_password,
+                    'pin' => $lastActiveEntry->pin_code,
                 ]);
 
-                if ($user->save()) {
-                    DB::table('password_resets')->insert([
-                        'phone' => $request->phone,
-                        'token' => $lastActiveEntry->pin_code,
-                        'created_at' => Carbon::now(),
-                    ]);
-                }
-
-                DB::table('sent_pin')
-                    ->where('phone', $request->phone)
-                    ->where('is_active', 1)
-                    ->update(['is_active' => 0]);
-
-                return redirect()->route('login', ['password_reset_success' => true]);
+                return $updateUserPassword ? redirect()->route('login', ['password_reset_success' => true]) : false;
             } else {
                 return redirect()
                     ->route('password.phone', ['phone' => $request->phone])
