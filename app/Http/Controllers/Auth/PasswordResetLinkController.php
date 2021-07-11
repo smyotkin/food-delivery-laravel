@@ -89,7 +89,7 @@ class PasswordResetLinkController extends Controller
     }
 
     /**
-     * Добавляет запись в таблицу пинов если не превышен лимит в сутки, отсутствует последнаяя запись или последная
+     * Добавляет запись в таблицу пинов если не превышен лимит в сутки и отсутствует последнаяя запись или последная
      * запись не активна
      *
      * @param $phone
@@ -123,9 +123,9 @@ class PasswordResetLinkController extends Controller
     public function sendSmsAjax(PasswordResetRequest $request)
     {
         if ($pin = $this->insertPinOrFail($request->phone)) {
-            $user = User::where('phone', $request->phone)->first();
-
             if (self::$sendSms) {
+                $user = User::where('phone', $request->phone)->first();
+
                 $user->notify(new SmsCenter([
                     'msg' => "Код для восстановления:\n",
                     'password' => $pin,
