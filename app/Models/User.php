@@ -221,4 +221,9 @@ class User extends Authenticatable
     {
         return !empty($id) ? User::find($id)->id === 1 : Auth::user()->id === 1;
     }
+
+    public static function getRoot()
+    {
+        return User::find(1);
+    }
 }
