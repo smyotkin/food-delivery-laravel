@@ -36,7 +36,7 @@
 
                     <div class="row mt-1">
                         <div class="col">
-                            <input type="text" id="pin" name="pin" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block w-full pin_format {{ !$last_active_entry || $pin_attempts == 0 ? 'disabled:opacity-50' : '' }}" value="{{ old('pin') ?? '' }}" placeholder="Пин-код из СМС" required autofocus {{ !$last_active_entry || $pin_attempts == 0 ? 'disabled' : '' }} onFocus="this.selectionStart = this.selectionEnd = this.value.length;">
+                            <input type="text" id="pin" name="pin" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block w-full pin_format {{ !$last_active_entry || $pin_attempts == 0 ? 'disabled:opacity-50' : '' }}" value="{{ old('pin') ?? '' }}" placeholder="Пин-код из СМС" required autofocus {{ !$last_active_entry || $pin_attempts == 0 ? 'disabled' : '' }}>
                         </div>
                         <div class="col text-center">
                             <button class="btn {{ $last_active_entry ? 'btn-outline-secondary disabled' : 'btn-primary' }} w-100 h-100" id="send_sms">
@@ -105,6 +105,8 @@
 
             $(document).ready(function () {
                 $('.pin_format').mask("9999", {autoclear: false});
+
+                setCursorToActive('.pin_format');
             });
 
             $('body').on('click', '#send_sms', function(event) {
