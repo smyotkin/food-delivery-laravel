@@ -3,18 +3,30 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\Users\PasswordResetRequest;
+use App\Http\Requests\Auth\PasswordResetRequest;
 use App\Models\User;
 use App\Notifications\SmsCenter;
 use Carbon\Carbon;
+use Exception;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Validator;
 
 class PasswordResetLinkController extends Controller
 {
-    public static $userPhone = null;
     public static $attemptsPerDay = 10;
     public static $pinLifetimeMinutes = 5;
+
+    /**
+     * Проверяем срок действия активных записей при каждом использовании класса
+     *
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        $this->checkActiveEntries();
+    }
 
     /**
      * Создаем представление для восстановления пароля (валидации номера телефона), в случае успеха - делаем
@@ -22,12 +34,10 @@ class PasswordResetLinkController extends Controller
      *
      * @param PasswordResetRequest $request
      * @return \Illuminate\Http\RedirectResponse|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function create(PasswordResetRequest $request)
     {
-        $this->checkActiveEntries();
-
         return !empty($request->phone) ?
             redirect()->route('password.phone', [
                 'phone' => $request->phone,
@@ -39,16 +49,12 @@ class PasswordResetLinkController extends Controller
      *
      * @param PasswordResetRequest $request
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
-    public function createForm(PasswordResetRequest $request)//: string
+    public function createForm(PasswordResetRequest $request)
     {
-        self::$userPhone = $request->phone;
-
-        $this->checkActiveEntries();
-
-        $todayEntries = $this->getTodayEntries();
-        $lastActiveEntry = $this->getlastActiveEntry();
+        $todayEntries = $this->getTodayEntries($request->phone);
+        $lastActiveEntry = $this->getlastActiveEntry($request->phone);
         $endPinTime = !empty($lastActiveEntry) ? Carbon::createFromTimeString($lastActiveEntry->created_at)->addMinutes
         (self::$pinLifetimeMinutes) : false;
 
@@ -59,6 +65,7 @@ class PasswordResetLinkController extends Controller
             'last_active_entry' => $lastActiveEntry,
             'attempts' => self::$attemptsPerDay - $todayEntries->count(),
             'pin_activity_time' => Carbon::now()->diff($endPinTime)->format('%I:%S'),
+            'pin_attempts' => !empty($lastActiveEntry) ? 3 - Cache::get("pin_attempts-{$lastActiveEntry->id}") : false,
         ]);
     }
 
@@ -66,7 +73,7 @@ class PasswordResetLinkController extends Controller
      * Проверяет срок действия активных записей и при истечении срока меняет статус is_active на 0
      *
      * @return bool|object
-     * @throws \Exception
+     * @throws Exception
      */
     public function checkActiveEntries()
     {
@@ -77,22 +84,21 @@ class PasswordResetLinkController extends Controller
     }
 
     /**
-     * Добавляет запись в таблицу пинов если не превышен лимит, последнаяя запись отсутствует или последная запись не
-     * активна
+     * Добавляет запись в таблицу пинов если не превышен лимит в сутки, отсутствует последнаяя запись или последная
+     * запись не активна
      *
+     * @param $phone
      * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
-    public function insertPinOrFail()
+    private function insertPinOrFail($phone)
     {
-        $this->checkActiveEntries();
-
-        $todayEntries = $this->getTodayEntries();
+        $todayEntries = $this->getTodayEntries($phone);
         $lastEntry = !empty($todayEntries) ? $todayEntries->first() : null;
 
         if ($todayEntries->count() < self::$attemptsPerDay && (empty($lastEntry) || $lastEntry->is_active == 0)) {
             return DB::table('sent_pin')->insert([
-                'phone' => self::$userPhone,
+                'phone' => $phone,
                 'pin_code' => $pin = $this->generatePin(),
                 'created_at' => Carbon::now(),
                 'is_active' => 1,
@@ -107,15 +113,11 @@ class PasswordResetLinkController extends Controller
      *
      * @param PasswordResetRequest $request
      * @return bool|string
-     * @throws \Exception
+     * @throws Exception
      */
     public function sendSmsAjax(PasswordResetRequest $request)
     {
-        self::$userPhone = $request->phone;
-
-        $this->checkActiveEntries();
-
-        if ($pin = $this->insertPinOrFail()) {
+        if ($pin = $this->insertPinOrFail($request->phone)) {
             $user = User::where('phone', $request->phone)->first();
 
             $user->notify(new SmsCenter([
@@ -135,9 +137,9 @@ class PasswordResetLinkController extends Controller
      * Генерация 4-х значного пин-кода
      *
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
-    public function generatePin()
+    private function generatePin()
     {
         return str_pad(random_int(100, 9999), 4, 0, STR_PAD_LEFT);
     }
@@ -146,71 +148,101 @@ class PasswordResetLinkController extends Controller
      * Получить все записи за сутки по номеру телефона
      *
      * @return string
-     * @throws \Exception
+     * @throws Exception
      */
-    public function getTodayEntries()
+    private function getTodayEntries($phone)
     {
-        if (!empty(self::$userPhone)) {
-            return DB::table('sent_pin')
-                    ->where('phone', self::$userPhone)
-                    ->whereDate('created_at', Carbon::today())
-                    ->orderBy('created_at','desc')
-                    ->get();
-        } else {
-            return false;
-        }
+        return DB::table('sent_pin')
+                ->where('phone', $phone)
+                ->whereDate('created_at', Carbon::today())
+                ->orderBy('created_at','desc')
+                ->get();
     }
 
     /**
      * Возвращает последнюю активную запись по номеру телефона
      *
+     * @param $phone
      * @return object|bool
      */
-    public function getLastActiveEntry()
+    private function getLastActiveEntry($phone)
     {
-        if (!empty(self::$userPhone)) {
-            return DB::table('sent_pin')
-                    ->where('phone', self::$userPhone)
-                    ->where('is_active', 1)
-                    ->orderBy('created_at','desc')
-                    ->first();
-        } else {
+        return DB::table('sent_pin')
+                ->where('phone', $phone)
+                ->where('is_active', 1)
+                ->orderBy('created_at','desc')
+                ->first();
+    }
+
+    /**
+     * Проверяет количество неправильных попыток ввода для активного пин-кода
+     *
+     * @param $lastActiveEntry
+     * @param $request
+     * @return bool|\Illuminate\Validation\Validator
+     */
+    public function checkPinAttempt($lastActiveEntry, $request)
+    {
+        $pinValidate = Validator::make($request->all(), [
+            'pin' => 'required|digits:4|exists:sent_pin,pin_code',
+        ]);
+        $cacheTitle = "pin_attempts-{$lastActiveEntry->id}";
+        $activePinAttempts = Cache::get($cacheTitle) ?? 0;
+
+        if ($pinValidate->fails()) {
+            if ($activePinAttempts < 3) {
+                Cache::put($cacheTitle, $activePinAttempts + 1, Carbon::now()->addMinutes(self::$pinLifetimeMinutes));
+            }
+
+            return $pinValidate;
+        }
+
+        if ($activePinAttempts >= 3) {
             return false;
         }
+
+        return true;
     }
 
     /**
      * Проверяем валидность данных (телефон, пин-код и новый пароль) и меняем пароль у пользователя по номеру телефона
      *
      * @param PasswordResetRequest $request
-     * @return \Illuminate\Http\RedirectResponse
-     * @throws \Exception
+     * @return bool|\Illuminate\Http\RedirectResponse
+     * @throws Exception
      */
     public function store(PasswordResetRequest $request)
     {
-        self::$userPhone = $request->phone;
+        $lastActiveEntry = $this->getLastActiveEntry($request->phone);
 
-        $this->checkActiveEntries();
+        if (!empty($lastActiveEntry)) {
+            $pinValidate = $this->checkPinAttempt($lastActiveEntry, $request);
 
-        if (!empty($this->getLastActiveEntry())) {
-            $user = User::where('phone', $request->phone)->first();
+            if ($pinValidate === true) {
+                $user = User::where('phone', $request->phone)->first();
 
-            $user->update([
-                'password' => Hash::make($request->new_password),
-            ]);
+                $user->update([
+                    'password' => Hash::make($request->new_password),
+                ]);
 
-            $user->save();
+                $user->save();
 
-            DB::table('sent_pin')
-                ->where('phone', $request->phone)
-                ->where('is_active', 1)
-                ->update(['is_active' => 0]);
+                DB::table('sent_pin')
+                    ->where('phone', $request->phone)
+                    ->where('is_active', 1)
+                    ->update(['is_active' => 0]);
 
-            //todo add to password_resets
+                //todo add to password_resets
 
-            return redirect()->route('login', ['password_reset_success' => 'Пароль успешно изменен!']);
+                return redirect()->route('login', ['password_reset_success' => true]);
+            } else {
+                return redirect()
+                    ->route('password.phone', ['phone' => $request->phone])
+                    ->withErrors($pinValidate)
+                    ->withInput();
+            }
         }
 
-        return redirect()->route('password.request', ['failed' => 'Произошла ошибка, попробуйте еще раз']);
+        return redirect()->route('password.request', ['failed' => true]);
     }
 }
