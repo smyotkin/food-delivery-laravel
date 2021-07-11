@@ -11,7 +11,7 @@
 
         @if (request()->failed)
             <div class="alert alert-danger text-sm" role="alert">
-                {{ request()->failed }}
+                Произошла ошибка, попробуйте еще раз
             </div>
         @endif
 
@@ -36,10 +36,10 @@
 
                     <div class="row mt-1">
                         <div class="col">
-                            <input type="text" id="pin" name="pin" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block w-full pin_format {{ !$last_active_entry ? 'disabled:opacity-50' : '' }}" value="{{ old('pin') ?? '' }}" placeholder="Пин-код из СМС" required autofocus {{ !$last_active_entry ? 'disabled' : '' }} onFocus="this.selectionStart = this.selectionEnd = this.value.length;">
+                            <input type="text" id="pin" name="pin" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block w-full pin_format {{ !$last_active_entry || $pin_attempts == 0 ? 'disabled:opacity-50' : '' }}" value="{{ old('pin') ?? '' }}" placeholder="Пин-код из СМС" required autofocus {{ !$last_active_entry || $pin_attempts == 0 ? 'disabled' : '' }} onFocus="this.selectionStart = this.selectionEnd = this.value.length;">
                         </div>
                         <div class="col text-center">
-                            <button class="btn btn-primary w-100 h-100" id="send_sms">
+                            <button class="btn {{ $last_active_entry ? 'btn-outline-secondary disabled' : 'btn-primary' }} w-100 h-100" id="send_sms">
                                 <span id="timer">
                                     {{ $pin_activity_time != '00:00' ? $pin_activity_time : 'Отправить код' }}
                                 </span>
@@ -51,31 +51,38 @@
                         <div class="row">
                             <div class="col">
                                 <div class="alert alert-secondary text-xs mt-3 mb-0 py-2" role="alert">
-                                    Вам было отправлено СМС-сообщение на номер {{ $phone }}. Код активен до {{ Date::parse($pin_ended)->format('H:i') }} (по МСК).
+                                    @if (isset($pin_attempts) && $pin_attempts == 0)
+                                        У вас закончились попытки ввода данного ключа, дождитесь окончания таймера и попробуйте еще раз.
+                                    @else
+                                        Вам было отправлено СМС-сообщение на номер {{ $phone }}. <br>
+                                        Код активен до {{ Date::parse($pin_ended)->format('H:i') }} (по МСК). <br>
+                                    @endif
                                 </div>
                             </div>
                         </div>
                     @endif
                 </div>
 
-                <div class="mt-3 {{ !$last_active_entry ? 'd-none' : '' }}">
-                    <x-label for="newPassword" :value="__('New Password')" />
+                @if ($pin_attempts > 0)
+                    <div class="mt-3 {{ !$last_active_entry ? 'd-none' : '' }}">
+                        <x-label for="newPassword" :value="__('New Password')" />
 
-                    <input type="password" id="newPassword" name="new_password" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block mt-1 w-full" value="" placeholder="Новый пароль" required autofocus>
-                </div>
+                        <input type="password" id="newPassword" name="new_password" class="rounded-md shadow-sm border-gray-300 focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50 block mt-1 w-full" value="" placeholder="Новый пароль" required autofocus>
+                    </div>
+                @endif
             @endif
 
             @if ((isset($attempts) && $attempts == 0) && $last_active_entry == false)
                 <div class="row">
                     <div class="col">
                         <div class="alert alert-secondary text-sm mt-4 mb-0 py-1 text-center" role="alert">
-                            У Вас больше не осталось попыток отправить СМС сегодня, попробуйте завтра.
+                            У Вас больше не осталось попыток восстановить пароль сегодня, попробуйте завтра.
                         </div>
                     </div>
                 </div>
             @endif
 
-            @if ((!empty($pin_created) && isset($attempts) && $attempts > 0) || !isset($phone) || $last_active_entry)
+            @if (isset($pin_attempts) && $pin_attempts > 0 && ((!empty($pin_created) && isset($attempts) && $attempts > 0) || $last_active_entry) || !isset($phone))
                 <div class="text-center mt-4">
                     <button type="submit" class="btn btn-dark {{ !empty($pin_created) ? 'btn-outline-dark disabled' : '' }}" id="setNewPassword-submit">Восстановить пароль</button>
                 </div>
@@ -142,7 +149,7 @@
 
                 element
                     .parent()
-                    .addClass('disabled btn-outline-secondary')
+                    .addClass('btn-outline-secondary disabled')
                     .removeClass('btn-primary')
                     .attr('disabled', true);
 
@@ -158,8 +165,16 @@
 
                     let minutes = Math.floor((distance % _hour) / _minute);
                     let seconds = Math.floor((distance % _minute) / _second);
+                    let min = minutes < 10 ? '0' + minutes : minutes;
+                    let sec = seconds < 10 ? '0' + seconds : seconds;
 
-                    element.text((minutes < 10 ? '0' + minutes : minutes) + ':' + (seconds < 10 ? '0' + seconds : seconds));
+                    element.text(min + ':' + sec);
+
+                    if ((minutes == 0 && seconds == 0) || min + ':' + sec === '00:00') {
+                        setTimeout(function() {
+                            window.location.reload(true)
+                        }, 3000);
+                    }
                 }
 
                 timer = setInterval(showRemaining, 1000);
