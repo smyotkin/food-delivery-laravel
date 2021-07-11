@@ -183,13 +183,14 @@ class PasswordResetLinkController extends Controller
      */
     public function checkPinAttempt($lastActiveEntry, $request)
     {
+//        dump($lastActiveEntry->pin_code);
         $pinValidate = Validator::make($request->all(), [
-            'pin' => 'required|digits:4|exists:sent_pin,pin_code',
+            'pin' => 'required|digits:4|in:' . $lastActiveEntry->pin_code,
         ]);
         $cacheTitle = "pin_attempts-{$lastActiveEntry->id}";
         $activePinAttempts = Cache::get($cacheTitle) ?? 0;
 
-        if ($pinValidate->fails()) {
+        if ($pinValidate->fails() && $request != $lastActiveEntry->pin_code) {
             if ($activePinAttempts < 3) {
                 Cache::put($cacheTitle, $activePinAttempts + 1, Carbon::now()->addMinutes(self::$pinLifetimeMinutes));
             }
