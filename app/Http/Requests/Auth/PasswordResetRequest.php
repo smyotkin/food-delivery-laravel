@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Http\Requests\Users;
+namespace App\Http\Requests\Auth;
 
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Route;
@@ -47,12 +47,12 @@ class PasswordResetRequest extends FormRequest
             case 'password.pin': {
                 return [
                     'phone' => 'required|exists:users,phone',
+                    'pin_attempts' => 'digits:1',
                 ];
             }
             case 'password.store': {
                 return [
                     'phone' => 'required|exists:users,phone',
-                    'pin' => 'required|digits:4|exists:sent_pin,pin_code',
                     'new_password' => 'required|min:6',
                 ];
             }
