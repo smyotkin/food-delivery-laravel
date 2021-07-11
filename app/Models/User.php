@@ -222,6 +222,11 @@ class User extends Authenticatable
         return !empty($id) ? User::find($id)->id === 1 : Auth::user()->id === 1;
     }
 
+    /**
+     * Возвращает рут-пользователя с id = 1
+     *
+     * @return User|null
+     */
     public static function getRoot()
     {
         return User::find(1);
