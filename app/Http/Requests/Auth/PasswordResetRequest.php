@@ -37,28 +37,30 @@ class PasswordResetRequest extends FormRequest
      */
     public function rules()
     {
+        $rootUserPhone = User::getRoot()->phone;
+
         switch (Route::currentRouteName()) {
             case 'password.request': {
                 return [
-                    'phone' => 'exists:users,phone',
+                    'phone' => "exists:users,phone|not_in:$rootUserPhone",
                 ];
             }
             case 'password.phone':
             case 'password.pin': {
                 return [
-                    'phone' => 'required|exists:users,phone',
+                    'phone' => "required|exists:users,phone|not_in:$rootUserPhone",
                     'pin_attempts' => 'digits:1',
                 ];
             }
             case 'password.store': {
                 return [
-                    'phone' => 'required|exists:users,phone',
+                    'phone' => "required|exists:users,phone|not_in:$rootUserPhone",
                     'new_password' => 'required|min:6',
                 ];
             }
             default:
                 return [
-                    'phone' => 'required|exists:users,phone',
+                    'phone' => "required|exists:users,phone|not_in:$rootUserPhone",
                 ];
         }
     }
