@@ -225,7 +225,13 @@ class PasswordResetLinkController extends Controller
                     'password' => Hash::make($request->new_password),
                 ]);
 
-                $user->save();
+                if ($user->save()) {
+                    DB::table('password_resets')->insert([
+                        'phone' => $request->phone,
+                        'token' => $lastActiveEntry->pin_code,
+                        'created_at' => Carbon::now(),
+                    ]);
+                }
 
                 DB::table('sent_pin')
                     ->where('phone', $request->phone)
