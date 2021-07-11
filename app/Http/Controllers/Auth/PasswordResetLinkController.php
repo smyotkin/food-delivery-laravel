@@ -238,8 +238,6 @@ class PasswordResetLinkController extends Controller
                     ->where('is_active', 1)
                     ->update(['is_active' => 0]);
 
-                //todo add to password_resets
-
                 return redirect()->route('login', ['password_reset_success' => true]);
             } else {
                 return redirect()
