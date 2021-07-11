@@ -183,7 +183,6 @@ class PasswordResetLinkController extends Controller
      */
     public function checkPinAttempt($lastActiveEntry, $request)
     {
-//        dump($lastActiveEntry->pin_code);
         $pinValidate = Validator::make($request->all(), [
             'pin' => 'required|digits:4|in:' . $lastActiveEntry->pin_code,
         ]);
