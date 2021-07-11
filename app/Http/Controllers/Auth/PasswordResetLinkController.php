@@ -17,6 +17,7 @@ class PasswordResetLinkController extends Controller
 {
     public static $attemptsPerDay = 10;
     public static $pinLifetimeMinutes = 5;
+    public static $sendSms = 0;
 
     /**
      * Проверяем срок действия активных записей при каждом использовании класса
@@ -25,6 +26,10 @@ class PasswordResetLinkController extends Controller
      */
     public function __construct()
     {
+        self::$attemptsPerDay = config('custom.password_resets.attempts_per_day') ?? self::$attemptsPerDay;
+        self::$pinLifetimeMinutes = config('custom.password_resets.pin_lifetime_minutes') ?? self::$pinLifetimeMinutes;
+        self::$sendSms = config('custom.password_resets.send_sms') ?? self::$sendSms;
+
         $this->checkActiveEntries();
     }
 
@@ -120,10 +125,12 @@ class PasswordResetLinkController extends Controller
         if ($pin = $this->insertPinOrFail($request->phone)) {
             $user = User::where('phone', $request->phone)->first();
 
-            $user->notify(new SmsCenter([
-                'msg' => "Код для восстановления:\n",
-                'password' => $pin,
-            ]));
+            if (self::$sendSms) {
+                $user->notify(new SmsCenter([
+                    'msg' => "Код для восстановления:\n",
+                    'password' => $pin,
+                ]));
+            }
 
             return json_encode([
                 'success' => true,
