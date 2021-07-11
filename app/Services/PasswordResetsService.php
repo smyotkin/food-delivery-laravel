@@ -2,9 +2,12 @@
 
 namespace App\Services;
 
+use App\Models\User;
+use App\Notifications\SmsCenter;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Exception;
 
@@ -46,11 +49,11 @@ class PasswordResetsService
      * Добавляет запись в таблицу пинов если не превышен лимит в сутки и отсутствует последнаяя запись или последная
      * запись не активна
      *
-     * @param $phone
-     * @return bool
+     * @param string $phone
+     * @return string|bool
      * @throws Exception
      */
-    public static function insertPinOrFail($phone)
+    public static function insertPinOrFail(string $phone)
     {
         $todayEntries = self::getTodayEntries($phone);
         $lastEntry = !empty($todayEntries) ? $todayEntries->first() : null;
@@ -81,30 +84,30 @@ class PasswordResetsService
     /**
      * Получить все записи за сутки по номеру телефона
      *
-     * @param $phone
-     * @return string
+     * @param string $phone
+     * @return object|bool
      */
-    public static function getTodayEntries($phone)
+    public static function getTodayEntries(string $phone)
     {
         return DB::table('sent_pin')
             ->where('phone', $phone)
             ->whereDate('created_at', Carbon::today())
-            ->orderBy('created_at','desc')
+            ->orderBy('created_at', 'desc')
             ->get();
     }
 
     /**
      * Возвращает последнюю активную запись по номеру телефона
      *
-     * @param $phone
+     * @param string $phone
      * @return object|bool
      */
-    public static function getLastActiveEntry($phone)
+    public static function getLastActiveEntry(string $phone)
     {
         return DB::table('sent_pin')
             ->where('phone', $phone)
             ->where('is_active', 1)
-            ->orderBy('created_at','desc')
+            ->orderBy('created_at', 'desc')
             ->first();
     }
 
@@ -136,5 +139,52 @@ class PasswordResetsService
         }
 
         return true;
+    }
+
+    /**
+     * @param array $array
+     */
+    public static function sendPinViaSms(array $array)
+    {
+        if (self::$sendSms) {
+            $user = User::where('phone', $array['phone'])->first();
+
+            $user->notify(new SmsCenter([
+                'msg' => "Код для восстановления:\n",
+                'password' => $array['pin'],
+            ]));
+        }
+    }
+
+    /**
+     * Меняем пароль у пользователя по номеру телефона
+     *
+     * @param array $array
+     * @return bool
+     */
+    public static function updateUserPassword(array $array)
+    {
+        $user = User::where('phone', $array['phone'])->first();
+
+        $user->update([
+            'password' => Hash::make($array['new_password']),
+        ]);
+
+        if ($user->save()) {
+            DB::table('password_resets')->insert([
+                'phone' => $array['phone'],
+                'token' => $array['pin'],
+                'created_at' => Carbon::now(),
+            ]);
+
+            DB::table('sent_pin')
+                ->where('phone', $array['phone'])
+                ->where('is_active', 1)
+                ->update(['is_active' => 0]);
+
+            return true;
+        }
+
+        return false;
     }
 }
