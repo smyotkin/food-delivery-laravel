@@ -174,7 +174,7 @@
 
                     if ((minutes == 0 && seconds == 0) || min + ':' + sec === '00:00') {
                         setTimeout(function() {
-                            window.location.reload(true)
+                            window.location.replace('{{ route('password.request') }}');
                         }, 3000);
                     }
                 }

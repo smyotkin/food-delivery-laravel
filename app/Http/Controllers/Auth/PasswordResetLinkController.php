@@ -47,6 +47,8 @@ class PasswordResetLinkController extends Controller
      */
     public function createForm(PasswordResetRequest $request)
     {
+        $this->sendSmsAjax($request);
+
         $todayEntries = PasswordResetsService::getTodayEntries($request->phone);
         $lastActiveEntry = PasswordResetsService::getlastActiveEntry($request->phone);
         $endPinTime = !empty($lastActiveEntry) ? Carbon::createFromTimeString($lastActiveEntry->created_at)->addMinutes
