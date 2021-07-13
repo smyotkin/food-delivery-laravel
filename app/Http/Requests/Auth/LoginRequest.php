@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Auth;
 
+use App\Models\User;
 use Illuminate\Auth\Events\Lockout;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Support\Facades\Auth;
@@ -45,9 +46,7 @@ class LoginRequest extends FormRequest
     {
         $this->ensureIsNotRateLimited();
 
-        $phone = str_replace(['+', ' ', '-'], '', $this->phone);
-
-        if (! Auth::attempt(['phone' => $phone, 'password' => $this->password])) {
+        if (!Auth::attempt(['phone' => User::toDigit($this->phone), 'password' => $this->password, 'is_active' => 1])) {
             RateLimiter::hit($this->throttleKey());
 
             throw ValidationException::withMessages([
