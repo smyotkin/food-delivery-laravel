@@ -191,7 +191,7 @@ class UsersController extends Controller
         $role_permissions = !empty($role) ? $role->permissions->pluck('slug')->toArray() : [];
 
         if ($is_custom_permissions = !empty($request->boolean('is_custom_permissions'))) {
-            $current_permissions = !empty($user) ? $user->pluck('slug')->toArray() : [];
+            $current_permissions = !empty($user) ? $user->pluck('slug')->toArray() : $role_permissions;
         } else {
             $current_permissions = $role_permissions;
         }
