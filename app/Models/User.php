@@ -219,7 +219,13 @@ class User extends Authenticatable
      */
     public static function isRoot($id = null)
     {
-        return !empty($id) ? User::find($id)->id === 1 : Auth::user()->id === 1;
+        if (!empty($id)) {
+            $user = User::find($id);
+
+            return $user ? $user->id === 1 : false;
+        } else {
+            return Auth::user()->id === 1;
+        }
     }
 
     /**
