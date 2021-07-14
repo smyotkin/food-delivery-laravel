@@ -150,6 +150,7 @@ class UsersService
             })
             ->orderBy('last_seen', 'desc')
             ->orderBy('updated_at', 'desc')
+            ->where('id', '!=', 1)
             ->with('roles');
 
         return $users->simplePaginate();
@@ -197,14 +198,17 @@ class UsersService
      */
     public static function checkRoleAndPermission($id, $action)
     {
-        $role = self::getRoleWithPermissions(['id' => $id]);
-        $permission = isset($role->status) ? "users_{$role->status}_$action" : null;
-
-        if (Auth::user()->id == $id || User::isRoot()) {
+        if (User::isRoot()) {
             return true;
         }
 
-        if (!isset($permission)) {
+        $user = User::find($id);
+        $role = self::getRoleWithPermissions(['id' => $id]);
+        $permission = isset($role->status) ? "users_{$role->status}_$action" : null;
+
+        if (User::getRoot()->id == $id || $user === null) {
+            abort(403, 'Пользователь не найден');
+        } elseif (!isset($permission)) {
             abort(403, 'Пользователь не имеет должности');
         } elseif (!Auth::user()->hasPermission($permission)) {
             abort(403, "Нет права: $permission");
@@ -212,7 +216,7 @@ class UsersService
             abort(403, "Запрещено");
         }
 
-        return false;
+        return true;
     }
 
     /**
