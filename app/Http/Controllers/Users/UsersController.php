@@ -165,14 +165,14 @@ class UsersController extends Controller
                 $current_permissions = $role_permissions;
             }
 
-            $returnedData = $returnedData + [
+            $returnedData = array_merge($returnedData, [
                 'user' => $user,
                 'role' => $role,
                 'is_custom_permissions' => $is_custom_permissions,
                 'role_permissions' => $role_permissions,
                 'current_permissions' => $current_permissions,
                 'available_statuses' => Auth::user()->availableStatusesByType('modify'),
-            ];
+            ]);
         }
 
         return view('users/user-form', $returnedData)->render();
