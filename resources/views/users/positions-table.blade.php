@@ -2,7 +2,11 @@
     @foreach($data as $position)
         <tr>
             <td>
-                <a href="/users/positions/{{ $position->id }}" class="text-decoration-none">{{ $position->name }}</a>
+                @permission('users_position_view')
+                    <a href="/users/positions/{{ $position->id }}" class="text-decoration-none">{{ $position->name }}</a>
+                @else_permission
+                    {{ $position->name }}
+                @endpermission
             </td>
             <td>{{ $position->slug }}</td>
             <td>{{ $statuses[$position->status]['name'] }}</td>
