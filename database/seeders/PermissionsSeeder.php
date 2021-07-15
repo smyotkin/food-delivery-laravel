@@ -387,11 +387,16 @@ class PermissionsSeeder extends Seeder
             ],
             [
                 'name' => 'Просмотр списка должностей',
+                'slug' => 'users_positions_view',
+                'group' => 'Пользователи / Должности',
+            ],
+            [
+                'name' => 'Просмотр карточки должности',
                 'slug' => 'users_position_view',
                 'group' => 'Пользователи / Должности',
             ],
             [
-                'name' => 'Редактирование прав должности',
+                'name' => 'Редактирование карточки должности',
                 'slug' => 'users_position_modify',
                 'group' => 'Пользователи / Должности',
             ],
