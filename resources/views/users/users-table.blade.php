@@ -26,6 +26,6 @@
     {{ $data->links('vendor.pagination.table-next') }}
 @else
     <tr>
-        <td colspan="6" class="text-center">Пользователи не найдены</td>
+        <td colspan="7" class="text-center">Пользователи не найдены</td>
     </tr>
 @endif
