@@ -125,10 +125,6 @@
                 });
             });
 
-            $('body').on('keyup change', '.update_user input, .update_user select', function() {
-                checkUserForm();
-            });
-
             $('body').on('change', '#status', function() {
                 $.ajax({
                     type: 'GET',
@@ -142,6 +138,8 @@
                         $('#position').attr('disabled',
                             data.length > 0 ? false : true
                         ).html(data);
+
+                        checkFormValidation();
                     }
                 });
             });
@@ -172,45 +170,25 @@
             }
         });
 
-        function checkUserForm() {
-            let isValid = true;
-            $('#user_form input, #user_form select').removeClass('is-invalid');
+        $('body').on('keyup change', '.update_user input, .update_user select', function() {
+            checkFormValidation();
+        });
+
+        function checkFormValidation() {
+            $('#user_form input, #user_form select, #permissions').removeClass('is-invalid validation-error alert-danger');
 
             $('#save_user').addClass('disabled btn-outline-secondary');
 
-            if ($('#first_name').val().length < 2) {
-                $('#first_name').addClass('is-invalid');
-
-                isValid = false;
-            }
-
-            if ($('#last_name').val().length < 2) {
-                $('#last_name').addClass('is-invalid');
-
-                isValid = false;
-            }
-
             let phoneValidation = new RegExp(/\+7\s\d{3}\s\d{3}\-\d{2}\-\d{2}/gm);
+            let fields = {
+                'first_name': validateField($('#first_name').val().length < 2, $('#first_name')),
+                'last_name': validateField($('#last_name').val().length < 2, $('#last_name')),
+                'phone': validateField(!phoneValidation.test($('#phone').val()), $('#phone')),
+                'status': validateField($('#status').val() === null, $('#status')),
+                'position': validateField($('#position').val() === null, $('#position')),
+            };
 
-            if (!phoneValidation.test($('#phone').val())) {
-                $('#phone').addClass('is-invalid');
-
-                isValid = false;
-            }
-
-            if ($('#status').val() === null) {
-                $('#status').addClass('is-invalid');
-
-                isValid = false;
-            }
-
-            if ($('#position').val() === null) {
-                $('#position').addClass('is-invalid');
-
-                isValid = false;
-            }
-
-            if (isValid)
+            if (checkValidation(fields))
                 $('#save_user').removeClass('disabled btn-outline-secondary').addClass('btn-outline-primary');
         }
 
