@@ -152,6 +152,6 @@ class PositionsService
      */
     public static function getWithPermissions(array $array): ?Role
     {
-        return self::checkPermission('view') ? Role::where('id', $array['id'])->with('permissions')->first() : null;
+        return Role::where('id', $array['id'])->with('permissions')->first();
     }
 }
