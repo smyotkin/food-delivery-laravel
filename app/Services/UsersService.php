@@ -198,7 +198,7 @@ class UsersService
      */
     public static function checkRoleAndPermission($id, $action)
     {
-        if (User::isRoot()) {
+        if (($action == 'view' && Auth::id() == $id) || User::isRoot()) {
             return true;
         }
 
