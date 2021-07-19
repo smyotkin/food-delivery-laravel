@@ -91,7 +91,7 @@
                     </a>
                 </div>
                 <div class="col-2">
-                    <a href="javascript:" class="text-decoration-none text-center text-white fs-5">
+                    <a href="/settings" class="text-decoration-none text-center text-white fs-5">
                         <div class="text-center">
                             <img src="/img/settings-icon.png" class="rounded rounded-5 shadow">
                         </div>
