@@ -2,6 +2,7 @@
 
 namespace App\Providers;
 
+use App\Models\Settings;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 
@@ -28,5 +29,16 @@ class AppServiceProvider extends ServiceProvider
     {
         Schema::defaultStringLength(191);
         Paginator::useBootstrap();
+
+        config([
+            'global' => Settings::all()
+                ->keyBy('key')
+                ->transform(function ($setting) {
+                    return $setting->value;
+                })->toArray(),
+        ]);
+
+        config()->set('services.smscru.login', Settings::get('smscru_login') ?? env('SMSCRU_LOGIN'));
+        config()->set('services.smscru.secret', Settings::get('smscru_secret') ?? env('SMSCRU_SECRET'));
     }
 }
