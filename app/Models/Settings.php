@@ -9,6 +9,8 @@ class Settings extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'value',
     ];
