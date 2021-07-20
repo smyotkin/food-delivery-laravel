@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Settings;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -153,7 +154,7 @@ class UsersService
             ->where('id', '!=', 1)
             ->with('roles');
 
-        return $users->simplePaginate();
+        return $users->simplePaginate(Settings::get('global_rows_per_page'));
     }
 
     /**

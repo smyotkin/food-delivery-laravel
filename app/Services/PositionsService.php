@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\Settings;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\Role;
@@ -86,7 +87,7 @@ class PositionsService
             })
             ->orderBy('created_at', 'desc');
 
-        return $paginate ? $roles->simplePaginate() : $roles->get();
+        return $paginate ? $roles->simplePaginate(Settings::get('global_rows_per_page')) : $roles->get();
     }
 
     /**

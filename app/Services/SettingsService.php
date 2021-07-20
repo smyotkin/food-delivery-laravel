@@ -25,7 +25,7 @@ class SettingsService
             })
             ->orderBy('key', 'asc');
 
-        return $paginate ? $settings->simplePaginate() : $settings->get();
+        return $paginate ? $settings->simplePaginate(Settings::get('global_rows_per_page')) : $settings->get();
     }
 
     /**
