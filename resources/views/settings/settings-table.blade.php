@@ -5,7 +5,7 @@
                 <div class="fw-bold">{{ $setting['name'] }}</div>
             </div>
 
-            <form class="position-relative" method="post" action="{{ route('settings.store') }}">
+            <form class="position-relative" method="post" action="{{ route('settings.update', ['setting' => $setting['key']]) }}">
                 @csrf
                 @php ($formattedValue = isset($setting['data']) ? $setting['data'][$setting['value']] : $setting['value'])
 
