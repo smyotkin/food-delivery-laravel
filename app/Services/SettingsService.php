@@ -125,15 +125,23 @@ class SettingsService
         $basicParams = collect($array)
             ->only([
                 'global_event_period',
-                'global_max_rows_limit',
                 'global_rows_per_page',
+                'global_max_rows_limit',
                 'smscru_login',
                 'smscru_secret',
             ]);
 
         $validator = Validator::make($array, [
             'global_event_period' => 'in:day,week,month,year',
+            'global_rows_per_page' => 'numeric',
+            'global_max_rows_limit' => 'numeric',
+            'smscru_login' => '',
+            'smscru_secret' => '',
         ]);
+
+        if ($validator->fails()) {
+            abort(500);
+        }
 
         try {
             DB::transaction(function() use ($basicParams) {
