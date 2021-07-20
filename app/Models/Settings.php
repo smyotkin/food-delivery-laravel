@@ -14,4 +14,9 @@ class Settings extends Model
     protected $fillable = [
         'value',
     ];
+
+    public static function get($key)
+    {
+        return self::where('key', $key)->first()->value;
+    }
 }
