@@ -17,7 +17,7 @@
             </div>
         </div>
         <div class="row mt-5 mb-3">
-            <div class="col-6 lh-1">
+            <div class="col-auto lh-1">
                 <h5 class="d-inline-block fw-normal align-middle m-0">
                     Настройки
                 </h5>
@@ -25,70 +25,55 @@
         </div>
 
         <div class="row">
-            <div class="col-6">
-                <table class="table table-striped">
-                    <thead>
-                        <tr class="fw-light bg-lightgray table-header">
-                            <td class="border-0">Имя</td>
-                            <td class="border-0">Значение</td>
-                        </tr>
-                    </thead>
-                    <tbody id="settings_ajax"></tbody>
-                </table>
+            <div class="col-5">
+                <div class="list-group list-group-flush">
+                    <li class="settings_option-block border-bottom list-group-item d-flex justify-content-between align-items-center py-3 px-1">
+                        <div class="me-auto">
+                            <div class="fw-bold">Файловый кеш</div>
+                        </div>
+
+                        <form class="d-none" method="post" action="{{ route('settings/clear.cache') }}">
+                            @csrf
+                        </form>
+
+                        <a href="javascript:" class="text-decoration-none btn btn-secondary btn-sm rounded-pill px-3" id="clear_cache">Очистить кэш</a>
+                    </li>
+                </div>
+                <div class="list-group list-group-flush" id="settings_ajax"></div>
             </div>
         </div>
     </div>
 
     <script>
-        let userSearch = $('#name_value-search');
-        let usersBlock = $('#settings_ajax');
-        let usersTable = $('#settings_ajax > .row');
-        let ajaxSearchDelay = 300;
-        let usersUpdateDelay = 10000;
+        let search = $('#name_value-search');
+        let ajaxBlock = $('#settings_ajax');
         let getSearchCookie = getCookie('settings_query_str');
         let page = 1;
         let searchNow = false;
 
         $(document).ready(function() {
-            if (getSearchCookie) {
-                userSearch.val(getSearchCookie);
-                if ($(this).val().length === 0 || $(this).val().length > 1)
-                    setTimeout(showUsersList, ajaxSearchDelay);
-            } else {
-                showUsersList();
-                setInterval(showUsersListInterval, usersUpdateDelay);
-            }
+            if (getSearchCookie)
+                search.val(getSearchCookie);
+
+            showList();
 
             userSearch.on('keyup', function () {
                 document.cookie = 'settings_query_str=' + encodeURIComponent($(this).val());
                 if ($(this).val().length >= 0) {
                     searchNow = true;
-                    setTimeout(showUsersList, ajaxSearchDelay);
+                    showList();
                 } else {
                     searchNow = false;
                 }
             });
 
-            $(document).on('click', '.table_pagination a', function(event) {
-                event.preventDefault();
-
-                searchNow = false;
-                page = $(this).attr('href').split('page=')[1];
-
-                showUsersList(page);
-            });
         });
 
-        function showUsersListInterval() {
-            if ($('#name_value-search').val().length === 0 && !searchNow && page === 1)
-                showUsersList();
-        }
-
-        function showUsersList(page = 1) {
+        function showList(page = 1) {
             $.ajax({
                 type: 'GET',
                 data: {
-                    query: $('#name_value-search').val(),
+                    query: search.val(),
                 },
                 url: '{{ route('settings/get.ajax') }}?page=' + page,
                 beforeSend: function () {
@@ -98,15 +83,104 @@
                     $('#preloader').addClass('d-none');
                 },
                 success: function (data) {
-                    $('#settings_ajax .table_pagination').remove();
+                    $('.table_pagination', ajaxBlock).remove();
 
                     if (searchNow || page == 1) {
-                        $('#settings_ajax').html(data);
+                        ajaxBlock.html(data);
                     } else {
-                        $('#settings_ajax').append(data);
+                        ajaxBlock.append(data);
                     }
                 }
             });
         }
+
+        $('body').on('click', '.table_pagination a', function(event) {
+            event.preventDefault();
+
+            searchNow = false;
+            page = $(this).attr('href').split('page=')[1];
+
+            showList(page);
+        });
+
+        $('body').on('click', '.settings_option', function () {
+            $(' + input,  + select', this).removeClass('d-none').focus();
+
+            $(this).closest('.settings_option-block').find('.save-icon').fadeIn();
+        });
+
+        $('body').on('click', '.save-icon', function() {
+            let closestForm = $(this).closest('.settings_option-block').find('form');
+            let formField = $('.form-control, .form-select', closestForm);
+            let formValue = 'Ошибка';
+
+            if (formField.is('input')) {
+                formValue = formField.val();
+            } else if (formField.is('select')) {
+                formValue = $('option:selected', formField).text();
+            }
+
+            $.ajax({
+                url: closestForm.prop('action'),
+                type: 'POST',
+                data: closestForm.serialize(),
+                beforeSend: function () {
+                    $('#preloader').removeClass('d-none');
+                },
+                complete: function() {
+                    $('#preloader').addClass('d-none');
+
+                    $('+ a.save-icon', closestForm).hide();
+                    $('input, select', closestForm).addClass('d-none');
+                },
+                success: function (data) {
+                    if (JSON.parse(data).success) {
+                        $('.settings_option', closestForm)
+                            .removeClass('btn-outline-dark btn-danger')
+                            .addClass('btn-success')
+                            .text(formValue)
+                            .fadeIn();
+                    }
+                },
+                error: function () {
+                    $('.settings_option', closestForm)
+                        .removeClass('btn-outline-dark btn-success')
+                        .addClass('btn-danger')
+                        .text('Ошибка')
+                        .fadeIn();
+                }
+            });
+        });
+
+        $('body').on('click', '#clear_cache', function (e) {
+            e.preventDefault();
+
+            let closestForm = $(this).closest('.settings_option-block').find('form');
+            let thisButton = $(this);
+
+            Swal.fire({
+                dangerMode: true,
+                title: 'Вы уверены?',
+                text: 'Что хотите очистить кэш',
+                icon: 'warning',
+                confirmButtonText: 'Да, я уверен!',
+                cancelButtonText: 'Отмена',
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: closestForm.prop('action'),
+                        type: 'POST',
+                        data: closestForm.serialize(),
+                        success: function (data) {
+                            thisButton
+                                .removeClass('btn-secondary')
+                                .addClass('btn-success')
+                                .text('Кэш очищен');
+                        }
+                    });
+                }
+            });
+        });
     </script>
 </x-app-layout>
