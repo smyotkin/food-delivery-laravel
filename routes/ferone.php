@@ -20,6 +20,9 @@ Route::middleware(['user.is_active'])->group(function () {
         Route::get('/settings/get.ajax', [SettingsController::class, 'getAjax'])
             ->name('settings/get.ajax');
 
+        Route::post('settings/clear.cache', [SettingsController::class, 'clearCache'])
+            ->name('settings/clear.cache');
+
         Route::resource('settings', SettingsController::class);
     });
 });
