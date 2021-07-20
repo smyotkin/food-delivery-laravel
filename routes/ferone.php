@@ -23,7 +23,9 @@ Route::middleware(['user.is_active'])->group(function () {
         Route::post('settings/clear.cache', [SettingsController::class, 'clearCache'])
             ->name('settings/clear.cache');
 
-        Route::resource('settings', SettingsController::class);
+        Route::resource('settings', SettingsController::class)->only([
+            'index', 'update'
+        ]);
     });
 });
 
