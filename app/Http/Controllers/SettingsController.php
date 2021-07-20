@@ -26,8 +26,10 @@ class SettingsController extends Controller
      */
     public function getAjax(Request $request): string
     {
+        $allSettings = SettingsService::find($request->toArray());
+
         return view('settings/settings-table', [
-            'settings' => SettingsService::find($request->toArray()),
+            'formatted' => SettingsService::formatSetting($allSettings->toArray()['data']),
         ])->render();
     }
 
@@ -44,12 +46,17 @@ class SettingsController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param \Illuminate\Http\Request $request
+     * @return false|string
+     * @throws \Throwable
      */
     public function store(Request $request)
     {
-        //
+        SettingsService::update($request->all());
+
+        return json_encode([
+            'success' => true,
+        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
@@ -95,5 +102,14 @@ class SettingsController extends Controller
     public function destroy($id)
     {
         //
+    }
+
+    public function clearCache()
+    {
+        SettingsService::clearCache();
+
+        return json_encode([
+            'success' => true,
+        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 }
