@@ -57,7 +57,7 @@
 
             showList();
 
-            userSearch.on('keyup', function () {
+            search.on('keyup', function () {
                 document.cookie = 'settings_query_str=' + encodeURIComponent($(this).val());
                 if ($(this).val().length >= 0) {
                     searchNow = true;
@@ -122,7 +122,7 @@
 
             $.ajax({
                 url: closestForm.prop('action'),
-                type: 'POST',
+                type: 'PUT',
                 data: closestForm.serialize(),
                 beforeSend: function () {
                     $('#preloader').removeClass('d-none');
