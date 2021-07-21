@@ -46,19 +46,7 @@ class UsersExport implements FromCollection, WithHeadings //, WithMapping
     */
     public function collection()
     {
-        $userModel = User::all();
-
-        $userModel->map(function($item) {
-//            dump($item->roles);
-
-            $item->role = $item->roles->toArray()[0]['name'] ?? 'Админ';
-            $item->status_name = isset($item->roles[0]->status) ? PositionsService::statuses[$item->roles[0]->status]['name'] :
-                'Главный админ';
-
-            return $item;
-        });
-
-        $userModel->makeHidden([
+        $userModel = User::all()->makeHidden([
             'phone',
             'online',
             'full_name',
@@ -68,7 +56,13 @@ class UsersExport implements FromCollection, WithHeadings //, WithMapping
             'status',
         ]);
 
-//        dump($userModel->toArray());
+        $userModel->map(function($item) {
+            $item->role = $item->roles->toArray()[0]['name'] ?? 'Админ';
+            $item->status_name = isset($item->roles[0]->status) ? PositionsService::statuses[$item->roles[0]->status]['name'] :
+                'Главный админ';
+
+            return $item;
+        });
 
         return $userModel;
     }
@@ -82,60 +76,13 @@ class UsersExport implements FromCollection, WithHeadings //, WithMapping
             'Фамилия',
             'Создан',
             'Обновлен',
-//            'phone',
             'Онлайн',
             'Страница',
             'Часовой пояс',
             'Активность',
             'Персонализированные права',
-//            'full_name',
-//            'phone_formatted',
-//            'registered_at',
-//            'online',
             'Должность',
             'Статус',
         ];
     }
-
-//    public function columnFormats(): array
-//    {
-//        return [
-//            'E' => NumberFormat::FORMAT_DATE_DDMMYYYY,
-//        ];
-//    }
-//
-//    public function map($invoice): array
-//    {
-//        return [
-//            $invoice->invoice_number,
-//            Date::dateTimeToExcel($invoice->created_at),
-//            $invoice->total
-//        ];
-//    }
-
-//    public function columnFormats(): array
-//    {
-//        return [
-//            'A' => NumberFormat::FORMAT_TEXT,
-//            'B' => NumberFormat::FORMAT_NUMBER,
-//            'C' => NumberFormat::FORMAT_TEXT,
-//            'D' => NumberFormat::FORMAT_TEXT,
-//            'E' => NumberFormat::FORMAT_TEXT,
-//        ];
-//    }
-//
-//    /**
-//     * @return array
-//     * @var $softreserve
-//     */
-//    public function map($softreserve): array
-//    {
-//        return [
-//            $softreserve->item_name,
-//            $softreserve->item_id,
-//            $softreserve->item_boss,
-//            $softreserve->character_name,
-//            $softreserve->character->spec->class,
-//        ];
-//    }
 }
