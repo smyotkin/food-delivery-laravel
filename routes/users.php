@@ -34,6 +34,8 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/users/getPermissionsCheckedAjax', [UsersController::class, 'getPermissionsCheckedAjax'])
         ->name('users.getPermissionsCheckedAjax');
 
+    Route::get('/users/export.csv', [UsersController::class, 'exportCsv']);
+
     Route::middleware(['last.page'])->group(function () {
         Route::middleware(['permissions:users_positions_view'])->group(function () {
             Route::resource('users/positions', PositionsController::class)->except([
