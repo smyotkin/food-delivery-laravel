@@ -85,14 +85,13 @@ class User extends Authenticatable
      * @var array
      */
     protected $fillable = [
+        'city_id',
         'first_name',
         'last_name',
-        'city_id',
-        'position_id',
-        'email',
         'password',
         'phone',
         'last_seen',
+        'last_page',
         'timezone',
         'is_active',
         'is_custom_permissions',
@@ -115,6 +114,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'is_active' => 'boolean',
+        'created_at' => 'datetime:d.m.Y H:I:s',
+        'updated_at' => 'datetime:d.m.Y H:I:s',
     ];
 
     protected $appends = [
