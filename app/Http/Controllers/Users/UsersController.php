@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers\Users;
 
+use App\Exports\UsersExport;
 use App\Models\Permission;
 use Illuminate\Http\Request;
 use App\Http\Requests\Users\CreateOrUpdateUserRequest;
@@ -204,4 +205,9 @@ class UsersController extends Controller
         ])->render();
     }
 
+
+    public function exportCsv(Request $request)
+    {
+        return (new UsersExport())->download();
+    }
 }
