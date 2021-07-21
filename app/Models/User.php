@@ -114,8 +114,8 @@ class User extends Authenticatable
      */
     protected $casts = [
         'is_active' => 'boolean',
-        'created_at' => 'datetime:d.m.Y H:I:s',
-        'updated_at' => 'datetime:d.m.Y H:I:s',
+        'created_at' => 'datetime:d.m.Y h:i:s',
+        'updated_at' => 'datetime:d.m.Y h:i:s',
     ];
 
     protected $appends = [
