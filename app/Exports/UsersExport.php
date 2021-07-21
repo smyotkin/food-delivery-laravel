@@ -3,6 +3,8 @@
 namespace App\Exports;
 
 use App\Models\User;
+use App\Services\PositionsService;
+use Carbon\Carbon;
 use Maatwebsite\Excel\Concerns\FromCollection;
 use Maatwebsite\Excel\Concerns\Exportable;
 use Maatwebsite\Excel\Concerns\WithHeadings;
@@ -19,7 +21,7 @@ class UsersExport implements FromCollection, WithHeadings //, WithMapping
      * It's required to define the fileName within
      * the export class when making use of Responsable.
      */
-    private $fileName = 'users.csv';
+    private $fileName = 'users';
 
     /**
      * Optional Writer Type
@@ -34,29 +36,39 @@ class UsersExport implements FromCollection, WithHeadings //, WithMapping
         'charset' => 'windows-1251',
     ];
 
+    public function __construct()
+    {
+        $this->fileName = ($this->fileName ?? 'users') . '_' . Carbon::now()->format('dmyhi') . '.csv';
+    }
+
     /**
     * @return \Illuminate\Support\Collection
     */
     public function collection()
     {
-//        dump(
-//            User::orderBy('created_at', 'desc')->first()->toArray()
-//        );
+        $userModel = User::all();
 
-//        return User::all()->map(function($item) {
-//            dump($item);
-//            return $item;
-//        });
-        $userModel = User::all()->makeHidden([
+        $userModel->map(function($item) {
+//            dump($item->roles);
+
+            $item->role = $item->roles->toArray()[0]['name'] ?? 'Админ';
+            $item->status_name = isset($item->roles[0]->status) ? PositionsService::statuses[$item->roles[0]->status]['name'] :
+                'Главный админ';
+
+            return $item;
+        });
+
+        $userModel->makeHidden([
             'phone',
             'online',
             'full_name',
             'phone_formatted',
             'registered_at',
+            'roles',
+            'status',
         ]);
-//        $userModel->hidden = ['phone'];
 
-        dump($userModel);
+//        dump($userModel->toArray());
 
         return $userModel;
     }
@@ -64,24 +76,24 @@ class UsersExport implements FromCollection, WithHeadings //, WithMapping
     public function headings(): array
     {
         return [
-            'id',
-            'city_id',
-            'first_name',
-            'last_name',
-            'created_at',
-            'updated_at',
+            'ID',
+            'ID города',
+            'Имя',
+            'Фамилия',
+            'Создан',
+            'Обновлен',
 //            'phone',
-            'last_seen',
-            'last_page',
-            'timezone',
-            'is_active',
-            'is_custom_permissions',
+            'Онлайн',
+            'Страница',
+            'Часовой пояс',
+            'Активность',
+            'Персонализированные права',
 //            'full_name',
 //            'phone_formatted',
 //            'registered_at',
 //            'online',
-            'status',
-            'role',
+            'Должность',
+            'Статус',
         ];
     }
 
