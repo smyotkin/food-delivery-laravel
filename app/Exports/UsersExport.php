@@ -33,8 +33,11 @@ class UsersExport implements FromCollection, WithHeadings //, WithMapping
         'charset' => 'windows-1251',
     ];
 
-    public function __construct()
+    private $query;
+
+    public function __construct($query = null)
     {
+        $this->query = $query;
         $this->fileName = ($this->fileName ?? 'users') . '_' . Carbon::now()->format('dmyhi') . '.csv';
     }
 
@@ -43,11 +46,12 @@ class UsersExport implements FromCollection, WithHeadings //, WithMapping
     */
     public function collection()
     {
-        $userModel = User::all()->makeHidden([
+        $usersCollection = $this->query ?? User::all();
+
+        $userModel = $usersCollection->makeHidden([
             'phone',
             'online',
             'full_name',
-            'phone_formatted',
             'registered_at',
             'roles',
             'status',
@@ -80,6 +84,7 @@ class UsersExport implements FromCollection, WithHeadings //, WithMapping
             'Персонализированные права',
             'Должность',
             'Статус',
+            'Телефон',
         ];
     }
 }
