@@ -208,6 +208,6 @@ class UsersController extends Controller
 
     public function exportCsv(Request $request)
     {
-        return (new UsersExport())->download();
+        return (new UsersExport(UsersService::find($request->toArray())))->download();
     }
 }
