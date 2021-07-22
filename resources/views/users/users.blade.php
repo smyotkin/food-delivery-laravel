@@ -23,7 +23,7 @@
                 <h5 class="d-inline-block fw-normal align-middle m-0">
                     Пользователи
                     @permission('users_download')
-                        <a href="javascript:" class="btn btn-sm btn-danger align-bottom rounded-0 px-1 py-0 ms-2"><small>CSV</small></a>
+                        <a href="{{ '/users/export.csv' }}" class="btn btn-sm btn-danger align-bottom rounded-0 px-1 py-0 ms-2" id="download_csv"><small>CSV</small></a>
                     @endpermission
                 </h5>
             </div>
@@ -65,7 +65,6 @@
         let searchNow = false;
 
         $(document).ready(function() {
-
             if (getSearchCookie) {
                 userSearch.val(getSearchCookie);
                 if ($(this).val().length == 0 || $(this).val().length > 1)
@@ -101,10 +100,14 @@
         }
 
         function showUsersList(page = 1) {
+            let query = $('#phone_lastname-search').val();
+
+            $('#download_csv').attr('href', '{{ '/users/export.csv' }}' + '?query=' + query);
+
             $.ajax({
                 type: 'GET',
                 data: {
-                    query: $('#phone_lastname-search').val(),
+                    query: query,
                 },
                 url: '{{ route('users/getAjax') }}?page=' + page,
                 beforeSend: function () {
