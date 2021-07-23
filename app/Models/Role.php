@@ -39,6 +39,11 @@ class Role extends Model
         'status',
     ];
 
+    protected $casts = [
+        'created_at' => 'datetime:d.m.Y h:i:s',
+        'updated_at' => 'datetime:d.m.Y h:i:s',
+    ];
+
     public function permissions()
     {
         return $this->belongsToMany(Permission::class, 'roles_permissions'); // ->withDefault()
