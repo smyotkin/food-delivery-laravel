@@ -98,14 +98,16 @@ class PositionsController extends Controller
     /**
      * Удаление должности
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @param int $id
+     * @return false|string
      */
-    public function destroy($id): \Illuminate\Http\RedirectResponse
+    public function destroy($id)
     {
         PositionsService::destroy($id);
 
-        return redirect()->route('positions.index');
+        return json_encode([
+            'success' => true,
+        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
