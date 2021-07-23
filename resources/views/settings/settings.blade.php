@@ -5,6 +5,8 @@
         <h5 class="m-0 fw-bold">Настройки</h5>
     </x-slot>
 
+    @include('layouts.settings-navigation')
+
     <div class="container-fluid px-5 mb-5">
         <div class="row">
             <div class="col-5 mt-4">
