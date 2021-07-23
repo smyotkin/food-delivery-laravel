@@ -205,7 +205,12 @@ class UsersController extends Controller
         ])->render();
     }
 
-
+    /**
+     * Экспорт в CSV
+     *
+     * @param Request $request
+     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     */
     public function exportCsv(Request $request)
     {
         return (new UsersExport(UsersService::find($request->toArray())))->download();
