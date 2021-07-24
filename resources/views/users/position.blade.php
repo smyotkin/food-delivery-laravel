@@ -152,7 +152,9 @@
                             type: 'POST',
                             data: $('#delete_position').serialize(),
                             success: function (data) {
-                                window.location.replace('{{ route('positions.index') }}');
+                                if (JSON.parse(data).success) {
+                                    window.location.replace('{{ route('positions.index') }}');
+                                }
                             },
                             error: function (response) {
                                 if (response.status === 500) {
