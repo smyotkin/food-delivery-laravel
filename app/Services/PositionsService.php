@@ -110,8 +110,22 @@ class PositionsService
     public static function destroy(int $id): bool
     {
         try {
-            return self::checkPermission('delete') ? Role::find($id)->delete() : false;
+            $role = Role::find($id);
+
+            if ($role && self::checkPermission('delete')) {
+                $removed = $role->delete();
+
+                if ($removed) {
+                    SystemService::createEvent('position_remove_success', $role->toArray() ?? [], $role->toArray() ?? []);
+                }
+
+                return $removed;
+            } else {
+                return false;
+            }
         } catch(\Exception $e) {
+            SystemService::createEvent('position_remove_error', $role->toArray() ?? [], $role->toArray() ?? []);
+
             Log::info("POSITION_ERROR: {$e->getMessage()}");
             abort(500, 'Невозможно удалить должность, она привязана минимум к одному пользователю!');
         }
