@@ -34,6 +34,9 @@ Route::middleware(['user.is_active'])->group(function () {
 
         Route::get('system/events/export.csv', [SystemEventsController::class, 'exportEventsCsv']);
 
+        Route::get('system/events/clear', [SystemEventsController::class, 'clearEvents'])
+            ->name('system/events/clear');
+
         Route::get('system/events/get.ajax', [SystemEventsController::class, 'getEventsAjax'])
             ->name('system/events/get.ajax');
     });
