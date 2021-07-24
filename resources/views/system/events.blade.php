@@ -10,7 +10,7 @@
     <div class="container-fluid px-5 mb-5">
         <div class="row">
             <div class="col-5 mt-4">
-                <input type="text" id="name-search" class="form-control rounded-0" placeholder="Поиск по названию" aria-label="Поиск по названию">
+                <input type="text" id="label_msg-search" class="form-control rounded-0" placeholder="Поиск по метке или сообщению" aria-label="Поиск по метке или сообщению">
             </div>
             <div class="col-auto mt-4 d-flex align-items-center">
                 <div class="spinner-border text-secondary d-none" role="status" id="preloader">
@@ -22,8 +22,21 @@
             <div class="col-auto lh-1">
                 <h5 class="d-inline-block fw-normal align-middle m-0">
                     Системные события
-                    <a href="{{ '/users/export.csv' }}" class="btn btn-sm btn-danger align-bottom rounded-0 px-1 py-0 ms-2" id="download_csv"><small>CSV</small></a>
+                    <a href="{{ '/system/events/export.csv' }}" class="btn btn-sm btn-danger align-bottom rounded-0 px-1 py-0 ms-2" id="download_csv"><small>CSV</small></a>
                 </h5>
+            </div>
+            <div class="col text-end">
+{{--                <a href="{{ route('system/events/clear') }}" class="btn btn-outline-secondary py-0" id="clearEvents">Очистить события</a>--}}
+                <div class="dropdown">
+                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">Очистить события</button>
+                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+                        <li><a class="dropdown-item" href="#">Все</a></li>
+                        <li><a class="dropdown-item" href="#">За день</a></li>
+                        <li><a class="dropdown-item" href="#">За неделю</a></li>
+                        <li><a class="dropdown-item" href="#">За месяц</a></li>
+                        <li><a class="dropdown-item" href="#">За год</a></li>
+                    </ul>
+                </div>
             </div>
         </div>
 
@@ -33,7 +46,7 @@
                     <thead>
                         <tr class="fw-light bg-lightgray table-header">
                             <td class="border-0">Дата создания</td>
-                            <td class="border-0">Название</td>
+                            <td class="border-0">Метка</td>
                             <td class="border-0">Пользователь</td>
                             <td class="border-0">Сообщение</td>
                         </tr>
@@ -45,7 +58,7 @@
     </div>
 
     <script>
-        let search = $('#name-search');
+        let search = $('#label_msg-search');
         let ajaxBlock = $('#events_ajax');
         let getSearchCookie = getCookie('events_query_str');
         let page = 1;
@@ -70,10 +83,14 @@
         });
 
         function showList(page = 1) {
+            let query = search.val();
+
+            $('#download_csv').attr('href', '{{ '/system/events/export.csv' }}' + '?query=' + query);
+
             $.ajax({
                 type: 'GET',
                 data: {
-                    query: search.val(),
+                    query: query,
                 },
                 url: '{{ route('system/events/get.ajax') }}?page=' + page,
                 beforeSend: function () {
