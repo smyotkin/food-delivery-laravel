@@ -180,6 +180,7 @@ return [
         App\Providers\PermissionServiceProvider::class,
         NotificationChannels\SmscRu\SmscRuServiceProvider::class,
         Maatwebsite\Excel\ExcelServiceProvider::class,
+        Rap2hpoutre\LaravelLogViewer\LaravelLogViewerServiceProvider::class,
     ],
 
     /*
