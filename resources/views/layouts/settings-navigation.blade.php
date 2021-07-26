@@ -13,6 +13,10 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('system/logs') ? 'active disabled' : '' }}" href="{{ route('logs.index') }}">Лог ошибок</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('system/notifications') ? 'active disabled' : '' }}" href="{{ route('notifications.index') }}">Уведомления</a>
+                </li>
             </ul>
         </div>
     </div>
