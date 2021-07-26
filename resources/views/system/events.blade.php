@@ -25,19 +25,27 @@
                     <a href="{{ '/system/events/export.csv' }}" class="btn btn-sm btn-danger align-bottom rounded-0 px-1 py-0 ms-2" id="download_csv"><small>CSV</small></a>
                 </h5>
             </div>
-            <div class="col text-end">
-{{--                <a href="{{ route('system/events/clear') }}" class="btn btn-outline-secondary py-0" id="clearEvents">Очистить события</a>--}}
-                <div class="dropdown">
-                    <button class="btn btn-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">Очистить события</button>
-                    <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
-                        <li><a class="dropdown-item" href="#">Все</a></li>
-                        <li><a class="dropdown-item" href="#">За день</a></li>
-                        <li><a class="dropdown-item" href="#">За неделю</a></li>
-                        <li><a class="dropdown-item" href="#">За месяц</a></li>
-                        <li><a class="dropdown-item" href="#">За год</a></li>
-                    </ul>
+
+            @php ($eventsCount = \App\Models\SystemEvents::count())
+
+            @if ($eventsCount > 0)
+                <div class="col text-end">
+                    <div class="dropdown">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                            Очистить события
+                            <span class="badge rounded-pill bg-danger ms-1">
+                                {{ $eventsCount }}
+                            </span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item clear_events" href="{{ route('system/events/clear', ['period' => 'day']) }}">За день</a></li>
+                            <li><a class="dropdown-item clear_events" href="{{ route('system/events/clear', ['period' => 'week']) }}">За неделю</a></li>
+                            <li><a class="dropdown-item clear_events" href="{{ route('system/events/clear', ['period' => 'month']) }}">За месяц</a></li>
+                            <li><a class="dropdown-item clear_events" href="{{ route('system/events/clear', ['period' => 'year']) }}">За год</a></li>
+                        </ul>
+                    </div>
                 </div>
-            </div>
+            @endif
         </div>
 
         <div class="row">
@@ -119,5 +127,60 @@
 
             showList(page);
         });
+
+        $('body').on('click', '.clear_events', function(event) {
+            event.preventDefault();
+
+            let route = $(this).attr('href');
+            let url = new URL(route);
+            let period = $(this).text().toLowerCase();
+            let routeParams = new URLSearchParams(url.search);
+
+            Swal.fire({
+                title: 'Вы уверены?',
+                text: 'Будут удалены все записи ' + period,
+                icon: 'warning',
+                confirmButtonText: 'Да, я уверен!',
+                cancelButtonText: 'Отмена',
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $.ajax({
+                        url: route,
+                        type: 'POST',
+                        data: {
+                            _token: '{{ csrf_token() }}',
+                            period: routeParams.get('period'),
+                        },
+                        success: function (data) {
+                            if (JSON.parse(data).success) {
+                                showList();
+                            }
+
+                            if (JSON.parse(data).count) {
+                                Swal.fire({
+                                    title: 'Успешно',
+                                    text: 'Всего было удалено: ' + JSON.parse(data).count,
+                                    icon: 'info',
+                                    showConfirmButton: false,
+                                });
+                            }
+                        },
+                        error: function (response) {
+                            if (response.status === 404) {
+                                Swal.fire({
+                                    title: 'Внимание!',
+                                    text: response.responseJSON.message,
+                                    icon: 'warning',
+                                    cancelButtonText: 'Закрыть',
+                                    showCancelButton: true,
+                                    showConfirmButton: false,
+                                });
+                            }
+                        }
+                    });
+                }
+            });
+        })
     </script>
 </x-app-layout>
