@@ -142,6 +142,8 @@ class PasswordResetsService
     }
 
     /**
+     * Отправка Pin по смс
+     *
      * @param array $array
      */
     public static function sendPinViaSms(array $array)
