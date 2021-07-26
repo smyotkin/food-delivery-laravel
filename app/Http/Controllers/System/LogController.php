@@ -1,11 +1,12 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\System;
 
+use App\Http\Controllers\Controller;
 use App\Services\SystemService;
 use Illuminate\Http\Request;
 
-class SystemLogController extends Controller
+class LogController extends Controller
 {
     public function index()
     {
