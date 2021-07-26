@@ -1,12 +1,13 @@
 <?php
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\System;
 
+use App\Http\Controllers\Controller;
 use App\Exports\SystemEventsExport;
 use App\Services\SystemService;
 use Illuminate\Http\Request;
 
-class SystemEventsController extends Controller
+class EventsController extends Controller
 {
 
     /**
