@@ -13,6 +13,9 @@
         <!-- Styles -->
         <link rel="stylesheet" href="{{ asset('css/app.css') }}">
         <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+
+        <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
+
         <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
 
         <!-- Scripts -->
@@ -23,6 +26,14 @@
         <script src="{{ asset('js/jquery.min.js') }}"></script>
         <script src="{{ asset('js/jquery.maskedinput.min.js') }}"></script>
         <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
+
+        <!-- FontAwesome -->
+        <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
+
+        <!-- Datatables -->
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.25/js/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="https://cdn.datatables.net/1.10.25/js/dataTables.bootstrap5.min.js"></script>
+
         <script src="{{ asset('js/custom.js') }}"></script>
     </head>
     <body class="font-sans antialiased">
