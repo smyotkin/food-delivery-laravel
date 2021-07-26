@@ -24,7 +24,7 @@ class SystemService
     ];
 
     /**
-     * Метод поиска настроек
+     * Метод поиска событий
      *
      * @param array|null $array
      * @param bool       $paginate
@@ -89,10 +89,44 @@ class SystemService
     }
 
     /**
-     * Очистка всех событий или за переданный период
+     * Очистка за переданный период
+     *
+     * @param string $period
+     * @return mixed
      */
-    public static function clearEvents()
+    public static function clearEvents(string $period)
     {
-        //
+        $date_start = $date_end = Carbon::now()->toDateString();
+
+        switch ($period) {
+            case 'week':
+                $date_start = Carbon::now()->subWeek()->toDateString();
+                break;
+            case 'month':
+                $date_start = Carbon::now()->subMonth()->toDateString();
+                break;
+            case 'year':
+                $date_start = Carbon::now()->subYear()->toDateString();
+                break;
+        }
+
+        $delete = SystemEvents::whereRaw("DATE(created_at) BETWEEN '$date_start' AND '$date_end'")->delete();
+
+        return $delete ? $delete : abort(404, 'Записи не найдены');
+    }
+
+    /**
+     * Удаляет события старше установленного срока в настройках
+     *
+     * @return mixed
+     */
+    public static function clearExpiredEvents()
+    {
+        $period = strtoupper(Settings::get('global_event_period'));
+        $number = $period == 'DAY' ? 0 : 1;
+        $delete = SystemEvents::whereRaw("created_at < DATE_SUB(CURDATE(), INTERVAL $number $period)")
+            ->delete();
+
+        return $delete ? $delete : false;
     }
 }
