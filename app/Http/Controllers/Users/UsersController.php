@@ -17,11 +17,6 @@ class UsersController extends Controller
 {
 
     /**
-     * Настройка доступа через Middleware
-     */
-    public function __construct() {}
-
-    /**
      * Шаблон отображения всех пользователей
      *
      * @return string
