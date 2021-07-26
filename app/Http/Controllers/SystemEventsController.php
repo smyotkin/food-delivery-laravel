@@ -8,6 +8,16 @@ use Illuminate\Http\Request;
 
 class SystemEventsController extends Controller
 {
+
+    /**
+     * Очищаем записи выше установленного срока хранения
+     *
+     */
+    public function __construct()
+    {
+        SystemService::clearExpiredEvents();
+    }
+
     /**
      * Display a listing of the resource.
      *
@@ -19,25 +29,21 @@ class SystemEventsController extends Controller
     }
 
     /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
+     * @param Request $request
+     * @return false|string
      */
-    public function store(Request $request)
+    public function clearEvents(Request $request)
     {
-        //
-    }
+        $validated = $request->validate([
+            'period' => 'required|in:day,week,month,year',
+        ]);
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  int  $id
-     * @return \Illuminate\Http\Response
-     */
-    public function destroy($id)
-    {
-        //
+        $count = SystemService::clearEvents($validated['period']);
+
+        return json_encode([
+            'success' => true,
+            'count' => $count,
+        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
