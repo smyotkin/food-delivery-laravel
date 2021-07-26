@@ -1,4 +1,4 @@
-@if (!empty($data))
+@if (!empty($data) && $data->count() > 0)
     @foreach($data as $event)
         <tr>
             <td>{{ $event['date'] }}</td>
@@ -35,7 +35,7 @@
 
     {{ $data->links('vendor.pagination.table-next') }}
 @else
-    <li class="list-group-item py-4 px-0">
-        События не найдены
-    </li>
+    <tr>
+        <td class="text-center text-muted" colspan="5">События не найдены</td>
+    </tr>
 @endif
