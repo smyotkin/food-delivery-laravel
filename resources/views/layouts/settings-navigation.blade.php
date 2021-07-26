@@ -9,6 +9,10 @@
                 <li class="nav-item">
                     <a class="nav-link {{ Request::is('system/events') ? 'active disabled' : '' }}" href="{{ route('events.index') }}">Системные события</a>
                 </li>
+
+                <li class="nav-item">
+                    <a class="nav-link {{ Request::is('system/logs') ? 'active disabled' : '' }}" href="{{ route('logs.index') }}">Лог ошибок</a>
+                </li>
             </ul>
         </div>
     </div>
