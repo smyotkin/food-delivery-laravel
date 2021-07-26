@@ -2,7 +2,9 @@
 
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\SystemEventsController;
+use App\Http\Controllers\SystemLogController;
 use Illuminate\Support\Facades\Route;
+use Rap2hpoutre\LaravelLogViewer\LogViewerController;
 
 require __DIR__.'/auth.php';
 
@@ -20,25 +22,29 @@ Route::middleware(['user.is_active'])->group(function () {
     Route::middleware(['auth', 'last.page'])->group(function () {
         Route::get('/settings/get.ajax', [SettingsController::class, 'getAjax'])
             ->name('settings/get.ajax');
-
         Route::post('settings/clear.cache', [SettingsController::class, 'clearCache'])
             ->name('settings/clear.cache');
-
         Route::resource('settings', SettingsController::class)->only([
             'index', 'update'
         ]);
 
-        Route::resource('system/events', SystemEventsController::class)->only([
-            'index'
-        ]);
-
+        Route::get('system/events', [SystemEventsController::class, 'index'])
+            ->name('events.index');
         Route::get('system/events/export.csv', [SystemEventsController::class, 'exportEventsCsv']);
-
-        Route::get('system/events/clear', [SystemEventsController::class, 'clearEvents'])
+        Route::post('system/events/clear', [SystemEventsController::class, 'clearEvents'])
             ->name('system/events/clear');
-
         Route::get('system/events/get.ajax', [SystemEventsController::class, 'getEventsAjax'])
             ->name('system/events/get.ajax');
+
+        Route::get('system/log', [SystemLogController::class, 'index'])
+            ->name('log.index');
+        Route::post('system/log/clear', [SystemLogController::class, 'clear'])
+            ->name('system/log/clear');
+        Route::get('system/log/get.ajax', [SystemLogController::class, 'getAjax'])
+            ->name('system/log/get.ajax');
+
+        Route::get('system/logs', [LogViewerController::class, 'index'])
+            ->name('logs.index');
     });
 });
 
