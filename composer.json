@@ -14,6 +14,7 @@
         "jenssegers/date": "^4.0",
         "laravel-lang/lang": "~8.0",
         "laravel-notification-channels/smsc-ru": "^3.1",
+        "laravel-notification-channels/telegram": "^0.5.1",
         "laravel/framework": "^8.40",
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
