@@ -49,6 +49,11 @@ Route::middleware(['user.is_active'])->group(function () {
 
         Route::get('system/notifications', [NotificationsController::class, 'index'])
             ->name('notifications.index');
+        Route::get('system/notifications/get.ajax', [NotificationsController::class, 'getAjax'])
+            ->name('system/notifications/get.ajax');
+        Route::resource('system/notifications', NotificationsController::class)->only([
+            'index', 'update'
+        ]);
     });
 });
 
