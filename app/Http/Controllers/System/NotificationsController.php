@@ -27,10 +27,24 @@ class NotificationsController extends Controller
     }
 
     /**
+     * Метод обновления настройки события
+     *
      * @param Request $request
+     * @return false|string
+     * @throws \Throwable
      */
     public function update(Request $request)
     {
+        $validated = $request->validate([
+            'key' => 'required',
+            'msg_template' => 'required',
+            'recipient_ids' => '',
+        ]);
 
+        SystemService::updateNotification($validated);
+
+        return json_encode([
+            'success' => true,
+        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 }
