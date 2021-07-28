@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Models\EventsNotifications;
 use App\Models\Settings;
 use App\Models\SystemEvents;
 use Illuminate\Support\Facades\Auth;
@@ -14,7 +15,7 @@ class SystemService
      */
     public const events = [
         'position_remove_success' => [
-            'label' => 'Должность удалена',
+            'label' => 'Удаление должности',
             'msg_template' => 'Должность "{name}" была удалена',
         ],
         'position_remove_error' => [
@@ -39,6 +40,26 @@ class SystemService
                     ->orWhere('msg', 'like', '%' . $array['query'] . '%');
             })
             ->orderBy('id', 'asc');
+
+        return $paginate ? $settings->simplePaginate(Settings::get('global_rows_per_page')) : $settings->get();
+    }
+
+    /**
+     * Метод поиска уведомлений
+     *
+     * @param array|null $array
+     * @param bool       $paginate
+     * @return mixed
+     */
+    public static function findEventsNotifications(?array $array = null, bool $paginate = true)
+    {
+        $settings = EventsNotifications::query()
+            ->when(isset($array['query']), function ($query) use ($array) {
+                $query
+                    ->where('label', 'like', '%' . $array['query'] . '%')
+                    ->orWhere('msg_template', 'like', '%' . $array['query'] . '%');
+            })
+            ->orderBy('label', 'asc');
 
         return $paginate ? $settings->simplePaginate(Settings::get('global_rows_per_page')) : $settings->get();
     }
