@@ -1,36 +1,45 @@
-@if (!empty($formatted))
-    @foreach($formatted as $setting)
-        <li class="settings_option-block list-group-item d-flex justify-content-between align-items-center py-3 px-1 position-relative">
-            <div class="me-auto">
-                <div class="fw-bold">{{ $setting['name'] }}</div>
-            </div>
+@if (!empty($data))
+    <table class="table align-middle">
+        <thead>
+            <tr class="bg-lightgray">
+                <th class="px-3" scope="col">Ключ</th>
+                <th class="px-3" scope="col">Сообщение</th>
+                <th class="px-3" scope="col">ID получателей</th>
+            </tr>
+        </thead>
 
-            <form class="position-relative" method="post" action="{{ route('settings.update', ['setting' => $setting['key']]) }}">
-                @csrf
-                @php ($formattedValue = isset($setting['data']) ? $setting['data'][$setting['value']] : $setting['value'])
+        <tbody>
+            @php ($previousLabelValue = '')
 
-                <a href="javascript:" onclick="$(this).hide()" class="settings_option text-decoration-none btn btn-outline-dark rounded-pill px-3">{{ $formattedValue }}</a>
-
-                @if ($setting['type'] == 'select')
-                    <select class="d-none form-select" name="{{ $setting['key'] }}" id="">
-                        @foreach ($setting['data'] as $key => $value)
-                            <option value="{{ $key }}" {{ $key == $setting['value'] ? 'selected' : '' }}>{{ $value }}</option>
-                        @endforeach
-                    </select>
-                @elseif ($setting['type'] == 'textarea')
-                    <textarea class="d-none form-control" name="{{ $setting['key'] }}" id="" cols="30" rows="10"></textarea>
-                @else
-                    <input class="d-none form-control" name="{{ $setting['key'] }}" type="{{ $setting['type'] ?? 'text' }}" value="{{ $setting['value'] ?? $setting['default'] }}">
+            @foreach ($data as $notification)
+                @if ($notification->label != $previousLabelValue)
+                    <tr>
+                        <td colspan="3" class="fs-5 p-3">{{ $notification->label }}</td>
+                    </tr>
                 @endif
-            </form>
 
-            <a href="javascript:" class="save-icon position-absolute start-100 h-100 ms-2" style="display: none"></a>
-        </li>
-    @endforeach
+                <tr class="bg-light">
+                    <td class="p-3 fw-bold">{{ $notification->key }}</td>
+                    <td class="p-3">
+                        <a href="javascript:" onclick="$(this).hide()" class="notification_option btn text-start text-decoration-none text-dark rounded-3 border border-dark w-100 px-3 py-2">{{ $notification['msg_template'] }}</a>
 
-    {{ $settings->links('vendor.pagination.table-next') }}
+                        <textarea class="d-none form-control" name="msg_template" rows="1">{{ $notification['msg_template'] }}</textarea>
+                    </td>
+                    <td class="position-relative p-3">
+                        <a href="javascript:" onclick="$(this).hide()" class="notification_option btn text-decoration-none text-dark rounded-3 border border-dark w-100 px-3 py-2">{{ !empty($notification['recipient_ids']) ? $notification['recipient_ids'] : 'Не задано' }}</a>
+
+                        <textarea class="d-none form-control" name="recipient_ids" rows="1">{{ $notification['recipient_ids'] }}</textarea>
+
+                        <a href="javascript:" class="save-icon position-absolute start-100 top-0 h-100 ms-3" style="display: none;"></a>
+                    </td>
+                </tr>
+
+                @php ($previousLabelValue = $notification->label)
+            @endforeach
+        </tbody>
+    </table>
 @else
     <li class="list-group-item py-4 px-0">
-        Настройки не найдены
+        Уведомления не найдены
     </li>
 @endif
