@@ -8,4 +8,18 @@ use Illuminate\Database\Eloquent\Model;
 class EventsNotifications extends Model
 {
     use HasFactory;
+
+    protected $primaryKey = 'key';
+
+    public $incrementing = false;
+
+    protected $fillable = [
+        'msg_template',
+        'recipient_ids',
+    ];
+
+    public static function get($key)
+    {
+        return self::where('key', $key)->first();
+    }
 }
