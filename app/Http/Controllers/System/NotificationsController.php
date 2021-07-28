@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class NotificationsController extends Controller
 {
-    //
     public function index()
     {
         return view('system/notifications')->render();
@@ -20,10 +19,18 @@ class NotificationsController extends Controller
      * @param Request $request
      * @return string
      */
-    public function getEventsAjax(Request $request)
+    public function getAjax(Request $request)
     {
         return view('system/notifications-table', [
-            'data' => SystemService::events,
+            'data' => SystemService::findEventsNotifications($request->toArray()),
         ])->render();
+    }
+
+    /**
+     * @param Request $request
+     */
+    public function update(Request $request)
+    {
+
     }
 }
