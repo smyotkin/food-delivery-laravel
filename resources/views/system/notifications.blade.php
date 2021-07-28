@@ -95,19 +95,16 @@
         $('body').on('click', '.notification_option', function () {
             $(' + input,  + select, + textarea', this).removeClass('d-none').focus();
 
+            $(this).closest('tr').find('.notification_option')
+                .removeClass('btn-success btn-danger')
+                .addClass('border text-dark border-dark');
+
             $(this).closest('tr').find('.save-icon').fadeIn();
         });
 
         $('body').on('click', '.save-icon', function() {
             let closestForm = $(this).closest('tr').find('form');
             let formField = $('.form-control, .form-select', closestForm);
-            let formValue = 'Ошибка';
-
-            if (formField.is('input')) {
-                formValue = formField.val();
-            } else if (formField.is('select')) {
-                formValue = $('option:selected', formField).text();
-            }
 
             $.ajax({
                 url: closestForm.prop('action'),
@@ -119,21 +116,24 @@
                 complete: function() {
                     $('#preloader').addClass('d-none');
 
-                    $('+ a.save-icon', closestForm).hide();
-                    $('input, select', closestForm).addClass('d-none');
+                    $('a.save-icon', closestForm).hide();
+                    formField.addClass('d-none');
                 },
                 success: function (data) {
                     if (JSON.parse(data).success) {
-                        $('.settings_option', closestForm)
-                            .removeClass('btn-outline-dark btn-danger')
+                        $('.notification_option', closestForm)
+                            .removeClass('border text-dark border-dark')
                             .addClass('btn-success')
-                            .text(formValue)
                             .fadeIn();
+
+                        formField.each(function(key, value) {
+                            $(this).closest('div').find('.notification_option').text($(this).val());
+                        });
                     }
                 },
                 error: function () {
-                    $('.settings_option', closestForm)
-                        .removeClass('btn-outline-dark btn-success')
+                    $('.notification_option', closestForm)
+                        .removeClass('border text-dark border-dark btn-success')
                         .addClass('btn-danger')
                         .text('Ошибка')
                         .fadeIn();
@@ -141,35 +141,35 @@
             });
         });
 
-        $('body').on('click', '#clear_cache', function (e) {
-            e.preventDefault();
-
-            let closestForm = $(this).closest('.settings_option-block').find('form');
-            let thisButton = $(this);
-
-            Swal.fire({
-                dangerMode: true,
-                title: 'Вы уверены?',
-                text: 'Что хотите очистить кэш',
-                icon: 'warning',
-                confirmButtonText: 'Да, я уверен!',
-                cancelButtonText: 'Отмена',
-                showCancelButton: true,
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    $.ajax({
-                        url: closestForm.prop('action'),
-                        type: 'POST',
-                        data: closestForm.serialize(),
-                        success: function (data) {
-                            thisButton
-                                .removeClass('btn-secondary')
-                                .addClass('btn-success')
-                                .text('Кэш очищен');
-                        }
-                    });
-                }
-            });
-        });
+        // $('body').on('click', '#clear_cache', function (e) {
+        //     e.preventDefault();
+        //
+        //     let closestForm = $(this).closest('.settings_option-block').find('form');
+        //     let thisButton = $(this);
+        //
+        //     Swal.fire({
+        //         dangerMode: true,
+        //         title: 'Вы уверены?',
+        //         text: 'Что хотите очистить кэш',
+        //         icon: 'warning',
+        //         confirmButtonText: 'Да, я уверен!',
+        //         cancelButtonText: 'Отмена',
+        //         showCancelButton: true,
+        //     }).then((result) => {
+        //         if (result.isConfirmed) {
+        //             $.ajax({
+        //                 url: closestForm.prop('action'),
+        //                 type: 'POST',
+        //                 data: closestForm.serialize(),
+        //                 success: function (data) {
+        //                     thisButton
+        //                         .removeClass('btn-secondary')
+        //                         .addClass('btn-success')
+        //                         .text('Кэш очищен');
+        //                 }
+        //             });
+        //         }
+        //     });
+        // });
     </script>
 </x-app-layout>
