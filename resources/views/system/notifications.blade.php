@@ -21,35 +21,22 @@
         <div class="row mt-5 mb-3">
             <div class="col-auto lh-1">
                 <h5 class="d-inline-block fw-normal align-middle m-0">
-                    Настройки
+                    Уведомления
                 </h5>
             </div>
         </div>
 
         <div class="row">
-            <div class="col-5">
-                <div class="list-group list-group-flush">
-                    <li class="settings_option-block border-bottom list-group-item d-flex justify-content-between align-items-center py-3 px-1">
-                        <div class="me-auto">
-                            <div class="fw-bold">Файловый кеш</div>
-                        </div>
-
-                        <form class="d-none" method="post" action="{{ route('settings/clear.cache') }}">
-                            @csrf
-                        </form>
-
-                        <a href="javascript:" class="text-decoration-none btn btn-secondary btn-sm rounded-pill px-3" id="clear_cache">Очистить кэш</a>
-                    </li>
-                </div>
-                <div class="list-group list-group-flush" id="settings_ajax"></div>
+            <div class="col-10">
+                <div class="list-group list-group-flush" id="ajax_block"></div>
             </div>
         </div>
     </div>
 
     <script>
         let search = $('#name_value-search');
-        let ajaxBlock = $('#settings_ajax');
-        let getSearchCookie = getCookie('settings_query_str');
+        let ajaxBlock = $('#ajax_block');
+        let getSearchCookie = getCookie('notifications_query_str');
         let page = 1;
         let searchNow = false;
 
@@ -77,7 +64,7 @@
                 data: {
                     query: search.val(),
                 },
-                url: '{{ route('settings/get.ajax') }}?page=' + page,
+                url: '{{ route('system/notifications/get.ajax') }}?page=' + page,
                 beforeSend: function () {
                     $('#preloader').removeClass('d-none');
                 },
@@ -105,14 +92,14 @@
             showList(page);
         });
 
-        $('body').on('click', '.settings_option', function () {
-            $(' + input,  + select', this).removeClass('d-none').focus();
+        $('body').on('click', '.notification_option', function () {
+            $(' + input,  + select, + textarea', this).removeClass('d-none').focus();
 
-            $(this).closest('.settings_option-block').find('.save-icon').fadeIn();
+            $(this).closest('tr').find('.save-icon').fadeIn();
         });
 
         $('body').on('click', '.save-icon', function() {
-            let closestForm = $(this).closest('.settings_option-block').find('form');
+            let closestForm = $(this).closest('tr').find('form');
             let formField = $('.form-control, .form-select', closestForm);
             let formValue = 'Ошибка';
 
