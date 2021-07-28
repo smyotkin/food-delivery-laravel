@@ -35,4 +35,8 @@ return [
         'secret' => env('SMSCRU_SECRET'),
         'sender' => env('SMSCRU_SENDER'),
     ],
+
+    'telegram-bot-api' => [
+        'token' => env('TELEGRAM_BOT_TOKEN', '***REMOVED***'),
+    ],
 ];
