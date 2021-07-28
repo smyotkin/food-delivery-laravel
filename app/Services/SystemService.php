@@ -5,8 +5,12 @@ namespace App\Services;
 use App\Models\EventsNotifications;
 use App\Models\Settings;
 use App\Models\SystemEvents;
+use App\Notifications\Telegram;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Notification;
 
 class SystemService
 {
@@ -75,18 +79,39 @@ class SystemService
     public static function createEvent($slug, ?array $element = null, ?array $data = null)
     {
         if ($event = self::events[$slug]) {
+            $msg = self::replacePlaceholders($event['msg_template'], $element);
+
+            self::sendEventNotification($slug, $msg);
+
             return SystemEvents::create([
                 'slug' => $slug,
                 'label' => $event['label'],
-                'msg' => self::replacePlaceholders($event['msg_template'], $element),
-                'data' => $data ? json_encode($data, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE)
-                    : null,
+                'msg' => $msg,
+                'data' => $data ? json_encode($data, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) : null,
                 'user_id' => Auth::user()->id,
                 'created_at' => Carbon::now(),
             ]);
         }
 
         return false;
+    }
+
+    /**
+     * Метод отправки уведомления о произошедшем событии
+     *
+     * @param $slug
+     * @param $msg
+     */
+    public static function sendEventNotification($slug, $msg) {
+        $eventNotification = EventsNotifications::find($slug)->first();
+        $chatIds = explode(',', str_replace([' '], '', $eventNotification->recipient_ids));
+
+        foreach($chatIds as $user) {
+            Notification::route('telegram', $user)
+                ->notify(new Telegram([
+                    'msg' => $msg,
+                ]));
+        }
     }
 
     /**
@@ -149,5 +174,33 @@ class SystemService
             ->delete();
 
         return $delete ? $delete : false;
+    }
+
+    /**
+     * Обновление настройки уведомления события
+     *
+     * @param array|null $array
+     * @throws \Throwable
+     */
+    public static function updateNotification(?array $array = null): void
+    {
+        $basicParams = collect($array)
+            ->only(['msg_template', 'recipient_ids']);
+
+        try {
+            DB::transaction(function() use ($basicParams, $array) {
+                if ($notification = EventsNotifications::get($array['key'])) {
+                    $notification->update($basicParams->all());
+                    $notification->saveOrFail();
+
+                    Log::info("UPDATE_NOTIFICATION: id({$notification->key})");
+                } else {
+                    return false;
+                }
+            });
+        } catch (\Exception $e) {
+            Log::info("UPDATE_NOTIFICATION_ERROR: {$e->getMessage()}");
+            abort(500);
+        }
     }
 }
