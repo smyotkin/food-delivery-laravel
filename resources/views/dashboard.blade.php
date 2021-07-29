@@ -1,7 +1,8 @@
 <x-app-layout>
+    <x-slot name="title">Главная</x-slot>
     <x-slot name="header"></x-slot>
 
-    <div class="container-fluid bg-gradient-ferone min-vh-100 d-flex align-items-center">
+    <div class="container-fluid bg-gradient-ferone min-vh-100 d-flex align-items-center" style="padding-top: 55px">
         <div class="container">
             <div class="row">
                 <div class="col-8 py-3 rounded rounded-5" style="background-color: rgba(0,0,0,0.3)">
