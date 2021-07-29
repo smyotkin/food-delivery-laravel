@@ -36,7 +36,7 @@
 
         <script src="{{ asset('js/custom.js') }}"></script>
     </head>
-    <body class="font-sans antialiased">
+    <body class="font-sans antialiased position-relative">
         <div class="min-h-screen bg-white">
             @include('layouts.navigation')
 
