@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Models\Settings;
+use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
@@ -79,10 +80,11 @@ class SettingsService
             case 'smscru_secret':
                 return [
                     'name' => 'Пароль СМС-центра',
-                    'value' => $value,
+                    'value' => Crypt::decryptString($value),
                     'raw' => $value,
                     'type' => 'text',
                     'default' => '',
+                    'encryption' => true,
                 ];
         }
 
@@ -145,10 +147,19 @@ class SettingsService
 
         try {
             DB::transaction(function() use ($basicParams) {
-                Settings::where('key', $basicParams->keys()->first())
-                    ->update([
-                        'value' => $basicParams->first(),
-                    ]);
+                if ($key = $basicParams->keys()->first()) {
+                    if ($key == 'smscru_secret') {
+                        $value = Crypt::encryptString($basicParams->first());
+                    } else {
+                        $value = $basicParams->first();
+                    }
+
+                    Settings::where('key', $key)
+                        ->update([
+                            'value' => $value,
+                        ]);
+                }
+
             });
         } catch (\Exception $e) {
             abort(500);
