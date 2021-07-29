@@ -9,18 +9,8 @@ use Illuminate\Http\Request;
 
 class EventsController extends Controller
 {
-
     /**
-     * Очищаем записи выше установленного срока хранения
-     *
-     */
-    public function __construct()
-    {
-        SystemService::clearExpiredEvents();
-    }
-
-    /**
-     * Display a listing of the resource.
+     * Список всех событий
      *
      * @return string
      */
@@ -30,6 +20,8 @@ class EventsController extends Controller
     }
 
     /**
+     * Удаление событий за период
+     *
      * @param Request $request
      * @return false|string
      */
