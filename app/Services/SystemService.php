@@ -45,7 +45,7 @@ class SystemService
                     ->where('label', 'like', '%' . $array['query'] . '%')
                     ->orWhere('msg', 'like', '%' . $array['query'] . '%');
             })
-            ->orderBy('id', 'asc');
+            ->orderBy('created_at', 'desc');
 
         return $paginate ? $settings->simplePaginate(Settings::get('global_rows_per_page')) : $settings->get();
     }
