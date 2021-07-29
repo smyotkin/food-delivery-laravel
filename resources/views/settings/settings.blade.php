@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Общие</x-slot>
     <x-slot name="back_href">{{ route('dashboard') }}</x-slot>
     <x-slot name="back_title">Ferone</x-slot>
     <x-slot name="header">

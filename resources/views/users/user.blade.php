@@ -1,15 +1,16 @@
 <x-app-layout>
+    <x-slot name="title">{{ isset($user) ? $user->fullname : 'Новый пользователь' }}</x-slot>
     <x-slot name="back_href">{{ route('users.index') }}</x-slot>
     <x-slot name="back_title">Пользователи</x-slot>
     <x-slot name="header">
-        <h5 class="m-0 fw-bold">Информация о пользователе</h5>
+        <h5 class="m-0 fw-bold">{{ isset($user) ? 'Информация о пользователе' : 'Новый пользователь' }}</h5>
     </x-slot>
 
     <div class="container-fluid bg-light px-5 py-4 mb-4 border border-start-0 border-end-0 border-secondary">
         <div class="row">
             <div class="col d-flex align-items-center">
                 <div class="info">
-                    <h4 class="text-muted fw-light">{{ $user->first_name ?? 'Имя' }} {{ $user->last_name ?? 'Фамилия' }}</h4>
+                    <h4 class="text-muted fw-light">{{ $user->fullname ?? 'Имя Фамилия' }}</h4>
                     <h6 class="text-muted fw-normal mb-0">{{ isset($user->phone) ? $user->phoneNumber($user->phone) : 'Телефон' }}</h6>
                 </div>
             </div>
@@ -33,7 +34,7 @@
                         @php ($created_at = Date::parse($user->created_at))
 
                         <small>
-                            Регистрация: {{ $user->first_name }} {{ $user->last_name }},
+                            Регистрация: {{ $user->fullname }},
                             {{ $created_at->format(now()->year == $created_at->year ? 'j F, H:i' : 'j F Y') }}
                         </small>
                     </p>
@@ -41,7 +42,7 @@
                         @php ($updated_at = Date::parse($user->updated_at))
 
                         <small>
-                            Изменения: {{ $user->first_name }} {{ $user->last_name }},
+                            Изменения: {{ $user->fullname }},
                             {{ $updated_at->format( now()->year == $updated_at->year ? 'j F, H:i' : 'j F Y') }}
                         </small>
                     </p>

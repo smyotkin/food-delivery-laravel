@@ -1,8 +1,9 @@
 <x-app-layout>
+    <x-slot name="title">{{ isset($role) ? $role->name : 'Новая должность' }}</x-slot>
     <x-slot name="back_href">{{ route('positions.index') }}</x-slot>
     <x-slot name="back_title">Должности</x-slot>
     <x-slot name="header">
-        <h5 class="m-0 fw-bold">Информация о должности</h5>
+        <h5 class="m-0 fw-bold">{{ isset($user) ? 'Информация о должности' : 'Новая должность' }}</h5>
     </x-slot>
 
     <div class="container-fluid bg-light px-5 py-4 mb-4 border border-start-0 border-end-0 border-secondary">

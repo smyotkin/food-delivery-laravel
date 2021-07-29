@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Системные события</x-slot>
     <x-slot name="back_href">{{ route('dashboard') }}</x-slot>
     <x-slot name="back_title">Ferone</x-slot>
     <x-slot name="header">
@@ -31,13 +32,13 @@
             @if ($eventsCount > 0)
                 <div class="col text-end">
                     <div class="dropdown">
-                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="dropdownMenuButton1" data-bs-toggle="dropdown" aria-expanded="false">
+                        <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="clearEvents" data-bs-toggle="dropdown" aria-expanded="false">
                             Очистить события
-                            <span class="badge rounded-pill bg-danger ms-1">
+                            <span class="count badge rounded-pill bg-light border border-secondary text-dark ms-1 pt-1">
                                 {{ $eventsCount }}
                             </span>
                         </button>
-                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="dropdownMenuButton1">
+                        <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="clearEvents">
                             <li><a class="dropdown-item clear_events" href="{{ route('system/events/clear', ['period' => 'day']) }}">За день</a></li>
                             <li><a class="dropdown-item clear_events" href="{{ route('system/events/clear', ['period' => 'week']) }}">За неделю</a></li>
                             <li><a class="dropdown-item clear_events" href="{{ route('system/events/clear', ['period' => 'month']) }}">За месяц</a></li>
@@ -71,6 +72,7 @@
         let getSearchCookie = getCookie('events_query_str');
         let page = 1;
         let searchNow = false;
+        let listCount = 0;
 
         $(document).ready(function() {
             if (getSearchCookie)
@@ -158,6 +160,14 @@
                             }
 
                             if (JSON.parse(data).count) {
+                                let count = parseInt($('#clearEvents .count').text()) - parseInt(JSON.parse(data).count);
+
+                                $('#clearEvents .count').text(count);
+
+                                if (count <= 0) {
+                                    $('#clearEvents').hide();
+                                }
+
                                 Swal.fire({
                                     title: 'Успешно',
                                     text: 'Всего было удалено: ' + JSON.parse(data).count,
