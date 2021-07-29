@@ -39,6 +39,6 @@ class AppServiceProvider extends ServiceProvider
         ]);
 
         config()->set('services.smscru.login', Settings::get('smscru_login') ?? env('SMSCRU_LOGIN'));
-        config()->set('services.smscru.secret', Settings::get('smscru_secret') ?? env('SMSCRU_SECRET'));
+        config()->set('services.smscru.secret', Settings::getDecrypted('smscru_secret') ?? env('SMSCRU_SECRET'));
     }
 }
