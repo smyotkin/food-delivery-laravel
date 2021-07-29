@@ -15,21 +15,7 @@ class PasswordResetsService
 {
     public static $attemptsPerDay = 10;
     public static $pinLifetimeMinutes = 5;
-    public static $sendSms = 0;
-
-    /**
-     * Проверяем срок действия активных записей при каждом использовании класса
-     *
-     * @throws Exception
-     */
-    public function __construct()
-    {
-        self::$attemptsPerDay = config('custom.password_resets.attempts_per_day') ?? self::$attemptsPerDay;
-        self::$pinLifetimeMinutes = config('custom.password_resets.pin_lifetime_minutes') ?? self::$pinLifetimeMinutes;
-        self::$sendSms = config('custom.password_resets.send_sms') ?? self::$sendSms;
-
-        self::checkActiveEntries();
-    }
+    public static $sendSms = 1;
 
     /**
      * Проверяет срок действия активных записей и при истечении срока меняет статус is_active на 0
@@ -41,7 +27,7 @@ class PasswordResetsService
     {
         return DB::table('sent_pin')
             ->where('is_active', 1)
-            ->whereRaw('DATE_ADD(`created_at`, INTERVAL ' . self::$pinLifetimeMinutes . ' MINUTE) < \'' . Carbon::now() . '\'')
+            ->whereRaw('DATE_ADD(`created_at`, INTERVAL ' . config('custom.password_resets.pin_lifetime_minutes', static::$pinLifetimeMinutes) . ' MINUTE) < \'' . Carbon::now() . '\'')
             ->update(['is_active' => 0]);
     }
 
@@ -55,10 +41,12 @@ class PasswordResetsService
      */
     public static function insertPinOrFail(string $phone)
     {
+        self::checkActiveEntries();
+
         $todayEntries = self::getTodayEntries($phone);
         $lastEntry = !empty($todayEntries) ? $todayEntries->first() : null;
 
-        if ($todayEntries->count() < self::$attemptsPerDay && (empty($lastEntry) || $lastEntry->is_active == 0)) {
+        if ($todayEntries->count() < config('custom.password_resets.attempts_per_day', static::$attemptsPerDay) && (empty($lastEntry) || $lastEntry->is_active == 0)) {
             return DB::table('sent_pin')->insert([
                 'phone' => $phone,
                 'pin_code' => $pin = self::generatePin(),
@@ -128,7 +116,7 @@ class PasswordResetsService
 
         if ($pinValidate->fails() && $request != $lastActiveEntry->pin_code) {
             if ($activePinAttempts < 3) {
-                Cache::put($cacheTitle, $activePinAttempts + 1, Carbon::now()->addMinutes(self::$pinLifetimeMinutes));
+                Cache::put($cacheTitle, $activePinAttempts + 1, Carbon::now()->addMinutes(config('custom.password_resets.pin_lifetime_minutes', static::$pinLifetimeMinutes)));
             }
 
             return $pinValidate;
@@ -148,7 +136,7 @@ class PasswordResetsService
      */
     public static function sendPinViaSms(array $array)
     {
-        if (self::$sendSms) {
+        if (config('custom.password_resets.send_sms', static::$sendSms)) {
             $user = User::where('phone', $array['phone'])->first();
 
             $user->notify(new SmsCenter([
