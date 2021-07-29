@@ -1,4 +1,5 @@
 <x-app-layout>
+    <x-slot name="title">Профиль</x-slot>
     <x-slot name="back_href">{{ route('dashboard') }}</x-slot>
     <x-slot name="back_title">Назад</x-slot>
     <x-slot name="header">
