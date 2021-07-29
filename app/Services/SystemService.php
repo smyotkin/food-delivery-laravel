@@ -37,6 +37,8 @@ class SystemService
      */
     public static function findEvents(?array $array = null, bool $paginate = true)
     {
+        self::clearExpiredEvents();
+
         $settings = SystemEvents::query()
             ->when(isset($array['query']), function ($query) use ($array) {
                 $query
@@ -78,6 +80,8 @@ class SystemService
      */
     public static function createEvent($slug, ?array $element = null, ?array $data = null)
     {
+        self::clearExpiredEvents();
+
         if ($event = self::events[$slug]) {
             $msg = self::replacePlaceholders($event['msg_template'], $element);
 
