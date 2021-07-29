@@ -1,4 +1,4 @@
-<nav x-data="{ open: false }" class="bg-transparent border-b border-secondary">
+<nav class="bg-white border-b border-secondary {{ Route::is('dashboard') ? 'position-absolute top-0' : '' }} w-100" {{ Route::is('dashboard') ? 'style="height: 55px;"' : '' }}>
     <!-- Primary Navigation Menu -->
     <div class="mx-auto px-4 sm:px-6 lg:px-8 py-1">
         <div class="flex justify-between py-2">
