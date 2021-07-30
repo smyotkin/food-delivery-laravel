@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\System\NotificationsController;
 use App\Http\Controllers\System\EventsController;
@@ -14,13 +15,12 @@ Route::get('/', function () {
 });
 
 Route::middleware(['user.is_active'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('dashboard');
-    })->middleware(['auth', 'last.page'])->name('dashboard');
-
     require __DIR__.'/users.php';
 
     Route::middleware(['auth', 'last.page'])->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index'])
+            ->name('dashboard');
+
         Route::get('/settings/get.ajax', [SettingsController::class, 'getAjax'])
             ->name('settings/get.ajax');
         Route::post('settings/clear.cache', [SettingsController::class, 'clearCache'])
