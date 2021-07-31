@@ -67,6 +67,26 @@
                     <span class="sr-only">Загрузка...</span>
                 </div>
             </div>
+
+            <div class="col d-flex justify-content-end">
+                @if($current_file)
+                    <a href="?dl={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none">
+                        <span class="fa fa-download"></span> Скачать файл
+                    </a>
+                    <a id="clean-log" href="?clean={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-4">
+                        <span class="fa fa-sync"></span> Очистить файл
+                    </a>
+                    <a id="delete-log" href="?del={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-4">
+                        <span class="fa fa-trash"></span> Удалить файл
+                    </a>
+
+                    @if(count($files) > 1)
+                        <a id="delete-all-log" href="?delall=true{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-4">
+                            <span class="fa fa-trash-alt"></span> Удалить все файлы
+                        </a>
+                    @endif
+                @endif
+            </div>
         </div>
 
         <div class="row">
@@ -200,123 +220,6 @@
     </div>
 
     <script>
-        {{--let search = $('#label_msg-search');--}}
-        {{--let ajaxBlock = $('#events_ajax');--}}
-        {{--let getSearchCookie = getCookie('events_query_str');--}}
-        {{--let page = 1;--}}
-        {{--let searchNow = false;--}}
-
-        {{--$(document).ready(function() {--}}
-        {{--    if (getSearchCookie)--}}
-        {{--        search.val(getSearchCookie);--}}
-
-        {{--    showList();--}}
-
-        {{--    search.on('keyup', function () {--}}
-        {{--        document.cookie = 'events_query_str=' + encodeURIComponent($(this).val());--}}
-        {{--        if ($(this).val().length >= 0) {--}}
-        {{--            searchNow = true;--}}
-        {{--            showList();--}}
-        {{--        } else {--}}
-        {{--            searchNow = false;--}}
-        {{--        }--}}
-        {{--    });--}}
-
-        {{--});--}}
-
-        {{--function showList(page = 1) {--}}
-        {{--    let query = search.val();--}}
-
-        {{--    $('#download_csv').attr('href', '{{ '/system/events/export.csv' }}' + '?query=' + query);--}}
-
-        {{--    $.ajax({--}}
-        {{--        type: 'GET',--}}
-        {{--        data: {--}}
-        {{--            query: query,--}}
-        {{--        },--}}
-        {{--        url: '{{ route('system/events/get.ajax') }}?page=' + page,--}}
-        {{--        beforeSend: function () {--}}
-        {{--            $('#preloader').removeClass('d-none');--}}
-        {{--        },--}}
-        {{--        complete: function() {--}}
-        {{--            $('#preloader').addClass('d-none');--}}
-        {{--        },--}}
-        {{--        success: function (data) {--}}
-        {{--            $('.table_pagination', ajaxBlock).remove();--}}
-
-        {{--            if (searchNow || page == 1) {--}}
-        {{--                ajaxBlock.html(data);--}}
-        {{--            } else {--}}
-        {{--                ajaxBlock.append(data);--}}
-        {{--            }--}}
-        {{--        }--}}
-        {{--    });--}}
-        {{--}--}}
-
-        {{--$('body').on('click', '.table_pagination a', function(event) {--}}
-        {{--    event.preventDefault();--}}
-
-        {{--    searchNow = false;--}}
-        {{--    page = $(this).attr('href').split('page=')[1];--}}
-
-        {{--    showList(page);--}}
-        {{--});--}}
-
-        {{--$('body').on('click', '.clear_events', function(event) {--}}
-        {{--    event.preventDefault();--}}
-
-        {{--    let route = $(this).attr('href');--}}
-        {{--    let url = new URL(route);--}}
-        {{--    let period = $(this).text().toLowerCase();--}}
-        {{--    let routeParams = new URLSearchParams(url.search);--}}
-
-        {{--    Swal.fire({--}}
-        {{--        title: 'Вы уверены?',--}}
-        {{--        text: 'Будут удалены все записи ' + period,--}}
-        {{--        icon: 'warning',--}}
-        {{--        confirmButtonText: 'Да, я уверен!',--}}
-        {{--        cancelButtonText: 'Отмена',--}}
-        {{--        showCancelButton: true,--}}
-        {{--    }).then((result) => {--}}
-        {{--        if (result.isConfirmed) {--}}
-        {{--            $.ajax({--}}
-        {{--                url: route,--}}
-        {{--                type: 'POST',--}}
-        {{--                data: {--}}
-        {{--                    _token: '{{ csrf_token() }}',--}}
-        {{--                    period: routeParams.get('period'),--}}
-        {{--                },--}}
-        {{--                success: function (data) {--}}
-        {{--                    if (JSON.parse(data).success) {--}}
-        {{--                        showList();--}}
-        {{--                    }--}}
-
-        {{--                    if (JSON.parse(data).count) {--}}
-        {{--                        Swal.fire({--}}
-        {{--                            title: 'Успешно',--}}
-        {{--                            text: 'Всего было удалено: ' + JSON.parse(data).count,--}}
-        {{--                            icon: 'info',--}}
-        {{--                            showConfirmButton: false,--}}
-        {{--                        });--}}
-        {{--                    }--}}
-        {{--                },--}}
-        {{--                error: function (response) {--}}
-        {{--                    if (response.status === 404) {--}}
-        {{--                        Swal.fire({--}}
-        {{--                            title: 'Внимание!',--}}
-        {{--                            text: response.responseJSON.message,--}}
-        {{--                            icon: 'warning',--}}
-        {{--                            cancelButtonText: 'Закрыть',--}}
-        {{--                            showCancelButton: true,--}}
-        {{--                            showConfirmButton: false,--}}
-        {{--                        });--}}
-        {{--                    }--}}
-        {{--                }--}}
-        {{--            });--}}
-        {{--        }--}}
-        {{--    });--}}
-        {{--})--}}
-
         $(document).ready(function () {
             $('.table-container tr').on('click', function () {
                 $('#' + $(this).data('display')).toggle();
