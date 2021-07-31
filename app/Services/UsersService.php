@@ -169,6 +169,54 @@ class UsersService
     }
 
     /**
+     * Получение пользователя по номеру телефона
+     *
+     * @param string $phone
+     * @return mixed
+     */
+    public static function getByPhone(string $phone)
+    {
+        try {
+            return User::where('phone', $phone)->firstOrFail();
+        } catch(\Exception $e) {
+            abort(404, 'Пользователь не найден');
+        }
+    }
+
+    /**
+     * Функция смены пароля у пользователя по id
+     *
+     * @param array $array
+     * @throws \Throwable
+     */
+    public static function changePassword(array $array)
+    {
+        try {
+            $params = collect($array)
+                ->only(['password'])
+                ->all();
+
+            DB::transaction(function() use ($array, $params) {
+                if ($user = User::find($array['id'] ?? 0)) {
+                    if ($params['password']) {
+                        $params['password'] = Hash::make($params['password']);
+                    }
+
+                    $user->update($params);
+                    $user->saveOrFail();
+
+                    Log::info("UPDATE_USER_PASSWORD: phone({$user->phone})");
+                } else {
+                    return false;
+                }
+            });
+        } catch (\Exception $e) {
+            Log::info("UPDATE_USER_PASSWORD_ERROR: {$e->getMessage()}");
+            abort(500);
+        }
+    }
+
+    /**
      * Возвращает одного пользователя или ошибку
      *
      * @param array $array
