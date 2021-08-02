@@ -55,6 +55,10 @@ class PasswordResetsService
             ]) ? $pin : false;
         }
 
+        if ($todayEntries->count() == config('custom.password_resets.attempts_per_day', static::$attemptsPerDay)) {
+            SystemService::createEvent('password_reset_limit', ['phone' => $phone]);
+        }
+
         return false;
     }
 
@@ -171,6 +175,8 @@ class PasswordResetsService
                 ->where('phone', $array['phone'])
                 ->where('is_active', 1)
                 ->update(['is_active' => 0]);
+
+            SystemService::createEvent('password_reset_success', ['phone' => $array['phone']]);
 
             return true;
         }
