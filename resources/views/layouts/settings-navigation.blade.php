@@ -6,17 +6,23 @@
                     <a class="nav-link {{ Request::is('settings') ? 'active disabled' : '' }}" href="{{ route('settings.index') }}">Общие</a>
                 </li>
 
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('system/events') ? 'active disabled' : '' }}" href="{{ route('events.index') }}">Системные события</a>
-                </li>
+                @permission('events_modify_and_view')
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('system/events') ? 'active disabled' : '' }}" href="{{ route('events.index') }}">Системные события</a>
+                    </li>
+                @endpermission
 
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('system/logs') ? 'active disabled' : '' }}" href="{{ route('logs.index') }}">Лог ошибок</a>
-                </li>
+                @permission('log_modify_and_view')
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('system/logs') ? 'active disabled' : '' }}" href="{{ route('logs.index') }}">Лог ошибок</a>
+                    </li>
+                @endpermission
 
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('system/notifications') ? 'active disabled' : '' }}" href="{{ route('notifications.index') }}">Уведомления</a>
-                </li>
+                @permission('notifications_modify_and_view')
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('system/notifications') ? 'active disabled' : '' }}" href="{{ route('notifications.index') }}">Уведомления</a>
+                    </li>
+                @endpermission
             </ul>
         </div>
     </div>
