@@ -142,6 +142,11 @@ class SettingsService
         ]);
 
         if ($validator->fails()) {
+            SystemService::createEvent('setting_update_failed', Settings::find($basicParams->keys()->first())
+                ->toArray(), $validator->errors()->toArray() + [
+                    'value' => $basicParams->first(),
+                ]);
+
             abort(500);
         }
 
@@ -154,14 +159,26 @@ class SettingsService
                         $value = $basicParams->first();
                     }
 
-                    Settings::where('key', $key)
-                        ->update([
-                            'value' => $value,
-                        ]);
-                }
+                    $setting = Settings::find($key);
+                    $oldValue = $setting->value;
+                    $updated = $setting->update([
+                        'value' => $value,
+                    ]);
 
+                    if ($updated) {
+                        SystemService::createEvent('setting_updated', $setting->first()->toArray(), [
+                            'old_value' => $oldValue,
+                            'new_value' => $setting->value,
+                        ]);
+                    }
+                }
             });
         } catch (\Exception $e) {
+            SystemService::createEvent('setting_update_failed', Settings::find($basicParams->keys()->first())
+                ->toArray(), [
+                    'value' => $basicParams->first(),
+                ]);
+
             abort(500);
         }
     }
