@@ -45,11 +45,15 @@ class PositionsService
         if ($role = Role::find($array['id'] ?? 0)) {
             self::checkPermission('modify');
 
+            $oldRole = $role->toArray();
+
             $role->update($basicParams);
             $role->saveOrFail();
 
             DB::table('roles_permissions')->where('role_id', '=', $role->id)->delete();
             $role->givePermissionsArray($array['permissions'] ?? []);
+
+            SystemService::createEvent('position_updated', $oldRole, $role->toArray());
 
             Log::info("UPDATE_POSITION: id({$role->id})");
         } else {
@@ -59,6 +63,8 @@ class PositionsService
 
             DB::table('roles_permissions')->where('role_id', '=', $role->id)->delete();
             $role->givePermissionsArray($array['permissions'] ?? []);
+
+            SystemService::createEvent('position_created', $role->toArray(), $role->toArray());
 
             Log::info("CREATE_NEW_POSITION(id: {$role->id}, name: {$role->name}, slug: {$role->slug})");
         }
@@ -109,14 +115,12 @@ class PositionsService
      */
     public static function destroy(int $id): bool
     {
+        $role = Role::find($id);
+
         try {
-            $role = Role::find($id);
-
             if ($role && self::checkPermission('delete')) {
-                $removed = $role->delete();
-
-                if ($removed) {
-                    SystemService::createEvent('position_remove_success', $role->toArray() ?? [], $role->toArray() ?? []);
+                if ($removed = $role->delete()) {
+                    SystemService::createEvent('position_removed', $role->toArray());
                 }
 
                 return $removed;
@@ -124,11 +128,13 @@ class PositionsService
                 return false;
             }
         } catch(\Exception $e) {
-            SystemService::createEvent('position_remove_error', $role->toArray() ?? [], $role->toArray() ?? []);
+            SystemService::createEvent('position_remove_error', $role->toArray(), $role->toArray());
 
             Log::info("POSITION_ERROR: {$e->getMessage()}");
             abort(500, 'Невозможно удалить должность, она привязана минимум к одному пользователю!');
         }
+
+        return false;
     }
 
     /**
