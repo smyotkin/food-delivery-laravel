@@ -57,6 +57,8 @@ class UsersService
                         abort(403, 'Нет права: ' . "users_{$permissionsParams['status']}_modify");
                     }
 
+                    $oldUser = $user->toArray();
+
                     $user->update($basicParams);
                     $user->saveOrFail();
 
@@ -69,6 +71,8 @@ class UsersService
                         DB::table('users_permissions')->where('user_id', '=', $user->id)->delete();
                         $user->givePermissionsArray($permissionsParams['permissions'] ?? []);
                     }
+
+                    SystemService::createEvent('user_updated', $oldUser, $user->toArray());
 
                     Log::info("UPDATE_USER: id({$user->id})");
                 } else {
@@ -97,6 +101,8 @@ class UsersService
 
                     $newUser->givePermissionsArray($permissionsParams['permissions'] ?? []);
 
+                    SystemService::createEvent('user_created', $newUser->toArray());
+
                     // todo Удалить пароль с логгера
                     Log::info("CREATE_NEW_USER(id: {$newUser->id}, phone: {$newUser->phone}, password: $password)");
                 }
@@ -121,8 +127,12 @@ class UsersService
                         $basicParams['password'] = Hash::make($basicParams['password']);
                     }
 
+                    $old = $user->toArray();
+
                     $user->update($basicParams->all());
                     $user->saveOrFail();
+
+                    SystemService::createEvent('user_updated', $old, $user->toArray());
 
                     Log::info("UPDATE_USER: id({$user->id})");
                 } else {
@@ -231,11 +241,28 @@ class UsersService
      * Удаляет пользователя
      *
      * @param int $id
-     * @return bool
+     * @return mixed
      */
     public static function destroy(int $id): bool
     {
-        return self::checkRoleAndPermission($id, 'delete') ? User::find($id)->delete() : false;
+        try {
+            $user = User::find($id);
+
+            if (self::checkRoleAndPermission($id, 'delete')) {
+                if ($removed = $user->delete()) {
+                    SystemService::createEvent('user_removed', $user->toArray());
+                }
+
+                return $removed;
+            } else {
+                return false;
+            }
+        } catch(\Exception $e) {
+            Log::info("USER_ERROR: {$e->getMessage()}");
+            abort(500, 'Невозможно удалить пользователя');
+        }
+
+        return false;
     }
 
     /**
