@@ -82,19 +82,21 @@ class SystemService
     {
         self::clearExpiredEvents();
 
-        if ($event = self::events[$slug]) {
+        if ($event = EventsNotifications::find($slug)) { //  self::events[$slug]
             $msg = self::replacePlaceholders($event['msg_template'], $element);
 
-            self::sendEventNotification($slug, $msg);
-
-            return SystemEvents::create([
+            $createEvent = SystemEvents::create([
                 'slug' => $slug,
-                'label' => $event['label'],
+                'label' => $event->label,
                 'msg' => $msg,
-                'data' => $data ? json_encode($data, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) : null,
-                'user_id' => Auth::user()->id,
+                'data' => $data ? json_encode($data ?? $element, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) : null,
+                'user_id' => !empty(Auth::user()) ? Auth::user()->id : 0,
                 'created_at' => Carbon::now(),
             ]);
+
+            self::sendEventNotification($slug, $msg, $createEvent);
+
+            return $createEvent;
         }
 
         return false;
@@ -103,17 +105,23 @@ class SystemService
     /**
      * Метод отправки уведомления о произошедшем событии
      *
-     * @param $slug
-     * @param $msg
+     * @param      $slug
+     * @param      $msg
+     * @param null $event
      */
-    public static function sendEventNotification($slug, $msg) {
-        $eventNotification = EventsNotifications::find($slug)->first();
+    public static function sendEventNotification($slug, $msg, $event = null) {
+        $eventNotification = EventsNotifications::find($slug);
         $chatIds = explode(',', str_replace([' '], '', $eventNotification->recipient_ids));
+        $date = !empty($event) ? $event->date : null;
+        $fullName = !empty($event->user) ? $event->user->full_name : null;
+        $ip = !empty($event->ip) ? "\nIP: {$event->ip}" : '';
+        $authUser = !empty($fullName) ? "\nПользователь: $fullName" : null;
+        $fullMsg = $date . ' - ' . $msg . $authUser . $ip;
 
         foreach($chatIds as $user) {
             Notification::route('telegram', $user)
                 ->notify(new Telegram([
-                    'msg' => $msg,
+                    'msg' => $fullMsg,
                 ]));
         }
     }
@@ -128,7 +136,7 @@ class SystemService
     public static function replacePlaceholders($msg, $element)
     {
         $replaces = collect($element)
-            ->only(['name', 'slug'])
+            ->only(['name', 'slug', 'full_name', 'phone', 'ip'])
             ->all();
 
         foreach ($replaces as $key => $value) {
