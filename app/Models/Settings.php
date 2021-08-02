@@ -10,6 +10,10 @@ class Settings extends Model
 {
     use HasFactory;
 
+    protected $primaryKey = 'key';
+
+    public $incrementing = false;
+
     public $timestamps = false;
 
     protected $fillable = [
