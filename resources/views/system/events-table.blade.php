@@ -3,7 +3,7 @@
         <tr>
             <td>{{ $event['date'] }}</td>
             <td>{{ $event['label'] }}</td>
-            <td>{{ $event['user']->full_name }}</td>
+            <td>{{ $event['user']->full_name ?? 'Неавторизован' }}</td>
             <td>
                 <div class="row">
                     <div class="col">
