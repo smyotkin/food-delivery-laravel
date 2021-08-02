@@ -416,24 +416,24 @@ class PermissionsSeeder extends Seeder
                 'group' => 'Настройки',
             ],
             [
-                'name' => 'Просмотр мониторинга',
-                'slug' => 'monitoring_view',
-                'group' => 'Мониторинг',
-            ],
-            [
-                'name' => 'Просмотр незавершенных текущих заказов',
-                'slug' => 'monitoring_unsent_view',
-                'group' => 'Мониторинг',
-            ],
-            [
-                'name' => 'Очистка незавершенных текущих заказов',
-                'slug' => 'monitoring_unsent_clear',
-                'group' => 'Мониторинг',
-            ],
-            [
                 'name' => 'Удаление должности',
                 'slug' => 'users_position_delete',
                 'group' => 'Пользователи / Должности',
+            ],
+            [
+                'name' => 'Просмотр и редактирование',
+                'slug' => 'events_modify_and_view',
+                'group' => 'Мониторинг / Системные события',
+            ],
+            [
+                'name' => 'Просмотр и редактирование',
+                'slug' => 'log_modify_and_view',
+                'group' => 'Мониторинг / Лог',
+            ],
+            [
+                'name' => 'Просмотр и редактирование',
+                'slug' => 'notifications_modify_and_view',
+                'group' => 'Мониторинг / Уведомления',
             ],
         ];
 
