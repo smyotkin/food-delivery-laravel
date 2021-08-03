@@ -2,9 +2,11 @@
     <div class="row">
         <div class="col pt-3">
             <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('users') ? 'active disabled' : '' }}" href="{{ route('users.index') }}">Пользователи</a>
-                </li>
+                @permission('users_view')
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('users') ? 'active disabled' : '' }}" href="{{ route('users.index') }}">Пользователи</a>
+                    </li>
+                @endpermission
 
                 @permission('users_positions_view')
                     <li class="nav-item">
