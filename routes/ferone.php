@@ -29,29 +29,28 @@ Route::middleware(['user.is_active'])->group(function () {
             'index', 'update'
         ]);
 
-        Route::get('system/events', [EventsController::class, 'index'])
-            ->name('events.index');
-        Route::get('system/events/export.csv', [EventsController::class, 'exportEventsCsv']);
-        Route::post('system/events/clear', [EventsController::class, 'clearEvents'])
-            ->name('system/events/clear');
-        Route::get('system/events/get.ajax', [EventsController::class, 'getEventsAjax'])
-            ->name('system/events/get.ajax');
+        Route::middleware(['permissions:events_modify_and_view'])->group(function () {
+            Route::get('system/events', [EventsController::class, 'index'])
+                ->name('events.index');
+            Route::get('system/events/export.csv', [EventsController::class, 'exportEventsCsv']);
+            Route::post('system/events/clear', [EventsController::class, 'clearEvents'])
+                ->name('system/events/clear');
+            Route::get('system/events/get.ajax', [EventsController::class, 'getEventsAjax'])
+                ->name('system/events/get.ajax');
+        });
 
-        Route::get('system/log', [LogController::class, 'index'])
-            ->name('log.index');
-        Route::post('system/log/clear', [LogController::class, 'clear'])
-            ->name('system/log/clear');
-        Route::get('system/log/get.ajax', [LogController::class, 'getAjax'])
-            ->name('system/log/get.ajax');
+        Route::middleware(['permissions:log_modify_and_view'])->group(function () {
+            Route::get('system/logs', [LogViewerController::class, 'index'])
+                ->name('logs.index');
+        });
 
-        Route::get('system/logs', [LogViewerController::class, 'index'])
-            ->name('logs.index');
-
-        Route::get('system/notifications/get.ajax', [NotificationsController::class, 'getAjax'])
-            ->name('system/notifications/get.ajax');
-        Route::resource('system/notifications', NotificationsController::class)->only([
-            'index', 'update'
-        ]);
+        Route::middleware(['permissions:notifications_modify_and_view'])->group(function () {
+            Route::get('system/notifications/get.ajax', [NotificationsController::class, 'getAjax'])
+                ->name('system/notifications/get.ajax');
+            Route::resource('system/notifications', NotificationsController::class)->only([
+                'index', 'update'
+            ]);
+        });
     });
 });
 
