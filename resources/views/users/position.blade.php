@@ -61,6 +61,8 @@
     </div>
 
     <script>
+        let positionsView = false;
+
         $.ajaxSetup({
             beforeSend: function () {
                 $('#preloader').removeClass('d-none');
@@ -101,6 +103,12 @@
         });
     </script>
 
+    @permission('users_positions_view')
+    <script>
+        let positionsView = true;
+    </script>
+    @endpermission
+
     @anyPermission('users_position_modify|users_position_create')
     <script>
         $('body').on('click', '#save', function(event) {
@@ -112,7 +120,11 @@
                 data: $('#position_form').serialize(),
                 success: function (data) {
                     if (JSON.parse(data).success) {
-                        window.location.replace('{{ route('positions.index') }}');
+                        if (positionsView) {
+                            window.location.replace('{{ route('positions.index') }}');
+                        } else {
+                            window.location.reload();
+                        }
                     }
                 },
                 error: function (response) {
