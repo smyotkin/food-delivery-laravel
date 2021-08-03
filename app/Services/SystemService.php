@@ -111,18 +111,20 @@ class SystemService
      */
     public static function sendEventNotification($slug, $msg, $event = null) {
         $eventNotification = EventsNotifications::find($slug);
-        $chatIds = explode(',', str_replace([' '], '', $eventNotification->recipient_ids));
-        $date = !empty($event) ? $event->date : null;
-        $fullName = !empty($event->user) ? $event->user->full_name : null;
-        $ip = !empty($event->ip) ? "\nIP: {$event->ip}" : '';
-        $authUser = !empty($fullName) ? "\nПользователь: $fullName" : null;
-        $fullMsg = $date . ' - ' . $msg . $authUser . $ip;
 
-        foreach($chatIds as $user) {
-            Notification::route('telegram', $user)
-                ->notify(new Telegram([
-                    'msg' => $fullMsg,
-                ]));
+        if (!empty($eventNotification->recipient_ids) && $chatIds = explode(',', str_replace([' '], '', $eventNotification->recipient_ids))) {
+            $date = !empty($event) ? $event->date : null;
+            $fullName = !empty($event->user) ? $event->user->full_name : null;
+            $ip = !empty($event->ip) ? "\nIP: {$event->ip}" : '';
+            $authUser = !empty($fullName) ? "\nПользователь: $fullName" : null;
+            $fullMsg = $date . ' - ' . $msg . $authUser . $ip;
+
+            foreach($chatIds as $user) {
+                Notification::route('telegram', $user)
+                    ->notify(new Telegram([
+                        'msg' => $fullMsg,
+                    ]));
+            }
         }
     }
 
