@@ -70,5 +70,6 @@ class Kernel extends HttpKernel
         'last.page' => \App\Http\Middleware\LastUserPage::class,
         'role' => \App\Http\Middleware\RoleMiddleware::class,
         'permissions' => \App\Http\Middleware\PermissionMiddleware::class,
+        'any-permissions' => \App\Http\Middleware\AnyPermission::class,
     ];
 }
