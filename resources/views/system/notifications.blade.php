@@ -127,8 +127,8 @@
                             .addClass('btn-success')
                             .fadeIn();
 
-                        formField.each(function(key, value) {
-                            $(this).closest('div').find('.notification_option').text($(this).val());
+                        formField.each(function() {
+                            $(this).closest('div').find('.notification_option').text($(this).val() ? $(this).val() : 'Не задано');
                         });
                     }
                 },
@@ -141,36 +141,5 @@
                 }
             });
         });
-
-        // $('body').on('click', '#clear_cache', function (e) {
-        //     e.preventDefault();
-        //
-        //     let closestForm = $(this).closest('.settings_option-block').find('form');
-        //     let thisButton = $(this);
-        //
-        //     Swal.fire({
-        //         dangerMode: true,
-        //         title: 'Вы уверены?',
-        //         text: 'Что хотите очистить кэш',
-        //         icon: 'warning',
-        //         confirmButtonText: 'Да, я уверен!',
-        //         cancelButtonText: 'Отмена',
-        //         showCancelButton: true,
-        //     }).then((result) => {
-        //         if (result.isConfirmed) {
-        //             $.ajax({
-        //                 url: closestForm.prop('action'),
-        //                 type: 'POST',
-        //                 data: closestForm.serialize(),
-        //                 success: function (data) {
-        //                     thisButton
-        //                         .removeClass('btn-secondary')
-        //                         .addClass('btn-success')
-        //                         .text('Кэш очищен');
-        //                 }
-        //             });
-        //         }
-        //     });
-        // });
     </script>
 </x-app-layout>
