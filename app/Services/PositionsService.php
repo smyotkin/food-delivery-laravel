@@ -175,4 +175,15 @@ class PositionsService
     {
         return Role::where('id', $array['id'])->with('permissions')->first();
     }
+
+    /**
+     * Возвращает должность c правами или исключение в случае отсутствия
+     *
+     * @param array $array
+     * @return Role|null
+     */
+    public static function getWithPermissionsOrFail(array $array): ?Role
+    {
+        return Role::where('id', $array['id'])->with('permissions')->firstOrFail();
+    }
 }
