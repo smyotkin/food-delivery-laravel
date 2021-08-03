@@ -68,7 +68,7 @@ class PositionsController extends Controller
      */
     public function show($id): string
     {
-        $role = PositionsService::getWithPermissions(['id' => $id]);
+        $role = PositionsService::getWithPermissionsOrFail(['id' => $id]);
 
         return view('users/position', [
             'role' => $role,
