@@ -17,23 +17,50 @@ class Modules extends Model
         'is_active',
     ];
 
+    protected static $subModulesPermissions = [
+        'users' => [
+            'users_view' => '/users',
+            'users_positions_view' => '/users/positions',
+        ],
+        'settings' => [
+            'settings_view' => '/settings',
+            'events_modify_and_view' => '/system/events',
+            'log_modify_and_view' => '/system/logs',
+            'notifications_modify_and_view' => '/system/notifications',
+        ]
+    ];
+
     /**
-     * Возвращает только доступные авторизованному пользователю модули (если есть права на просмотр)
+     * Возвращает только доступные авторизованному пользователю модули (если есть права на просмотр и если если есть
+     * право на просмотр подмодуля)
      *
-     * @param null $user
      * @return mixed
      */
-    public static function getAvailable($user = null)
+    public static function getAvailable()
     {
         $authUserPermissions = Auth::user()->permissions()->get();
 
         $getModulesViewRules = !empty($authUserPermissions) ? $authUserPermissions->filter(function ($item) {
-            return substr_count($item->slug, '_') == 1 && preg_match("/(.*)\_view/m", $item->slug);
-        })->pluck('slug')->map(function ($item) {
-            return str_replace('_view', '', $item);
-        })->toArray() : [];
+            return preg_match("/(.*)_view/m", $item->slug);
+        })->pluck('slug')->toArray() : [];
 
-        return self::where('is_active', 1)->whereIn('slug', $getModulesViewRules)->get();
+        $getActiveModules = self::where('is_active', 1)->get();
+        $availableModules = collect([]);
+
+        foreach ($getActiveModules as $module) {
+            if (!empty(self::$subModulesPermissions[$module['slug']])) {
+                foreach (self::$subModulesPermissions[$module['slug']] as $permission => $url) {
+                    if (in_array($permission, $getModulesViewRules)) {
+                        $module->url = $url;
+                        $availableModules[] = $module;
+
+                        continue 2;
+                    }
+                }
+            }
+        }
+
+        return $availableModules;
     }
 
     /**
