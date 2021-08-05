@@ -2,9 +2,11 @@
     <div class="row">
         <div class="col pt-3">
             <ul class="nav nav-tabs">
-                <li class="nav-item">
-                    <a class="nav-link {{ Request::is('settings') ? 'active disabled' : '' }}" href="{{ route('settings.index') }}">Общие</a>
-                </li>
+                @permission('settings_view')
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('settings') ? 'active disabled' : '' }}" href="{{ route('settings.index') }}">Общие</a>
+                    </li>
+                @endpermission
 
                 @permission('events_modify_and_view')
                     <li class="nav-item">
