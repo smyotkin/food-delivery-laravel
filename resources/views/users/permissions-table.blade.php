@@ -17,7 +17,7 @@
                 @if ($permission->group != $previousGroupValue)
                     <tr>
                         <td></td>
-                        <td colspan="2" class="py-3">
+                        <td colspan="2" class="py-3 {{ !$is_custom_permissions || !has_permission('users_modes_modify') ? 'text-muted' : '' }}">
                             <strong>{{ $permission->group }}</strong>
                         </td>
                     </tr>
@@ -25,14 +25,14 @@
 
                 <tr class="bg-light">
                     <td class="text-center">
-                        <input class="form-check-input permission" type="checkbox" name="permissions[]" value="{{ $permission->slug }}" id="{{ $permission->slug }}" {{ isset($current_permissions) && in_array($permission->slug, $current_permissions) ? 'checked' : '' }} {{ !$is_custom_permissions ? 'disabled' : '' }}>
+                        <input class="form-check-input permission" type="checkbox" name="permissions[]" value="{{ $permission->slug }}" id="{{ $permission->slug }}" {{ isset($current_permissions) && in_array($permission->slug, $current_permissions) ? 'checked' : '' }} {{ !$is_custom_permissions || !has_permission('users_modes_modify') ? 'disabled' : '' }}>
                     </td>
                     <td>
-                        <label class="form-check-label {{ isset($role_permissions) && in_array($permission->slug, $role_permissions) ? 'bg-secondary text-white px-2' : '' }} {{ !$is_custom_permissions ? 'bg-transparent text-muted' : '' }} " for="{{ $permission->slug }}">
+                        <label class="form-check-label {{ isset($role_permissions) && in_array($permission->slug, $role_permissions) ? 'bg-secondary text-white px-2' : '' }} {{ !$is_custom_permissions || !has_permission('users_modes_modify') ? 'bg-transparent text-muted' : '' }} " for="{{ $permission->slug }}">
                             {{ $permission->name }}
                         </label>
                     </td>
-                    <td class="{{ !$is_custom_permissions ? 'text-muted' : '' }}">
+                    <td class="{{ !$is_custom_permissions || !has_permission('users_modes_modify') ? 'text-muted' : '' }}">
                         {{ $permission->slug }}
                     </td>
                 </tr>
