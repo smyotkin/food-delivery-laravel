@@ -29,19 +29,22 @@
 
         <div class="row">
             <div class="col-5">
-                <div class="list-group list-group-flush">
-                    <li class="settings_option-block border-bottom list-group-item d-flex justify-content-between align-items-center py-3 px-1">
-                        <div class="me-auto">
-                            <div class="fw-bold">Файловый кеш</div>
-                        </div>
+                @if (has_permission('settings_modify'))
+                    <div class="list-group list-group-flush">
+                        <li class="settings_option-block border-bottom list-group-item d-flex justify-content-between align-items-center py-3 px-1">
+                            <div class="me-auto">
+                                <div class="fw-bold">Файловый кеш</div>
+                            </div>
 
-                        <form class="d-none" method="post" action="{{ route('settings/clear.cache') }}">
-                            @csrf
-                        </form>
+                            <form class="d-none" method="post" action="{{ route('settings/clear.cache') }}">
+                                @csrf
+                            </form>
 
-                        <a href="javascript:" class="text-decoration-none btn btn-secondary btn-sm rounded-pill px-3" id="clear_cache">Очистить кэш</a>
-                    </li>
-                </div>
+                            <a href="javascript:" class="text-decoration-none btn btn-secondary btn-sm rounded-pill px-3" id="clear_cache">Очистить кэш</a>
+                        </li>
+                    </div>
+                @endif
+
                 <div class="list-group list-group-flush" id="settings_ajax"></div>
             </div>
         </div>
