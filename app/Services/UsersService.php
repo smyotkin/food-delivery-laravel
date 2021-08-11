@@ -283,7 +283,7 @@ class UsersService
         $permission = isset($role->status) ? "users_{$role->status}_$action" : null;
 
         if (User::getRoot()->id == $id || $user === null) {
-            abort(403, 'Пользователь не найден');
+            abort(404, 'Пользователь не найден');
         } elseif (!isset($permission)) {
             abort(403, 'Пользователь не имеет должности');
         } elseif (!Auth::user()->hasPermission($permission)) {
