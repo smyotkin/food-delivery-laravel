@@ -3,6 +3,8 @@
 namespace App\Exceptions;
 
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\HttpException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -36,6 +38,28 @@ class Handler extends ExceptionHandler
     {
         $this->reportable(function (Throwable $e) {
             //
+        });
+
+        $this->renderable(function (NotFoundHttpException $e, $request) {
+            if ($request->getHost() == config('custom.subdomain.api')) {
+                return response()->json([
+                    'error' => [
+                        'code' => 404,
+                        'message' => 'Не найдено.',
+                    ],
+                ], 404);
+            }
+        });
+
+        $this->renderable(function (HttpException $e, $request) {
+            if ($request->getHost() == config('custom.subdomain.api')) {
+                return response()->json([
+                    'error' => [
+                        'code' => $e->getStatusCode(),
+                        'message' => $e->getMessage(),
+                    ],
+                ], $e->getStatusCode());
+            }
         });
     }
 }
