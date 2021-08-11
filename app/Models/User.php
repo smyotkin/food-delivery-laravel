@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Auth;
 use Jenssegers\Date\Date;
 
 use App\Traits\HasRolesAndPermissions;
+use Laravel\Sanctum\HasApiTokens;
 
 /**
  * App\Models\User
@@ -58,6 +59,7 @@ use App\Traits\HasRolesAndPermissions;
  */
 class User extends Authenticatable
 {
+    use HasApiTokens;
     use HasFactory;
     use HasRolesAndPermissions;
     use Notifiable;
@@ -113,6 +115,7 @@ class User extends Authenticatable
      * @var array
      */
     protected $casts = [
+        'is_custom_permissions' => 'boolean',
         'is_active' => 'boolean',
         'created_at' => 'datetime:d.m.Y h:i:s',
         'updated_at' => 'datetime:d.m.Y h:i:s',
@@ -124,6 +127,7 @@ class User extends Authenticatable
         'registered_at',
         'online',
         'status',
+        'role_permissions',
     ];
 
     /**
@@ -182,6 +186,13 @@ class User extends Authenticatable
         $timeOrOffline = $this->last_seen != null ? Date::parse($this->last_seen)->diffForHumans() : 'offline';
 
         return Cache::has('user-is-online-' . $this->id) ? 'online' : $timeOrOffline;
+    }
+
+    public function getRolePermissionsAttribute()
+    {
+        $role = $this->roles->first();
+
+        return $role ? $role->permissions : [];
     }
 
     public function setPhoneAttribute($value)
