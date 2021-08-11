@@ -16,6 +16,7 @@
         "laravel-notification-channels/smsc-ru": "^3.1",
         "laravel-notification-channels/telegram": "^0.5.1",
         "laravel/framework": "^8.40",
+        "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
         "rap2hpoutre/laravel-log-viewer": "^1.7"
