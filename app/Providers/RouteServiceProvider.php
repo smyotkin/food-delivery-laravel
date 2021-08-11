@@ -28,6 +28,8 @@ class RouteServiceProvider extends ServiceProvider
      */
     // protected $namespace = 'App\\Http\\Controllers';
 
+     protected $apiVersion = 'v1';
+
     /**
      * Define your route model bindings, pattern filters, etc.
      *
@@ -39,8 +41,9 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->routes(function () {
             Route::domain(config('custom.subdomain.api'))
+                ->prefix($this->apiVersion)
                 ->middleware('api')
-                ->namespace($this->namespace)
+                ->namespace('App\\Http\\Controllers\\Api\\' . $this->apiVersion)
                 ->group(base_path('routes/api.php'));
 
             Route::domain(config('custom.subdomain.ferone'))
