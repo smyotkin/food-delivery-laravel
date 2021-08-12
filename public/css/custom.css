@@ -64,6 +64,13 @@ img {
     min-height: 75px
 }
 
+.settings_option {
+    max-width: 200px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
 .save-icon {
     width: 25px;
     background-repeat: no-repeat;
