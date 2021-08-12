@@ -86,6 +86,15 @@ class SettingsService
                     'default' => '',
                     'encryption' => true,
                 ];
+            case 'telegram_token':
+                return [
+                    'name' => 'Токен Telegram-бота',
+                    'value' => Crypt::decryptString($value),
+                    'raw' => $value,
+                    'type' => 'text',
+                    'default' => '',
+                    'encryption' => true,
+                ];
         }
 
         return false;
@@ -131,6 +140,7 @@ class SettingsService
                 'global_max_rows_limit',
                 'smscru_login',
                 'smscru_secret',
+                'telegram_token',
             ]);
 
         $validator = Validator::make($array, [
@@ -139,6 +149,7 @@ class SettingsService
             'global_max_rows_limit' => 'numeric',
             'smscru_login' => '',
             'smscru_secret' => '',
+            'telegram_token' => '',
         ]);
 
         if ($validator->fails()) {
@@ -153,7 +164,7 @@ class SettingsService
         try {
             DB::transaction(function() use ($basicParams) {
                 if ($key = $basicParams->keys()->first()) {
-                    if ($key == 'smscru_secret') {
+                    if (in_array($key, ['smscru_secret', 'telegram_token'])) {
                         $value = Crypt::encryptString($basicParams->first());
                     } else {
                         $value = $basicParams->first();
@@ -166,7 +177,7 @@ class SettingsService
                     ]);
 
                     if ($updated) {
-                        SystemService::createEvent('setting_updated', $setting->first()->toArray(), [
+                        SystemService::createEvent('setting_updated', $setting->toArray(), [
                             'old_value' => $oldValue,
                             'new_value' => $setting->value,
                         ]);
