@@ -34,6 +34,6 @@ class RootUserSeeder extends Seeder
             ]);
         }
 
-        $user->permissions()->attach($allPermissions);
+        $user->permissions()->syncWithoutDetaching($allPermissions);
     }
 }
