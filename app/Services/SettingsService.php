@@ -80,7 +80,7 @@ class SettingsService
             case 'smscru_secret':
                 return [
                     'name' => 'Пароль СМС-центра',
-                    'value' => Crypt::decryptString($value),
+                    'value' => !empty($value) ? Crypt::decryptString($value) : $value,
                     'raw' => $value,
                     'type' => 'text',
                     'default' => '',
@@ -89,7 +89,7 @@ class SettingsService
             case 'telegram_token':
                 return [
                     'name' => 'Токен Telegram-бота',
-                    'value' => Crypt::decryptString($value),
+                    'value' => !empty($value) ? Crypt::decryptString($value) : $value,
                     'raw' => $value,
                     'type' => 'text',
                     'default' => '',
