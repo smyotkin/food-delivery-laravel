@@ -10,6 +10,8 @@ class Modules extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'name',
         'url',
