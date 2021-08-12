@@ -17,20 +17,22 @@ class RootUserSeeder extends Seeder
      */
     public function run()
     {
-        $allPermissions = Permission::all();
+        if (!User::find(1)) {
+            $allPermissions = Permission::all();
 
-        $user = User::create([
-            'id' => 1,
-            'city_id' => 0,
-            'first_name' => 'Главный',
-            'last_name' => 'Админ',
-            'password' => Hash::make(123456),
-            'phone' => '79112223344',
-            'timezone' => 'Europe/Moscow',
-            'is_active' => 1,
-            'is_custom_permissions' => 1,
-        ]);
+            $user = User::create([
+                'id' => 1,
+                'city_id' => 0,
+                'first_name' => 'Главный',
+                'last_name' => 'Админ',
+                'password' => Hash::make(123456),
+                'phone' => '79112223344',
+                'timezone' => 'Europe/Moscow',
+                'is_active' => 1,
+                'is_custom_permissions' => 1,
+            ]);
 
-        $user->permissions()->attach($allPermissions);
+            $user->permissions()->attach($allPermissions);
+        }
     }
 }
