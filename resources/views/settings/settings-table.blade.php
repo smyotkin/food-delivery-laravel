@@ -10,7 +10,7 @@
                 @php ($formattedValue = isset($setting['data']) ? $setting['data'][$setting['value']] : $setting['value'])
 
                 @if (has_permission('settings_modify'))
-                    <a href="javascript:" onclick="$(this).hide()" class="settings_option text-decoration-none btn btn-outline-dark rounded-pill px-3">{{ $formattedValue }}</a>
+                    <a href="javascript:" onclick="$(this).hide()" class="settings_option text-decoration-none btn btn-outline-dark rounded-pill px-3">{{ !empty($formattedValue) ? $formattedValue : 'Не задано' }}</a>
 
                     @if ($setting['type'] == 'select')
                         <select class="d-none form-select" name="{{ $setting['key'] }}" id="">
