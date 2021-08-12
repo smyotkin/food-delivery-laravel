@@ -40,5 +40,6 @@ class AppServiceProvider extends ServiceProvider
 
         config()->set('services.smscru.login', Settings::get('smscru_login') ?? env('SMSCRU_LOGIN'));
         config()->set('services.smscru.secret', Settings::getDecrypted('smscru_secret') ?? env('SMSCRU_SECRET'));
+        config()->set('services.telegram-bot-api.token', Settings::getDecrypted('telegram_token') ?? env('TELEGRAM_BOT_TOKEN'));
     }
 }
