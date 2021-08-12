@@ -29,7 +29,7 @@ class Settings extends Model
 
     public static function getDecrypted($key)
     {
-        $value = self::where('key', $key)->first()->value;
+        $value = self::get($key);
 
         return $value ? Crypt::decryptString($value) : false;
     }
