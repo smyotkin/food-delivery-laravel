@@ -22,7 +22,9 @@ class Settings extends Model
 
     public static function get($key)
     {
-        return self::where('key', $key)->first()->value;
+        $option = self::where('key', $key)->first();
+
+        return $option ? $option->value : false;
     }
 
     public static function getDecrypted($key)
