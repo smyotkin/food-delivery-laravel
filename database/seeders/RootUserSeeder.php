@@ -17,9 +17,10 @@ class RootUserSeeder extends Seeder
      */
     public function run()
     {
-        if (!User::find(1)) {
-            $allPermissions = Permission::all();
+        $allPermissions = Permission::all();
+        $user = User::find(1);
 
+        if (!$user) {
             $user = User::create([
                 'id' => 1,
                 'city_id' => 0,
@@ -31,8 +32,8 @@ class RootUserSeeder extends Seeder
                 'is_active' => 1,
                 'is_custom_permissions' => 1,
             ]);
-
-            $user->permissions()->attach($allPermissions);
         }
+
+        $user->permissions()->attach($allPermissions);
     }
 }
