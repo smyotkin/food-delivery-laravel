@@ -21,7 +21,7 @@
                     @elseif ($setting['type'] == 'textarea')
                         <textarea class="d-none form-control" name="{{ $setting['key'] }}" id="" cols="30" rows="10"></textarea>
                     @else
-                        <input class="d-none form-control" name="{{ $setting['key'] }}" type="{{ $setting['type'] ?? 'text' }}" value="{{ $setting['value'] ?? $setting['default'] }}">
+                        <input class="d-none form-control" name="{{ $setting['key'] }}" type="{{ $setting['type'] ?? 'text' }}" value="{{ $setting['value'] ?? $setting['default'] }}" {{ isset($setting['min']) ? 'min=' . $setting['min'] : '' }} {{ isset($setting['max']) ? 'max=' . $setting['max'] : '' }}>
                     @endif
                 @else
                     <span class="text-decoration-none btn btn-outline-dark rounded-pill px-3 disabled">{{ $formattedValue }}</span>
