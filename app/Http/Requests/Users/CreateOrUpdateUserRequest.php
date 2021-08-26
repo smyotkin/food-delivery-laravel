@@ -16,6 +16,8 @@ class CreateOrUpdateUserRequest extends FormRequest
     protected function prepareForValidation(): void
     {
         $this->merge([
+            'first_name' => mb_ucfirst($this->first_name),
+            'last_name' => mb_ucfirst($this->last_name),
             'phone' => User::toDigit($this->phone),
             'is_active' => !empty($this->is_active) ? 1 : 0,
             'is_custom_permissions' => !empty($this->is_custom_permissions) ? 1 : 0,
