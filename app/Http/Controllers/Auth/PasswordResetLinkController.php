@@ -11,17 +11,6 @@ use Exception;
 
 class PasswordResetLinkController extends Controller
 {
-
-    /**
-     * Проверяем срок действия активных записей при каждом использовании класса
-     *
-     * @throws Exception
-     */
-    public function __construct()
-    {
-        PasswordResetsService::checkActiveEntries();
-    }
-
     /**
      * Создаем представление для восстановления пароля (валидации номера телефона), в случае успеха - делаем
      * переадресацию
