@@ -26,7 +26,7 @@ class SettingsService
             })
             ->orderBy('key', 'asc');
 
-        return $paginate ? $settings->simplePaginate(Settings::get('global_rows_per_page')) : $settings->get();
+        return $paginate ? $settings->simplePaginate() : $settings->get();
     }
 
     /**
@@ -60,6 +60,8 @@ class SettingsService
                     'raw' => $value,
                     'type' => 'number',
                     'default' => '50',
+                    'min' => '1',
+                    'max' => '1000',
                 ];
             case 'global_max_rows_limit':
                 return [
