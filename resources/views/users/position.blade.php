@@ -105,7 +105,7 @@
 
     @permission('users_positions_view')
     <script>
-        let positionsView = true;
+        positionsView = true;
     </script>
     @endpermission
 
