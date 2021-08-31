@@ -61,6 +61,7 @@ img {
 }
 
 .settings_option-block {
+    display: block;
     min-height: 75px
 }
 
@@ -73,6 +74,7 @@ img {
 
 .save-icon {
     width: 25px;
+
     background-repeat: no-repeat;
     background-color: #06971b;
 
@@ -90,3 +92,19 @@ img {
 .save-icon:hover {
     background-color: #18d723;
 }
+
+.module_link {
+    max-width: 100%;
+}
+
+@media (max-width: 768px) {
+    .dashboard_link {
+        font-size: 16px !important;
+    }
+
+    .save-icon {
+        height: 70px !important;
+        bottom: 0;
+    }
+}
+
