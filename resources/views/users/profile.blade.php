@@ -6,21 +6,21 @@
         <h5 class="m-0 fw-bold">Профиль пользователя</h5>
     </x-slot>
 
-    <div class="container-fluid bg-light px-5 py-5 mb-4 border border-start-0 border-end-0 border-secondary">
-        <div class="row px-5">
-            <div class="col d-flex align-items-center">
+    <div class="container-fluid bg-light px-5 py-4 py-md-5 mb-4 border border-start-0 border-end-0 border-secondary">
+        <div class="row px-md-5">
+            <div class="col-12 col-md d-flex align-items-center">
                 <div class="info">
                     <h4>{{ $user->first_name }} {{ $user->last_name }}</h4>
                     <h6 class="text-muted fw-normal mb-0">{{ $user->phoneNumber($user->phone) }}</h6>
                 </div>
             </div>
 
-            <div class="col">
+            <div class="col-12 col-md mt-3 mt-md-0">
                 <p class="fw-bold mb-0">Должность</p>
                 <p class="mb-0">{{ $role->name ?? '---' }}</p>
             </div>
 
-            <div class="col">
+            <div class="col-12 col-md mt-3 mt-md-0">
                 <p class="fw-bold mb-0">Регистрация</p>
                 <p class="mb-0">
                     @php ($created_at = Date::parse($user->created_at))
@@ -28,7 +28,7 @@
                 </p>
             </div>
 
-            <div class="col">
+            <div class="col-12 col-md mt-3 mt-md-0">
                 <p class="fw-bold mb-0">Часовой пояс</p>
                 <button type="button" class="btn-link text-decoration-none" data-bs-toggle="modal" data-bs-target="#timezoneModal" id="timezone-link">{{ $timezones[$user->timezone] }}</button>
 
