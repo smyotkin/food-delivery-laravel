@@ -12,11 +12,12 @@
                         <div class="w-100">
                             <div class="row">
                                 @foreach($control as $module)
-                                    <div class="col-{{ 12 / $controlCount }}">
+                                    <div class="col-12 col-md-{{ 12 / $controlCount }}">
                                         <a href="{{ $module->url }}" class="text-decoration-none text-center text-white fs-5">
                                             <div class="text-center">
-                                                <img src="/img/{{ $module->slug }}-icon.png" class="rounded rounded-5 shadow">
+                                                <img src="/img/{{ $module->slug }}-icon.png" class="rounded rounded-5 shadow module_img">
                                             </div>
+
                                             <div class="name mt-3 lh-1 text-shadow">{{ $module->name }}</div>
                                         </a>
                                     </div>
@@ -27,11 +28,12 @@
                 @endif
 
                 @foreach($other as $module)
-                    <div class="col-2 d-flex align-items-center justify-content-center py-4">
-                        <a href="{{ $module->url }}" class="text-decoration-none text-center text-white fs-5">
+                    <div class="col-12 col-md-2 d-flex align-items-center justify-content-center py-4">
+                        <a href="{{ $module->url }}" class="text-decoration-none text-center text-white fs-5 module_link">
                             <div class="text-center">
-                                <img src="/img/{{ $module->slug }}-icon.png" class="rounded rounded-5 shadow">
+                                <img src="/img/{{ $module->slug }}-icon.png" class="rounded rounded-5 shadow module_img">
                             </div>
+
                             <div class="name mt-3 lh-1 text-shadow">{{ $module->name }}</div>
                         </a>
                     </div>
