@@ -1,6 +1,6 @@
 <div class="container-fluid bg-lightgray px-5">
     <div class="row">
-        <div class="col pt-3">
+        <div class="col py-3 pb-md-3 ">
             <ul class="nav nav-tabs">
                 @permission('settings_view')
                     <li class="nav-item">
