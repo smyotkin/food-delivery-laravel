@@ -10,7 +10,7 @@
 
     <div class="container-fluid px-5 mb-5">
         <div class="row">
-            <div class="col-5 mt-4">
+            <div class="col-12 col-md-5 mt-4">
                 <input type="text" id="name_value-search" class="form-control rounded-0" placeholder="Поиск по названию или значению" aria-label="Поиск по названию или значению">
             </div>
             <div class="col-auto mt-4 d-flex align-items-center">
@@ -19,8 +19,8 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-5 mb-3">
-            <div class="col-auto lh-1">
+        <div class="row mt-md-5 mb-3">
+            <div class="col-12 col-md-auto lh-1 text-center text-md-start">
                 <h5 class="d-inline-block fw-normal align-middle m-0">
                     Настройки
                 </h5>
@@ -28,10 +28,10 @@
         </div>
 
         <div class="row">
-            <div class="col-5">
+            <div class="col-12 col-md-5">
                 @if (has_permission('settings_modify'))
                     <div class="list-group list-group-flush">
-                        <li class="settings_option-block border-bottom list-group-item d-flex justify-content-between align-items-center py-3 px-1">
+                        <li class="settings_option-block border-bottom list-group-item d-md-flex justify-content-between align-items-center py-3 px-1">
                             <div class="me-auto">
                                 <div class="fw-bold">Файловый кеш</div>
                             </div>
@@ -40,7 +40,7 @@
                                 @csrf
                             </form>
 
-                            <a href="javascript:" class="text-decoration-none btn btn-secondary btn-sm rounded-pill px-3" id="clear_cache">Очистить кэш</a>
+                            <a href="javascript:" class="d-block d-md-inline-block mt-2 mt-md-0 text-decoration-none btn btn-secondary btn-sm rounded-pill px-3" id="clear_cache">Очистить кэш</a>
                         </li>
                     </div>
                 @endif
