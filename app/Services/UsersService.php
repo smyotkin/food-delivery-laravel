@@ -149,9 +149,10 @@ class UsersService
      * Метод поиска пользователей
      *
      * @param array|null $array
+     * @param bool       $paginate
      * @return mixed
      */
-    public static function find(?array $array = null)
+    public static function find(?array $array = null, bool $paginate = true)
     {
         $users = User::query()
             ->when(isset($array['query']), function ($query) use ($array) {
@@ -164,7 +165,7 @@ class UsersService
             ->where('id', '!=', 1)
             ->with('roles');
 
-        return $users->simplePaginate(Settings::get('global_rows_per_page'));
+        return $paginate ? $users->simplePaginate(Settings::get('global_rows_per_page')) : $users->get();
     }
 
     /**
