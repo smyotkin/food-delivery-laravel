@@ -21,8 +21,8 @@ class AuthController extends Controller
 
         if (!$user || !Hash::check($fields['password'], $user->password)) {
             throw ValidationException::withMessages([
-                'phone' => ['Введенные данные некорректны.'],
-            ]);
+                'msg' => ['Введенные данные некорректны.'],
+            ])->status(401);
         }
 
         $token = $user->createToken('API')->plainTextToken;
@@ -32,7 +32,7 @@ class AuthController extends Controller
             'token' => $token,
         ];
 
-        return response($response, 201);
+        return response($response, 200);
     }
 
     public function logout() {
