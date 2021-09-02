@@ -83,12 +83,15 @@ class UsersService
                         abort(403, 'Нет права: ' . "users_{$permissionsParams['status']}_add");
                     }
 
+                    $rolePerms = PositionsService::getWithPermissions(['id' => $permissionsParams['position_id']])
+                            ->permissions->pluck('slug')->toArray();
+
                     $newUser = User::create($basicParams + [
                         'city_id' => 0,
                         'password' => Hash::make($password = random_int(100000, 999999)),
                     ]);
 
-                    if ($newUser) {
+                    if ($newUser && config('custom.password_resets.send_sms', 1)) {
                         $newUser->notify(new SmsCenter([
                             'password' => $password
                         ]));
@@ -99,7 +102,7 @@ class UsersService
                         'role_id' => $permissionsParams['position_id'],
                     ]);
 
-                    $newUser->givePermissionsArray($permissionsParams['permissions'] ?? []);
+                    $newUser->givePermissionsArray($permissionsParams['permissions'] ?? $rolePerms);
 
                     SystemService::createEvent('user_created', $newUser->toArray());
 
