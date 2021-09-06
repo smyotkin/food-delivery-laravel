@@ -8,9 +8,9 @@
 
     @include('layouts.settings-navigation')
 
-    <div class="container-fluid px-5 mb-5">
+    <div class="container-fluid px-4 px-md-5 mb-5">
         <div class="row">
-            <div class="col-5 mt-4">
+            <div class="col-12 col-md-5 mt-4">
                 <input type="text" id="label_msg-search" class="form-control rounded-0" placeholder="Поиск по метке или сообщению" aria-label="Поиск по метке или сообщению">
             </div>
             <div class="col-auto mt-4 d-flex align-items-center">
@@ -19,7 +19,8 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-5 mb-3">
+
+        <div class="row mb-3 mt-md-5">
             <div class="col-auto lh-1">
                 <h5 class="d-inline-block fw-normal align-middle m-0">
                     Системные события
@@ -30,8 +31,8 @@
             @php ($eventsCount = \App\Models\SystemEvents::count())
 
             @if ($eventsCount > 0)
-                <div class="col text-end">
-                    <div class="dropdown">
+                <div class="col text-center text-md-end mt-3 mt-md-0">
+                    <div class="dropdown d-block d-md-inline-block">
                         <button class="btn btn-outline-secondary btn-sm dropdown-toggle" type="button" id="clearEvents" data-bs-toggle="dropdown" aria-expanded="false">
                             Очистить события
                             <span class="count badge rounded-pill bg-light border border-secondary text-dark ms-1 pt-1">
@@ -51,17 +52,19 @@
 
         <div class="row">
             <div class="col-12">
-                <table class="table table-striped">
-                    <thead>
-                        <tr class="fw-light bg-lightgray table-header">
-                            <td class="border-0">Дата создания</td>
-                            <td class="border-0">Метка</td>
-                            <td class="border-0">Пользователь</td>
-                            <td class="border-0">Сообщение</td>
-                        </tr>
-                    </thead>
-                    <tbody id="events_ajax"></tbody>
-                </table>
+                <div class="table-responsive-sm">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="fw-light bg-lightgray table-header">
+                                <td class="border-0">Дата создания</td>
+                                <td class="border-0">Метка</td>
+                                <td class="border-0">Пользователь</td>
+                                <td class="border-0">Сообщение</td>
+                            </tr>
+                        </thead>
+                        <tbody id="events_ajax"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

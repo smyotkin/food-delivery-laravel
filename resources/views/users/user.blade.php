@@ -1,30 +1,34 @@
 <x-app-layout>
     <x-slot name="title">{{ isset($user) ? $user->fullname : 'Новый пользователь' }}</x-slot>
     <x-slot name="back_href">{{ route('users.index') }}</x-slot>
-    <x-slot name="back_title">Пользователи</x-slot>
+    <x-slot name="back_title">
+        <span class="d-none d-md-inline-block">Пользователи</span>
+        <span class="d-inline-block d-md-none">Назад</span>
+    </x-slot>
     <x-slot name="header">
         <h5 class="m-0 fw-bold">{{ isset($user) ? 'Информация о пользователе' : 'Новый пользователь' }}</h5>
     </x-slot>
 
-    <div class="container-fluid bg-light px-5 py-4 mb-4 border border-start-0 border-end-0 border-secondary">
+    <div class="container-fluid bg-light px-4 px-md-5 py-4 mb-4 border border-start-0 border-end-0 border-secondary">
         <div class="row">
-            <div class="col d-flex align-items-center">
+            <div class="col-12 col-md d-flex align-items-center">
                 <div class="info">
                     <h4 class="text-muted fw-light">{{ $user->fullname ?? 'Имя Фамилия' }}</h4>
                     <h6 class="text-muted fw-normal mb-0">{{ isset($user->phone) ? $user->phoneNumber($user->phone) : 'Телефон' }}</h6>
                 </div>
             </div>
-            <div class="col text-end lh-base">
+
+            <div class="col-12 col-md text-end lh-base">
                 @if (isset($user))
                     @permission("users_{$user->status}_modify")
                         <p class="mb-2">
-                            <a href="javascript:" onclick="" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                            <a href="javascript:" onclick="" class="d-block d-md-inline-block btn btn-outline-secondary py-1 py-md-0 mt-3 mt-md-0 save_user disabled">Сохранить</a>
                         </p>
                     @endpermission
                 @else
                     @anyPermission('users_employee_add|users_specialist_add|users_head_add|users_owner_add')
                         <p class="mb-2">
-                            <a href="javascript:" onclick="" id="save_user" class="btn btn-outline-secondary py-0 disabled">Сохранить</a>
+                            <a href="javascript:" onclick="" class="d-block d-md-inline-block btn btn-outline-secondary py-1 py-md-0 mt-3 mt-md-0 save_user disabled">Сохранить</a>
                         </p>
                     @endanyPermission
                 @endif
@@ -64,7 +68,7 @@
     </div>
 
 
-    <div class="container-fluid px-5 mb-5">
+    <div class="container-fluid px-4 px-md-5 mb-5">
         <div class="col-auto my-4 d-flex align-items-center" id="preloader">
             <div class="spinner-border text-secondary mr-4" role="status" style="width: 3rem; height: 3rem;"></div>
             <strong class="text-muted">Загрузка...</strong>
@@ -96,7 +100,7 @@
                 }
             });
 
-            $('body').on('click', '#save_user', function(event) {
+            $('body').on('click', '.save_user', function(event) {
                 event.preventDefault();
 
                 $.ajax({
@@ -178,7 +182,7 @@
         function checkFormValidation() {
             $('#user_form input, #user_form select, #permissions').removeClass('is-invalid validation-error alert-danger');
 
-            $('#save_user').addClass('disabled btn-outline-secondary');
+            $('.save_user').addClass('disabled btn-outline-secondary');
 
             let phoneValidation = new RegExp(/\+7\s\d{3}\s\d{3}\-\d{2}\-\d{2}/gm);
             let fields = {
@@ -190,7 +194,7 @@
             };
 
             if (checkValidation(fields))
-                $('#save_user').removeClass('disabled btn-outline-secondary').addClass('btn-outline-primary');
+                $('.save_user').removeClass('disabled btn-outline-secondary').addClass('btn-outline-primary');
         }
 
         $('body').on('click', '#delete', function (e) {

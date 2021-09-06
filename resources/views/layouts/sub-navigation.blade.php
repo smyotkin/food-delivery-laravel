@@ -1,7 +1,7 @@
-<div class="container-fluid bg-lightgray px-5">
+<div class="container-fluid bg-lightgray px-4 px-md-5">
     <div class="row">
-        <div class="col pt-3">
-            <ul class="nav nav-tabs">
+        <div class="col py-3 pb-md-0">
+            <ul class="nav nav-tabs justify-content-center justify-content-md-start flex-column flex-md-row">
                 @permission('users_view')
                     <li class="nav-item">
                         <a class="nav-link {{ Request::is('users') ? 'active disabled' : '' }}" href="{{ route('users.index') }}">Пользователи</a>
