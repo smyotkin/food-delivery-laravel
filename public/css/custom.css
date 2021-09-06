@@ -106,5 +106,17 @@ img {
         height: 70px !important;
         bottom: 0;
     }
+
+    #table-log_length {
+        margin-bottom: 20px;
+    }
+
+    .save_user, #clearEvents, #table-log_filter label, #table-log_filter label input{
+        width: 100%;
+    }
+
+    #table-log_filter label input {
+        margin: 0;
+    }
 }
 
