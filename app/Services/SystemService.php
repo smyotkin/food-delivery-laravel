@@ -67,7 +67,7 @@ class SystemService
             })
             ->orderBy('label', 'asc');
 
-        return $paginate ? $settings->simplePaginate(Settings::get('global_rows_per_page')) : $settings->get();
+        return $paginate ? $settings->simplePaginate() : $settings->get();
     }
 
     /**
