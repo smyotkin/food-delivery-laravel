@@ -8,9 +8,9 @@
 
     @include('layouts.sub-navigation')
 
-    <div class="container-fluid px-5 mb-5">
+    <div class="container-fluid px-4 px-md-5 mb-5">
         <div class="row">
-            <div class="col-5 mt-4">
+            <div class="col-12 col-md-5 mt-4">
                 <input type="text" id="name_slug-search" class="form-control rounded-0" placeholder="Поиск по названию или метке" aria-label="Поиск по названию или метке">
             </div>
             <div class="col-auto mt-4 d-flex align-items-center">
@@ -20,30 +20,32 @@
             </div>
         </div>
 
-        <div class="row mt-5 mb-3">
-            <div class="col-auto lh-1">
+        <div class="row mb-3 mt-md-5">
+            <div class="col-12 col-md-auto lh-1">
                 <h5 class="d-inline-block fw-normal align-middle m-0">Должности</h5>
             </div>
 
             @permission('users_position_create')
-                <div class="col text-end">
-                    <a href="{{ route('positions.create') }}" class="btn btn-outline-primary py-0">Новая должность</a>
+                <div class="col-12 col-md text-end">
+                    <a href="{{ route('positions.create') }}" class="d-block d-md-inline-block btn btn-outline-primary py-1 py-md-0 mt-3 mt-md-0">Новая должность</a>
                 </div>
             @endpermission
         </div>
 
         <div class="row">
             <div class="col">
-                <table class="table table-striped">
-                    <thead>
-                        <tr class="fw-light bg-lightgray table-header">
-                            <td class="border-0">Название</td>
-                            <td class="border-0">Метка</td>
-                            <td class="border-0">Статус</td>
-                        </tr>
-                    </thead>
-                    <tbody id="positions_ajax"></tbody>
-                </table>
+                <div class="table-responsive-sm">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr class="fw-light bg-lightgray table-header">
+                                <td class="border-0">Название</td>
+                                <td class="border-0">Метка</td>
+                                <td class="border-0">Статус</td>
+                            </tr>
+                        </thead>
+                        <tbody id="positions_ajax"></tbody>
+                    </table>
+                </div>
             </div>
         </div>
     </div>

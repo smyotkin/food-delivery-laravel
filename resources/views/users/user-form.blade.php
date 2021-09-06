@@ -6,18 +6,18 @@
 </div>
 
 <div class="row">
-    <form method="post" action="{{ isset($user) ? route('users.update', ['user' => $user]) : route('users.store') }}" id="user_form" class="col-10 update_user needs-validation" novalidate>
+    <form method="post" action="{{ isset($user) ? route('users.update', ['user' => $user]) : route('users.store') }}" id="user_form" class="col-12 col-md-10 update_user needs-validation" novalidate>
         @method(isset($user) ? 'patch' : 'post')
         @csrf
 
         <fieldset class="row g-3" {{ isset($user) && !auth()->user()->hasPermission("users_{$user->status}_modify") ? 'disabled' : '' }}>
-            <div class="col-5">
+            <div class="col-12 col-md-5">
                 <div class="row g-3">
                     @isset($user)
                         <input type="hidden" name="id" value="{{ $user->id }}">
                     @endisset
 
-                    <div class="col-6">
+                    <div class="col-12 col-md-6">
                         <label for="first_name" class="form-label fw-bold">Имя</label>
                         <input type="text" class="form-control rounded-0" id="first_name" name="first_name" value="{{ old('first_name') ?? $user->first_name ?? '' }}" placeholder="Имя" required>
                         <div class="invalid-feedback text-sm">
@@ -25,7 +25,7 @@
                         </div>
                     </div>
 
-                    <div class="col-6">
+                    <div class="col-12 col-md-6">
                         <label for="last_name" class="form-label fw-bold">Фамилия</label>
                         <input type="text" class="form-control rounded-0" id="last_name" name="last_name" value="{{ old('last_name') ?? $user->last_name ?? '' }}" placeholder="Фамилия" required>
                         <div class="invalid-feedback text-sm">
@@ -64,11 +64,28 @@
                 </div>
             </div>
 
-            <div class="col-7" id="permissions">
+            <div class="col-12 col-md-7" id="permissions">
                 @if (!empty($role) || (isset($user) && $user::isRoot()))
                     @include('users/permissions-table')
                 @endif
             </div>
         </fieldset>
     </form>
+
+    <div class="d-block d-md-none">
+        @if (isset($user))
+            @permission("users_{$user->status}_modify")
+            <p class="mb-2">
+                <a href="javascript:" class="d-block d-md-inline-block btn btn-outline-secondary py-1 py-md-0 mt-3 mt-md-0 save_user disabled">Сохранить</a>
+            </p>
+            @endpermission
+        @else
+            @anyPermission('users_employee_add|users_specialist_add|users_head_add|users_owner_add')
+            <p class="mb-2">
+                <a href="javascript:" class="d-block d-md-inline-block btn btn-outline-secondary py-1 py-md-0 mt-3 mt-md-0 save_user disabled">Сохранить</a>
+            </p>
+            @endanyPermission
+        @endif
+    </div>
 </div>
+

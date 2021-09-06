@@ -54,9 +54,9 @@
 
     @include('layouts.settings-navigation')
 
-    <div class="container-fluid px-5 mb-5">
-        <div class="row mt-5 mb-3">
-            <div class="col-auto d-flex align-items-center lh-1">
+    <div class="container-fluid px-4 px-md-5 mb-5">
+        <div class="row mt-md-5 mt-4 mb-3">
+            <div class="col-12 col-md-auto d-flex align-items-center lh-1">
                 <h5 class="d-inline-block fw-normal align-middle m-0">
                     Лог ошибок
                 </h5>
@@ -68,20 +68,20 @@
                 </div>
             </div>
 
-            <div class="col d-flex justify-content-end">
+            <div class="col-12 col-md d-flex flex-column flex-md-row justify-content-end mt-3 mt-md-0">
                 @if($current_file)
                     <a href="?dl={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none">
                         <span class="fa fa-download"></span> Скачать файл
                     </a>
-                    <a id="clean-log" href="?clean={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-4">
+                    <a id="clean-log" href="?clean={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-md-4">
                         <span class="fa fa-sync"></span> Очистить файл
                     </a>
-                    <a id="delete-log" href="?del={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-4">
+                    <a id="delete-log" href="?del={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-md-4">
                         <span class="fa fa-trash"></span> Удалить файл
                     </a>
 
                     @if(count($files) > 1)
-                        <a id="delete-all-log" href="?delall=true{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-4">
+                        <a id="delete-all-log" href="?delall=true{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-md-4">
                             <span class="fa fa-trash-alt"></span> Удалить все файлы
                         </a>
                     @endif
@@ -120,96 +120,98 @@
                 </div>
             </div>
 
-            <div class="{{ count($logs) > 0 ? 'col-10' : 'col-12' }} table-container">
+            <div class="{{ count($logs) > 0 ? 'col-12 col-md-10' : 'col-md-12' }} table-container">
                 @if ($logs === null)
                     <div>
                         Файл лога весит более 50 мб, пожалуйста загрузите файл вручную.
                     </div>
                 @else
-                    <table id="table-log" class="table table-striped table-hover align-middle" data-ordering-index="{{ $standardFormat ? 2 : 0 }}">
-                        <thead>
-                            <tr>
-                                @if ($standardFormat)
-                                    <th>Статус</th>
-                                    <th>Контекст</th>
-                                    <th>Дата</th>
-                                @else
-                                    <th>#</th>
-                                @endif
-                                <th>Текст</th>
-                            </tr>
-                        </thead>
+                    <div class="table-responsive-sm">
+                        <table id="table-log" class="table table-striped table-hover align-middle" data-ordering-index="{{ $standardFormat ? 2 : 0 }}">
+                            <thead>
+                                <tr>
+                                    @if ($standardFormat)
+                                        <th>Статус</th>
+                                        <th>Контекст</th>
+                                        <th>Дата</th>
+                                    @else
+                                        <th>#</th>
+                                    @endif
+                                    <th style="min-width: 200px">Текст</th>
+                                </tr>
+                            </thead>
 
-                        <tbody>
-                        @foreach($logs as $key => $log)
-                            <tr data-display="stack{{ $key }}">
-                                @if ($standardFormat)
-                                    @php
-                                        $russian = [
-                                            'debug' => 'Дебаг',
-                                            'info' => 'Инфо',
-                                            'notice' => 'Уведомление',
-                                            'warning' => 'Внимание',
-                                            'error' => 'Ошибка',
-                                            'critical' => 'Критично',
-                                            'alert' => 'Тревога',
-                                            'emergency' => 'Экстренный',
-                                            'processed' => 'Обработано',
-                                            'failed' => 'Провалено',
-                                        ];
-                                    @endphp
+                            <tbody>
+                            @foreach($logs as $key => $log)
+                                <tr data-display="stack{{ $key }}">
+                                    @if ($standardFormat)
+                                        @php
+                                            $russian = [
+                                                'debug' => 'Дебаг',
+                                                'info' => 'Инфо',
+                                                'notice' => 'Уведомление',
+                                                'warning' => 'Внимание',
+                                                'error' => 'Ошибка',
+                                                'critical' => 'Критично',
+                                                'alert' => 'Тревога',
+                                                'emergency' => 'Экстренный',
+                                                'processed' => 'Обработано',
+                                                'failed' => 'Провалено',
+                                            ];
+                                        @endphp
 
-                                    <td class="nowrap text-{{ $log['level_class'] }}">
-                                        <span class="fa fa-{{ $log['level_img'] }}" aria-hidden="true"></span>
-                                        <span class="fw-bold">
-                                            &nbsp;&nbsp;{{ $russian[$log['level']] }}
-                                        </span>
+                                        <td class="nowrap text-{{ $log['level_class'] }}">
+                                            <span class="fa fa-{{ $log['level_img'] }}" aria-hidden="true"></span>
+                                            <span class="fw-bold">
+                                                &nbsp;&nbsp;{{ $russian[$log['level']] }}
+                                            </span>
+                                        </td>
+                                        <td class="text text-center">{{ $log['context'] }}</td>
+                                    @endif
+                                    <td class="date">{{ $log['date'] }}</td>
+                                    <td class="text">
+                                        @if ($log['stack'])
+                                            <button type="button"
+                                                    class="float-right expand btn btn-outline-dark btn-sm mb-2 ml-2"
+                                                    data-display="stack{{ $key }}">
+                                                <span class="fa fa-search"></span>
+                                            </button>
+                                        @endif
+
+                                        {{ $log['text'] }}
+
+                                        @if (isset($log['in_file']))
+                                            <br/>{{ $log['in_file'] }}
+                                        @endif
+
+                                        @if ($log['stack'])
+                                            <div class="stack" id="stack{{ $key }}"
+                                                 style="display: none; white-space: pre-wrap;">{{ trim($log['stack']) }}
+                                            </div>
+                                        @endif
                                     </td>
-                                    <td class="text text-center">{{ $log['context'] }}</td>
-                                @endif
-                                <td class="date">{{ $log['date'] }}</td>
-                                <td class="text">
-                                    @if ($log['stack'])
-                                        <button type="button"
-                                                class="float-right expand btn btn-outline-dark btn-sm mb-2 ml-2"
-                                                data-display="stack{{ $key }}">
-                                            <span class="fa fa-search"></span>
-                                        </button>
-                                    @endif
+                                </tr>
+                            @endforeach
 
-                                    {{ $log['text'] }}
-
-                                    @if (isset($log['in_file']))
-                                        <br/>{{ $log['in_file'] }}
-                                    @endif
-
-                                    @if ($log['stack'])
-                                        <div class="stack" id="stack{{ $key }}"
-                                             style="display: none; white-space: pre-wrap;">{{ trim($log['stack']) }}
-                                        </div>
-                                    @endif
-                                </td>
-                            </tr>
-                        @endforeach
-
-                        </tbody>
-                    </table>
+                            </tbody>
+                        </table>
+                    </div>
                 @endif
 
-                <div class="py-3">
+                <div class="d-flex flex-column d-md-block py-3">
                     @if($current_file)
                         <a href="?dl={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none">
                             <span class="fa fa-download"></span> Скачать файл
                         </a>
-                        <a id="clean-log" href="?clean={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-4">
+                        <a id="clean-log" href="?clean={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-md-4">
                             <span class="fa fa-sync"></span> Очистить файл
                         </a>
-                        <a id="delete-log" href="?del={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-4">
+                        <a id="delete-log" href="?del={{ \Illuminate\Support\Facades\Crypt::encrypt($current_file) }}{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-md-4">
                             <span class="fa fa-trash"></span> Удалить файл
                         </a>
 
                         @if(count($files) > 1)
-                            <a id="delete-all-log" href="?delall=true{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-4">
+                            <a id="delete-all-log" href="?delall=true{{ ($current_folder) ? '&f=' . \Illuminate\Support\Facades\Crypt::encrypt($current_folder) : '' }}" class="text-decoration-none ms-md-4">
                                 <span class="fa fa-trash-alt"></span> Удалить все файлы
                             </a>
                         @endif

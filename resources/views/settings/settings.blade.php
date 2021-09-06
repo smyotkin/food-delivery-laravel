@@ -19,8 +19,9 @@
                 </div>
             </div>
         </div>
+
         <div class="row mt-md-5 mb-3">
-            <div class="col-12 col-md-auto lh-1 text-center text-md-start">
+            <div class="col-12 col-md-auto lh-1">
                 <h5 class="d-inline-block fw-normal align-middle m-0">
                     Настройки
                 </h5>

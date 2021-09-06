@@ -8,9 +8,9 @@
 
     @include('layouts.settings-navigation')
 
-    <div class="container-fluid px-5 mb-5">
+    <div class="container-fluid px-4 px-md-5 mb-5">
         <div class="row">
-            <div class="col-5 mt-4">
+            <div class="col-12 col-md-5 mt-4">
                 <input type="text" id="name_value-search" class="form-control rounded-0" placeholder="Поиск по названию или значению" aria-label="Поиск по названию или значению">
             </div>
             <div class="col-auto mt-4 d-flex align-items-center">
@@ -19,7 +19,8 @@
                 </div>
             </div>
         </div>
-        <div class="row mt-5 mb-3">
+
+        <div class="row mb-3 mt-md-5">
             <div class="col-auto lh-1">
                 <h5 class="d-inline-block fw-normal align-middle m-0">
                     Уведомления
@@ -28,7 +29,7 @@
         </div>
 
         <div class="row">
-            <div class="col-10">
+            <div class="col-12 col-md-10">
                 <div class="list-group list-group-flush" id="ajax_block"></div>
             </div>
         </div>
