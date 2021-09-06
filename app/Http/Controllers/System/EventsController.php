@@ -47,7 +47,7 @@ class EventsController extends Controller
      */
     public function exportEventsCsv(Request $request)
     {
-        return (new SystemEventsExport(SystemService::findEvents($request->toArray())))->download();
+        return (new SystemEventsExport(SystemService::findEvents($request->toArray(), false)))->download();
     }
 
     /**
