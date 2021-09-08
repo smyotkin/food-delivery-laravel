@@ -96,7 +96,7 @@ trait HasRolesAndPermissions
         return $this;
     }
 
-    public function givePermissionsArray($array)
+    public function givePermissionsArray(array $array)
     {
         $permissions = $this->getAllPermissions($array);
 
@@ -107,6 +107,20 @@ trait HasRolesAndPermissions
         $this->permissions()->saveMany($permissions);
 
         return $this;
+    }
+
+    /**
+     * Удаляем все текущие права и добавляем новые
+     *
+     * @param array $permissions
+     *
+     * @return $this
+     */
+    public function syncPermissionsArray(array $permissions)
+    {
+        $this->permissions()->detach();
+
+        return $this->givePermissionsArray($permissions);
     }
 
     /**
