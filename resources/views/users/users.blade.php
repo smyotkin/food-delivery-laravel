@@ -9,16 +9,7 @@
     @include('layouts.sub-navigation')
 
     <div class="container-fluid px-4 px-md-5 mb-5">
-        <div class="row">
-            <div class="col-12 col-md-5 mt-4">
-                <input type="text" id="phone_lastname-search" class="form-control rounded-0" placeholder="Поиск по номеру телефона или фамилии" aria-label="Поиск по номеру телефона или фамилии">
-            </div>
-            <div class="col-auto mt-4 d-flex align-items-center">
-                <div class="spinner-border text-secondary d-none" role="status" id="preloader">
-                    <span class="sr-only">Загрузка...</span>
-                </div>
-            </div>
-        </div>
+        @include('components.header-search-preloader', ['id' => 'users-search', 'placeholder' => 'Поиск по номеру телефона или фамилии'])
 
         <div class="row mb-3 mt-md-5">
             <div class="col-auto lh-1">
@@ -60,77 +51,8 @@
     </div>
 
     <script>
-        let userSearch = $('#phone_lastname-search');
-        let usersBlock = $('#users_ajax');
-        let usersTable = $('#users_ajax > .row');
-        let ajaxSearchDelay = 300;
-        let usersUpdateDelay = 10000;
-        let getSearchCookie = getCookie('users_query_str');
-        let page = 1;
-        let searchNow = false;
-
         $(document).ready(function() {
-            if (getSearchCookie) {
-                userSearch.val(getSearchCookie);
-                if ($(this).val().length == 0 || $(this).val().length > 1)
-                    setTimeout(showUsersList, ajaxSearchDelay);
-            } else {
-                showUsersList();
-                setInterval(showUsersListInterval, usersUpdateDelay);
-            }
-
-            userSearch.on('keyup', function () {
-                document.cookie = 'users_query_str=' + encodeURIComponent($(this).val());
-                if ($(this).val().length >= 0) {
-                    searchNow = true;
-                    setTimeout(showUsersList, ajaxSearchDelay);
-                } else {
-                    searchNow = false;
-                }
-            });
-
-            $(document).on('click', '.table_pagination a', function(event) {
-                event.preventDefault();
-
-                searchNow = false;
-                page = $(this).attr('href').split('page=')[1];
-
-                showUsersList(page);
-            });
+            updateTableList('users', '{{ route('users/getAjax') }}', 10000);
         });
-
-        function showUsersListInterval() {
-            if ($('#phone_lastname-search').val().length == 0 && !searchNow && page == 1)
-                showUsersList();
-        }
-
-        function showUsersList(page = 1) {
-            let query = $('#phone_lastname-search').val();
-
-            $('#download_csv').attr('href', '{{ '/users/export.csv' }}' + '?query=' + query);
-
-            $.ajax({
-                type: 'GET',
-                data: {
-                    query: query,
-                },
-                url: '{{ route('users/getAjax') }}?page=' + page,
-                beforeSend: function () {
-                    $('#preloader').removeClass('d-none');
-                },
-                complete: function() {
-                    $('#preloader').addClass('d-none');
-                },
-                success: function (data) {
-                    $('#users_ajax .table_pagination').remove();
-
-                    if (searchNow || page == 1) {
-                        $('#users_ajax').html(data);
-                    } else {
-                        $('#users_ajax').append(data);
-                    }
-                }
-            });
-        }
     </script>
 </x-app-layout>
