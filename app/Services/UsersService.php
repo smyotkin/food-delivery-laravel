@@ -39,80 +39,74 @@ class UsersService
      */
     public static function createOrUpdate(?array $array = null): void
     {
-        try {
-            $basicParams = collect($array)
-                ->only(['first_name', 'last_name', 'phone', 'is_active', 'is_custom_permissions', 'timezone'])
-                ->all();
+        $params = collect($array)->only([
+            'id',
+            'first_name',
+            'last_name',
+            'phone',
+            'is_active',
+            'is_custom_permissions',
+            'status',
+            'position_id',
+            'permissions'
+        ]);
 
-            $permissionsParams = collect($array)
-                ->only(['status', 'position_id', 'permissions'])
-                ->all();
+        $user = User::find($params->get('id', 0));
+        $role = Role::findOrFail($params->get('position_id'));
 
-            DB::transaction(function() use ($array, $basicParams, $permissionsParams) {
-                if ($user = User::find($array['id'] ?? 0)) {
-                    if (
-                        Role::find($permissionsParams['position_id'])->status != $permissionsParams['status'] ||
-                        Auth::user()->hasPermission("users_{$permissionsParams['status']}_modify") === false
-                    ) {
-                        abort(403, 'Нет права: ' . "users_{$permissionsParams['status']}_modify");
-                    }
+        UsersService::checkPermission([
+                'role_status' => $role->status,
+                'form_status' => $params->get('status'),
+            ], $user ? 'modify' : 'add'
+        );
 
-                    $oldUser = $user->toArray();
+        if (!$user = User::find($params->get('id', 0))) {
+            $params
+                ->put('city_id', 0)
+                ->put('password', Hash::make($password = random_int(100000, 999999)));
+        }
 
-                    $user->update($basicParams);
-                    $user->saveOrFail();
+        $permissions = $params->get('is_custom_permissions') == true ? $params->get('permissions', []) :
+            $role->permissions->pluck('slug')->toArray();
 
-                    DB::table('users_roles')->updateOrInsert(
-                        ['user_id' => $user->id],
-                        ['role_id' => $permissionsParams['position_id']],
-                    );
+        DB::transaction(function() use (&$newUser, $params, $permissions) {
+            $newUser = User::updateOrCreate(
+                ['id' => $params->get('id', 0)],
+                $params->all()
+            );
 
-                    if ($basicParams['is_custom_permissions'] == true) {
-                        DB::table('users_permissions')->where('user_id', '=', $user->id)->delete();
-                        $user->givePermissionsArray($permissionsParams['permissions'] ?? []);
-                    }
+            $newUser->syncRole($params->get('position_id'));
+            $newUser->syncPermissionsArray($permissions);
+        });
 
-                    SystemService::createEvent('user_updated', $oldUser, $user->toArray());
+        if ($newUser->wasRecentlyCreated) {
+            $newUser->notify(new SmsCenter([
+                'password' => $password
+            ]));
 
-                    Log::info("UPDATE_USER: id({$user->id})");
-                } else {
-                    if (
-                        Role::find($permissionsParams['position_id'])->status != $permissionsParams['status'] ||
-                        Auth::user()->hasPermission("users_{$permissionsParams['status']}_add") === false
-                    ) {
-                        abort(403, 'Нет права: ' . "users_{$permissionsParams['status']}_add");
-                    }
+            // todo Удалить пароль с логгера
+            Log::info("CREATE_NEW_USER(id: {$newUser->id}, phone: {$newUser->phone}, password: $password)");
 
-                    $rolePerms = PositionsService::getWithPermissions(['id' => $permissionsParams['position_id']])
-                            ->permissions->pluck('slug')->toArray();
+            SystemService::createEvent('user_created', $newUser->toArray());
+        } else {
+            SystemService::createEvent('user_updated', $user->toArray(), $newUser->toArray());
+        }
+    }
 
-                    $newUser = User::create($basicParams + [
-                        'city_id' => 0,
-                        'password' => Hash::make($password = random_int(100000, 999999)),
-                    ]);
+    /**
+     * Проверяет права на действие(action) у авторизированного пользователя
+     *
+     * @param array  $statuses
+     * @param string $action
+     * @return void
+     */
+    public static function checkPermission(array $statuses, string $action): void
+    {
+        $permission = "users_{$statuses['form_status']}_{$action}";
+        $hasPermission = Auth::user()->hasPermission($permission);
 
-                    if ($newUser && config('custom.password_resets.send_sms', 1)) {
-                        $newUser->notify(new SmsCenter([
-                            'password' => $password
-                        ]));
-                    }
-
-                    DB::table('users_roles')->insert([
-                        'user_id' => $newUser->id,
-                        'role_id' => $permissionsParams['position_id'],
-                    ]);
-
-                    $newUser->givePermissionsArray($permissionsParams['permissions'] ?? $rolePerms);
-
-                    SystemService::createEvent('user_created', $newUser->toArray());
-
-                    // todo Удалить пароль с логгера
-                    Log::info("CREATE_NEW_USER(id: {$newUser->id}, phone: {$newUser->phone}, password: $password)");
-                }
-            });
-        } catch (\Exception $e) {
-            Log::info("CREATE_OR_UPDATE_ERROR: {$e->getMessage()}");
-            abort(500);
+        if (!User::isRoot() && $statuses['form_status'] !== $statuses['role_status'] || !$hasPermission) {
+            abort(403, 'Нет права: ' . $permission);
         }
     }
 
@@ -247,7 +241,7 @@ class UsersService
      * @param int $id
      * @return mixed
      */
-    public static function destroy(int $id): bool
+    public static function destroy(int $id): bool // ?User
     {
         try {
             $user = User::find($id);
