@@ -124,6 +124,17 @@ trait HasRolesAndPermissions
     }
 
     /**
+     * Remove all current roles and set the given ones.
+     *
+     * @param int $id
+     * @return $this
+     */
+    public function syncRole(int $id)
+    {
+        return $this->roles()->sync($id);
+    }
+
+    /**
      * @param mixed ...$permissions
      * @return $this
      */
