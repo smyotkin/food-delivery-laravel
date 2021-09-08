@@ -106,25 +106,25 @@ class SettingsService
      * Форматирование настроек
      *
      * @param $array
-     * @return array|bool
+     * @return array
      */
-    public static function formatSetting($array)
+    public static function formatSetting(array $array): array
     {
-        if (!empty($array)) {
-            $formatted = [];
-
-            foreach ($array as $row) {
-                if ($formattedValue = self::getSetting($row['key'], $row['value'])) {
-                    $formatted[] = $formattedValue + [
-                        'key' => $row['key'],
-                    ];
-                }
-            }
-
-            return $formatted;
+        if (empty($array)) {
+            return [];
         }
 
-        return false;
+        $formatted = [];
+
+        foreach ($array as $row) {
+            if ($formattedValue = self::getSetting($row['key'], $row['value'])) {
+                $formatted[] = $formattedValue + [
+                    'key' => $row['key'],
+                ];
+            }
+        }
+
+        return $formatted;
     }
 
     /**
