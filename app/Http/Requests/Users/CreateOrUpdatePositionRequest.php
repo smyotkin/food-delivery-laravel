@@ -38,8 +38,8 @@ class CreateOrUpdatePositionRequest extends FormRequest
     {
         $rules = collect([
             'id' => 'required|integer|exists:roles,id',
-            'name' => 'required|string|max:255',
-            'slug' => "required|string|max:255|unique:roles,slug,{$this->id}",
+            'name' => 'required|string|min:2|max:255',
+            'slug' => "required|string|regex:/^[a-zA-Z_]*$/u|min:2|max:255|unique:roles,slug,{$this->id}",
             'status' => 'required|in:owner,head,specialist,employee',
             'permissions' => 'required|array|exists:permissions,slug',
         ]);
