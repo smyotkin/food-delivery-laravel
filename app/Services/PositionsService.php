@@ -33,43 +33,30 @@ class PositionsService
      * Создание или редактирование(если указан id) должности
      *
      * @param array|null $array
-     * @return Role
+     * @return void
      * @throws \Throwable
      */
-    public static function createOrUpdate(?array $array = null): Role
+    public static function createOrUpdate(?array $array = null): void
     {
-        $basicParams = collect($array)
-            ->only(['name', 'slug', 'status'])
-            ->all();
+        $params = collect($array)->only(['id', 'name', 'slug', 'status', 'permissions']);
+        $existingRole = Role::find($id = $params->get('id', 0));
 
-        if ($role = Role::find($array['id'] ?? 0)) {
-            self::checkPermission('modify');
+        PositionsService::checkPermission($existingRole ? 'modify' : 'create');
 
-            $oldRole = $role->toArray();
+        DB::transaction(function() use ($params, $id, &$role) {
+            $role = Role::updateOrCreate(
+                ['id' => $id],
+                $params->all()
+            );
 
-            $role->update($basicParams);
-            $role->saveOrFail();
+            $role->syncPermissionsArray($params->get('permissions', []));
+        });
 
-            DB::table('roles_permissions')->where('role_id', '=', $role->id)->delete();
-            $role->givePermissionsArray($array['permissions'] ?? []);
-
-            SystemService::createEvent('position_updated', $oldRole, $role->toArray());
-
-            Log::info("UPDATE_POSITION: id({$role->id})");
-        } else {
-            self::checkPermission('create');
-
-            $role = Role::create($basicParams);
-
-            DB::table('roles_permissions')->where('role_id', '=', $role->id)->delete();
-            $role->givePermissionsArray($array['permissions'] ?? []);
-
-            SystemService::createEvent('position_created', $role->toArray(), $role->toArray());
-
-            Log::info("CREATE_NEW_POSITION(id: {$role->id}, name: {$role->name}, slug: {$role->slug})");
-        }
-
-        return $role;
+        SystemService::createEvent(
+            $role->wasChanged() ? 'position_updated' : 'position_created',
+            $role->wasChanged() ? $existingRole->toArray() : $role->toArray(),
+            $role->toArray()
+        );
     }
 
     /**
