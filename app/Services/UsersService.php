@@ -48,7 +48,7 @@ class UsersService
             'is_custom_permissions',
             'status',
             'position_id',
-            'permissions'
+            'permissions',
         ]);
 
         $user = User::find($params->get('id', 0));
@@ -112,34 +112,24 @@ class UsersService
 
     public static function updateProfile(?array $array = null): void
     {
-        try {
-            $basicParams = collect($array)
-                ->only(['timezone', 'password']);
+        $params = collect($array)->only([
+            'timezone',
+            'password',
+        ]);
+        $user = Auth::user();
 
-            DB::transaction(function() use ($basicParams) {
-                if ($user = Auth::user()) {
-                    $password = $basicParams['password'] ?? false;
-
-                    if ($password) {
-                        $basicParams['password'] = Hash::make($basicParams['password']);
-                    }
-
-                    $old = $user->toArray();
-
-                    $user->update($basicParams->all());
-                    $user->saveOrFail();
-
-                    SystemService::createEvent('user_updated', $old, $user->toArray());
-
-                    Log::info("UPDATE_USER: id({$user->id})");
-                } else {
-                    return false;
-                }
-            });
-        } catch (\Exception $e) {
-            Log::info("UPDATE_PROFILE_ERROR: {$e->getMessage()}");
-            abort(500);
+        if ($password = $params->get('password', false)) {
+            $params->put('password', Hash::make($password));
         }
+
+        DB::transaction(function() use ($params, &$user) {
+            $updatedUser = $user;
+
+            $updatedUser->update($params->all());
+            $updatedUser->saveOrFail();
+
+            SystemService::createEvent('user_updated', $user->toArray(), $updatedUser->toArray());
+        });
     }
 
     /**
@@ -197,31 +187,23 @@ class UsersService
      * @param array $array
      * @throws \Throwable
      */
-    public static function changePassword(array $array)
+    public static function changePassword(array $array): void
     {
-        try {
-            $params = collect($array)
-                ->only(['password'])
-                ->all();
+        $params = collect($array)->only(['id', 'password']);
+        $user = User::findOrFail($params->get('id', 0));
 
-            DB::transaction(function() use ($array, $params) {
-                if ($user = User::find($array['id'] ?? 0)) {
-                    if ($params['password']) {
-                        $params['password'] = Hash::make($params['password']);
-                    }
-
-                    $user->update($params);
-                    $user->saveOrFail();
-
-                    Log::info("UPDATE_USER_PASSWORD: phone({$user->phone})");
-                } else {
-                    return false;
-                }
-            });
-        } catch (\Exception $e) {
-            Log::info("UPDATE_USER_PASSWORD_ERROR: {$e->getMessage()}");
-            abort(500);
+        if ($password = $params->get('password', false)) {
+            $params->put('password', Hash::make($password));
         }
+
+        DB::transaction(function() use ($params, &$user) {
+            $updatedUser = $user;
+
+            $updatedUser->update($params->all());
+            $updatedUser->saveOrFail();
+
+            SystemService::createEvent('user_updated', $user->toArray(), $updatedUser->toArray());
+        });
     }
 
     /**
@@ -239,28 +221,17 @@ class UsersService
      * Удаляет пользователя
      *
      * @param int $id
-     * @return mixed
+     * @return void
      */
-    public static function destroy(int $id): bool // ?User
+    public static function destroy(int $id): void
     {
-        try {
-            $user = User::find($id);
+        $user = User::findOrFail($id);
 
-            if (self::checkRoleAndPermission($id, 'delete')) {
-                if ($removed = $user->delete()) {
-                    SystemService::createEvent('user_removed', $user->toArray());
-                }
-
-                return $removed;
-            } else {
-                return false;
+        if (self::checkRoleAndPermission($id, 'delete')) {
+            if ($user->delete()) {
+                SystemService::createEvent('user_removed', $user->toArray());
             }
-        } catch(\Exception $e) {
-            Log::info("USER_ERROR: {$e->getMessage()}");
-            abort(500, 'Невозможно удалить пользователя');
         }
-
-        return false;
     }
 
     /**
