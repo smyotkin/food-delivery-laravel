@@ -2,12 +2,13 @@
 
 namespace App\Services;
 
-use App\Models\Settings;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Log;
+use App\Models\Settings;
 use App\Models\Role;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
+use Throwable;
 
 class PositionsService
 {
@@ -33,12 +34,17 @@ class PositionsService
      * Создание или редактирование(если указан id) должности
      *
      * @param array|null $array
-     * @return void
-     * @throws \Throwable
+     * @throws Throwable
      */
     public static function createOrUpdate(?array $array = null): void
     {
-        $params = collect($array)->only(['id', 'name', 'slug', 'status', 'permissions']);
+        $params = collect($array)->only([
+            'id',
+            'name',
+            'slug',
+            'status',
+            'permissions',
+        ]);
         $existingRole = Role::find($id = $params->get('id', 0));
 
         PositionsService::checkPermission($existingRole ? 'modify' : 'create');
@@ -68,7 +74,7 @@ class PositionsService
      */
     public static function find(?array $array = null, bool $paginate = true)
     {
-        $roles = Role::query()
+        $positions = Role::query()
             ->when(isset($array['query']), function ($query) use ($array) {
                 $query
                     ->where('name', 'like', '%' . $array['query'] . '%')
@@ -80,7 +86,7 @@ class PositionsService
             })
             ->orderBy('created_at', 'desc');
 
-        return $paginate ? $roles->simplePaginate(Settings::get('global_rows_per_page')) : $roles->get();
+        return $paginate ? $positions->simplePaginate(Settings::get('global_rows_per_page')) : $positions->get();
     }
 
     /**
@@ -91,65 +97,49 @@ class PositionsService
      */
     public static function get(array $array): ?Role
     {
-        return self::checkPermission('view') ? Role::find($array['id']) : null;
+        self::checkPermission('view');
+
+        return Role::find($array['id']);
     }
 
     /**
      * Удаляет должность
      *
      * @param int $id
-     * @return bool
+     * @throws Throwable
      */
-    public static function destroy(int $id): bool
+    public static function destroy(int $id): void
     {
-        $role = Role::find($id);
+        self::checkPermission('delete');
+
+        $role = Role::findOrFail($id);
 
         try {
-            if ($role && self::checkPermission('delete')) {
-                if ($removed = $role->delete()) {
-                    SystemService::createEvent('position_removed', $role->toArray());
-                }
+            $role->delete();
+        } catch(Throwable $e) {
+            SystemService::createEvent('position_remove_error', $role->toArray(), ['msg' => $e->getMessage()]);
 
-                return $removed;
-            } else {
-                return false;
-            }
-        } catch(\Exception $e) {
-            SystemService::createEvent('position_remove_error', $role->toArray(), $role->toArray());
+            Log::error($e);
 
-            Log::info("POSITION_ERROR: {$e->getMessage()}");
-            abort(500, 'Невозможно удалить должность, она привязана минимум к одному пользователю!');
+            abort(500, 'Невозможно удалить должность');
         }
 
-        return false;
+        SystemService::createEvent('position_removed', $role->toArray());
     }
 
     /**
      * Проверяет права на действие(action) у авторизированного пользователя
      *
      * @param $action
-     * @return mixed
+     * @return void
      */
-    public static function checkPermission($action)
+    public static function checkPermission($action): void
     {
         $permission = "users_position_$action";
 
         if (!User::isRoot() && !Auth::user()->hasPermission($permission)) {
             abort(403, "Нет права: $permission");
         }
-
-        return true;
-    }
-
-    /**
-     * Возвращает должность или ошибку
-     *
-     * @param array $array
-     * @return mixed
-     */
-    public static function getOrFail(array $array)
-    {
-        return Role::findOrFail($array['id']);
     }
 
     /**
@@ -167,9 +157,9 @@ class PositionsService
      * Возвращает должность c правами или исключение в случае отсутствия
      *
      * @param array $array
-     * @return Role|null
+     * @return Role
      */
-    public static function getWithPermissionsOrFail(array $array): ?Role
+    public static function getWithPermissionsOrFail(array $array): Role
     {
         return Role::where('id', $array['id'])->with('permissions')->firstOrFail();
     }
