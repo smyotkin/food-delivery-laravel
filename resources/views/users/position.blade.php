@@ -121,13 +121,11 @@
                 url: $('#position_form').prop('action'),
                 type: 'POST',
                 data: $('#position_form').serialize(),
-                success: function (data) {
-                    if (JSON.parse(data).success) {
-                        if (positionsView) {
-                            window.location.replace('{{ route('positions.index') }}');
-                        } else {
-                            window.location.reload();
-                        }
+                success: function () {
+                    if (positionsView) {
+                        window.location.replace('{{ route('positions.index') }}');
+                    } else {
+                        window.location.reload();
                     }
                 },
                 error: function (response) {

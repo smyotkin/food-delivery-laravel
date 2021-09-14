@@ -77,14 +77,12 @@
                     $('+ a.save-icon', closestForm).hide();
                     $('input, select', closestForm).addClass('d-none');
                 },
-                success: function (data) {
-                    if (JSON.parse(data).success) {
-                        $('.settings_option', closestForm)
-                            .removeClass('btn-outline-dark btn-danger')
-                            .addClass('btn-success')
-                            .text(formValue)
-                            .fadeIn();
-                    }
+                success: function () {
+                    $('.settings_option', closestForm)
+                        .removeClass('btn-outline-dark btn-danger')
+                        .addClass('btn-success')
+                        .text(formValue)
+                        .fadeIn();
                 },
                 error: function () {
                     $('.settings_option', closestForm)
