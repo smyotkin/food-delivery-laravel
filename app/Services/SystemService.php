@@ -9,25 +9,11 @@ use App\Notifications\Telegram;
 use Illuminate\Support\Facades\Auth;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
+use Throwable;
 
 class SystemService
 {
-    /**
-     * Список событий
-     */
-    public const events = [
-        'position_remove_success' => [
-            'label' => 'Удаление должности',
-            'msg_template' => 'Должность "{name}" была удалена',
-        ],
-        'position_remove_error' => [
-            'label' => 'Удаление должности',
-            'msg_template' => 'Попытка удалить должность "{name}" не удалась.',
-        ],
-    ];
-
     /**
      * Метод поиска событий
      *
@@ -37,8 +23,6 @@ class SystemService
      */
     public static function findEvents(?array $array = null, bool $paginate = true)
     {
-        self::clearExpiredEvents();
-
         $settings = SystemEvents::query()
             ->when(isset($array['query']), function ($query) use ($array) {
                 $query
@@ -73,16 +57,16 @@ class SystemService
     /**
      * Метод создания нового события
      *
-     * @param            $slug
+     * @param string     $slug
      * @param array|null $element
      * @param array|null $data
-     * @return bool
+     * @throws Throwable
      */
-    public static function createEvent($slug, ?array $element = null, ?array $data = null)
+    public static function createEvent(string $slug, ?array $element = null, ?array $data = null): void
     {
         self::clearExpiredEvents();
 
-        if ($event = EventsNotifications::find($slug)) { //  self::events[$slug]
+        if ($event = EventsNotifications::find($slug)) {
             $msg = self::replacePlaceholders($event['msg_template'], $element);
 
             $createEvent = SystemEvents::create([
@@ -90,39 +74,37 @@ class SystemService
                 'label' => $event->label,
                 'msg' => $msg,
                 'data' => $data ? json_encode($data ?? $element, JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE) : null,
-                'user_id' => !empty(Auth::user()) ? Auth::user()->id : 0,
+                'user_id' => Auth::user()->id ?? 0,
                 'created_at' => Carbon::now(),
             ]);
 
             self::sendEventNotification($slug, $msg, $createEvent);
-
-            return $createEvent;
         }
-
-        return false;
     }
 
     /**
      * Метод отправки уведомления о произошедшем событии
      *
-     * @param      $slug
-     * @param      $msg
-     * @param null $event
+     * @param string            $slug
+     * @param string            $msg
+     * @param SystemEvents|null $event
      */
-    public static function sendEventNotification($slug, $msg, $event = null) {
+    public static function sendEventNotification(string $slug, string $msg, ?SystemEvents $event = null): void
+    {
         $eventNotification = EventsNotifications::find($slug);
+        $chatIds = explode(',', str_replace([' '], '', $eventNotification->recipient_ids));
 
-        if (!empty($eventNotification->recipient_ids) && $chatIds = explode(',', str_replace([' '], '', $eventNotification->recipient_ids))) {
-            $date = !empty($event) ? $event->date : null;
-            $fullName = !empty($event->user) ? $event->user->full_name : null;
-            $ip = !empty($event->ip) ? "\nIP: {$event->ip}" : '';
-            $authUser = !empty($fullName) ? "\nПользователь: $fullName" : null;
-            $fullMsg = $date . ' - ' . $msg . $authUser . $ip;
+        if (!empty($eventNotification->recipient_ids) && $chatIds) {
+            $msgParams = [
+                'date' => !empty($event->date) ? $event->date : '',
+                'ip' => !empty($event->ip) ? "\nIP: {$event->ip}" : '',
+                'auth_user' => "\nПользователь: " . (!empty($event->user->full_name) ? $event->user->full_name : 'Неавторизован'),
+            ];
 
-            foreach($chatIds as $user) {
+            foreach ($chatIds as $user) {
                 Notification::route('telegram', $user)
                     ->notify(new Telegram([
-                        'msg' => $fullMsg,
+                        'msg' => $msgParams['date'] . ' - ' . $msg . $msgParams['auth_user'] . $msgParams['ip'],
                     ]));
             }
         }
@@ -131,14 +113,20 @@ class SystemService
     /**
      * Метод замены плейсхолдеров (напр. {test}) в тексте
      *
-     * @param $msg
-     * @param $element
-     * @return string|string[]
+     * @param string     $msg
+     * @param array|null $element
+     * @return string
      */
-    public static function replacePlaceholders($msg, $element)
+    public static function replacePlaceholders(string $msg, ?array $element): string
     {
         $replaces = collect($element)
-            ->only(['name', 'slug', 'full_name', 'phone', 'ip'])
+            ->only([
+                'name',
+                'slug',
+                'full_name',
+                'phone',
+                'ip',
+            ])
             ->all();
 
         foreach ($replaces as $key => $value) {
@@ -152,9 +140,9 @@ class SystemService
      * Очистка за переданный период
      *
      * @param string $period
-     * @return mixed
+     * @return int
      */
-    public static function clearEvents(string $period)
+    public static function clearEvents(string $period): int
     {
         $date_start = $date_end = Carbon::now()->toDateString();
 
@@ -170,51 +158,38 @@ class SystemService
                 break;
         }
 
-        $delete = SystemEvents::whereRaw("DATE(created_at) BETWEEN '$date_start' AND '$date_end'")->delete();
-
-        return $delete ? $delete : abort(404, 'Записи не найдены');
+        return (int) SystemEvents::whereRaw("DATE(created_at) BETWEEN '$date_start' AND '$date_end'")->delete();
     }
 
     /**
      * Удаляет события старше установленного срока в настройках
      *
-     * @return mixed
+     * @throws Throwable
      */
-    public static function clearExpiredEvents()
+    public static function clearExpiredEvents(): void
     {
         $period = strtoupper(Settings::get('global_event_period'));
         $number = $period == 'DAY' ? 0 : 1;
-        $delete = SystemEvents::whereRaw("created_at < DATE_SUB(CURDATE(), INTERVAL $number $period)")
-            ->delete();
 
-        return $delete ? $delete : false;
+        SystemEvents::whereRaw("created_at < DATE_SUB(CURDATE(), INTERVAL $number $period)")->delete();
     }
 
     /**
      * Обновление настройки уведомления события
      *
      * @param array|null $array
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public static function updateNotification(?array $array = null): void
+    public static function updateNotificationOrFail(?array $array = null): void
     {
-        $basicParams = collect($array)
-            ->only(['msg_template', 'recipient_ids']);
+        $params = collect($array)->only([
+            'key',
+            'msg_template',
+            'recipient_ids',
+        ]);
+        $notification = EventsNotifications::getOrFail($params->get('key'));
 
-        try {
-            DB::transaction(function() use ($basicParams, $array) {
-                if ($notification = EventsNotifications::get($array['key'])) {
-                    $notification->update($basicParams->all());
-                    $notification->saveOrFail();
-
-                    Log::info("UPDATE_NOTIFICATION: id({$notification->key})");
-                } else {
-                    return false;
-                }
-            });
-        } catch (\Exception $e) {
-            Log::info("UPDATE_NOTIFICATION_ERROR: {$e->getMessage()}");
-            abort(500);
-        }
+        $notification->update($params->all());
+        $notification->saveOrFail();
     }
 }
