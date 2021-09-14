@@ -5,9 +5,16 @@ namespace App\Http\Controllers\System;
 use App\Http\Controllers\Controller;
 use App\Services\SystemService;
 use Illuminate\Http\Request;
+use Exception;
+use Throwable;
 
 class NotificationsController extends Controller
 {
+    /**
+     * Отобразить страницу с событиями
+     *
+     * @return string
+     */
     public function index()
     {
         return view('system/notifications')->render();
@@ -30,21 +37,14 @@ class NotificationsController extends Controller
      * Метод обновления настройки события
      *
      * @param Request $request
-     * @return false|string
-     * @throws \Throwable
+     * @throws Exception|Throwable
      */
-    public function update(Request $request)
+    public function update(Request $request): void
     {
-        $validated = $request->validate([
+        SystemService::updateNotificationOrFail($request->validate([
             'key' => 'required',
             'msg_template' => 'required',
             'recipient_ids' => '',
-        ]);
-
-        SystemService::updateNotification($validated);
-
-        return json_encode([
-            'success' => true,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
+        ]));
     }
 }
