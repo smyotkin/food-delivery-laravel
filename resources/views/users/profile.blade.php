@@ -111,15 +111,11 @@
                 url: $('#change_timezone').prop('action'),
                 type: 'POST',
                 data: $('#change_timezone').serialize(),
-                success: function (data) {
-                    if (JSON.parse(data).success) {
-                        $('#timezoneModal').modal('hide');
-
-                        $('#timezone-link').addClass('text-success').prop('disabled', true).removeAttr("data-bs-toggle").text(checkedTitle);
-
-                        $('#change_timezone-btn').remove();
-                        $("#change_timezone .modal-footer button[data-bs-dismiss='modal']").text('Закрыть');
-                    }
+                success: function () {
+                    $('#timezoneModal').modal('hide');
+                    $('#timezone-link').addClass('text-success').prop('disabled', true).removeAttr("data-bs-toggle").text(checkedTitle);
+                    $('#change_timezone-btn').remove();
+                    $("#change_timezone .modal-footer button[data-bs-dismiss='modal']").text('Закрыть');
                 }
             });
         });
@@ -153,16 +149,12 @@
                         url: $('.change_password-form').prop('action'),
                         type: 'POST',
                         data: $('.change_password-form').serialize(),
-                        success: function (data) {
-                            if (JSON.parse(data).success) {
-                                $('#password').addClass('is-valid').parent().find('.form-text-info').addClass('text-success').text('Пароль успешно изменен!');
-                                $('#password').closest('form').find('fieldset').prop('disabled', true);
-                                $('#change_password-submit').remove();
-                            }
+                        success: function () {
+                            $('#password').addClass('is-valid').parent().find('.form-text-info').addClass('text-success').text('Пароль успешно изменен!');
+                            $('#password').closest('form').find('fieldset').prop('disabled', true);
+                            $('#change_password-submit').remove();
                         },
                         error: function (response) {
-                            console.log(response.responseJSON.errors.password);
-
                             if (response.responseJSON.errors.password) {
                                 $('#password').addClass('is-invalid');
                                 $('#password + .invalid-feedback').text(response.responseJSON.errors.password[0]);

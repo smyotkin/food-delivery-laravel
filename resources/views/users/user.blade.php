@@ -112,10 +112,8 @@
                     complete: function() {
                         $('#preloader').addClass('d-none');
                     },
-                    success: function (data) {
-                        if (JSON.parse(data).success) {
-                            window.location.replace('/users');
-                        }
+                    success: function () {
+                        window.location.replace('/users');
                     },
                     error: function (response) {
                         if (typeof(response.responseJSON.errors) != 'undefined') {
