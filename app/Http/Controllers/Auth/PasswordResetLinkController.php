@@ -4,10 +4,12 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\PasswordResetRequest;
+use App\Services\PasswordResetsService;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Cache;
 use Carbon\Carbon;
-use App\Services\PasswordResetsService;
 use Exception;
+use Throwable;
 
 class PasswordResetLinkController extends Controller
 {
@@ -16,7 +18,7 @@ class PasswordResetLinkController extends Controller
      * переадресацию
      *
      * @param PasswordResetRequest $request
-     * @return \Illuminate\Http\RedirectResponse|string
+     * @return RedirectResponse|string
      * @throws Exception
      */
     public function create(PasswordResetRequest $request)
@@ -32,12 +34,10 @@ class PasswordResetLinkController extends Controller
      *
      * @param PasswordResetRequest $request
      * @return string
-     * @throws Exception
+     * @throws Exception|Throwable
      */
     public function createForm(PasswordResetRequest $request)
     {
-        $this->sendSmsAjax($request);
-
         $todayEntries = PasswordResetsService::getTodayEntries($request->phone);
         $lastActiveEntry = PasswordResetsService::getlastActiveEntry($request->phone);
         $endPinTime = !empty($lastActiveEntry) ? Carbon::createFromTimeString($lastActiveEntry->created_at)->addMinutes
@@ -58,33 +58,26 @@ class PasswordResetLinkController extends Controller
      * Отправляет СМС если добавилась запись в таблицу пинов
      *
      * @param PasswordResetRequest $request
-     * @return bool|string
-     * @throws Exception
+     * @throws Exception|Throwable
      */
-    public function sendSmsAjax(PasswordResetRequest $request)
+    public function sendSmsAjax(PasswordResetRequest $request): void
     {
-        if ($pin = PasswordResetsService::insertPinOrFail($request->phone)) {
-            PasswordResetsService::sendPinViaSms([
-                'phone' => $request->phone,
-                'pin' => $pin,
-            ]);
+        $pin = PasswordResetsService::insertPinOrFail($request->phone);
 
-            return json_encode([
-                'success' => true,
-            ], JSON_UNESCAPED_SLASHES|JSON_UNESCAPED_UNICODE);
-        }
-
-        return false;
+        PasswordResetsService::sendPinViaSms([
+            'phone' => $request->phone,
+            'pin' => $pin,
+        ]);
     }
 
     /**
      * Проверяем валидность данных (телефон, пин-код и новый пароль) и меняем пароль у пользователя по номеру телефона
      *
      * @param PasswordResetRequest $request
-     * @return bool|\Illuminate\Http\RedirectResponse
-     * @throws Exception
+     * @return RedirectResponse
+     * @throws Exception|Throwable
      */
-    public function store(PasswordResetRequest $request)
+    public function store(PasswordResetRequest $request): RedirectResponse
     {
         $lastActiveEntry = PasswordResetsService::getLastActiveEntry($request->phone);
 
@@ -92,13 +85,13 @@ class PasswordResetLinkController extends Controller
             $pinValidate = PasswordResetsService::checkPinAttempt($lastActiveEntry, $request);
 
             if ($pinValidate === true) {
-                $updateUserPassword = PasswordResetsService::updateUserPassword([
+                PasswordResetsService::updateUserPassword([
                     'phone' => $request->phone,
                     'new_password' => $request->new_password,
                     'pin' => $lastActiveEntry->pin_code,
                 ]);
 
-                return $updateUserPassword ? redirect()->route('login', ['password_reset_success' => true]) : false;
+                return redirect()->route('login', ['password_reset_success' => true]);
             } else {
                 return redirect()
                     ->route('password.phone', ['phone' => $request->phone])
