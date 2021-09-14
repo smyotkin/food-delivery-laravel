@@ -42,7 +42,7 @@ class SmsCenter extends Notification
         $msg = $this->data['msg'] ?? 'Пароль: ';
         $password = $this->data['password'] ?? '';
 
-        return config('custom.send_sms', 1) ? SmscRuMessage::create($msg . $password) : null;
+        return SmscRuMessage::create($msg . $password);
     }
 
 }
