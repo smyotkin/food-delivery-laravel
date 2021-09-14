@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers\Users;
 
-use App\Http\Controllers\Controller;
-use App\Services\PositionsService;
 use Illuminate\Http\Request;
 use App\Http\Requests\Users\CreateOrUpdatePositionRequest;
+use App\Http\Controllers\Controller;
+use App\Services\PositionsService;
 use App\Models\Permission;
 
 class PositionsController extends Controller
@@ -130,7 +130,7 @@ class PositionsController extends Controller
      * @param Request $request
      * @return string
      */
-    public function getAjaxByStatus(Request $request): string
+    public function getSelectAjax(Request $request): string
     {
         return view('users/positions-select', [
             'positions' => PositionsService::find($request->toArray()),
