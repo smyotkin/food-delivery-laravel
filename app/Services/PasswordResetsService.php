@@ -5,11 +5,15 @@ namespace App\Services;
 use App\Models\User;
 use App\Notifications\SmsCenter;
 use Carbon\Carbon;
+use Illuminate\Database\Eloquent\Collection;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Exception;
+use Throwable;
 
 class PasswordResetsService
 {
@@ -20,12 +24,11 @@ class PasswordResetsService
     /**
      * Проверяет срок действия активных записей и при истечении срока меняет статус is_active на 0
      *
-     * @return bool|object
-     * @throws Exception
+     * @throws Exception|Throwable
      */
-    public static function checkActiveEntries()
+    public static function checkActiveEntries(): void
     {
-        return DB::table('sent_pin')
+        DB::table('sent_pin')
             ->where('is_active', 1)
             ->whereRaw('DATE_ADD(`created_at`, INTERVAL ' . config('custom.password_resets.pin_lifetime_minutes', static::$pinLifetimeMinutes) . ' MINUTE) < \'' . Carbon::now() . '\'')
             ->update(['is_active' => 0]);
@@ -37,29 +40,35 @@ class PasswordResetsService
      *
      * @param string $phone
      * @return string|bool
-     * @throws Exception
+     * @throws Exception|Throwable
      */
-    public static function insertPinOrFail(string $phone)
+    public static function insertPinOrFail(string $phone): ?string
     {
         self::checkActiveEntries();
 
         $todayEntries = self::getTodayEntries($phone);
         $lastEntry = !empty($todayEntries) ? $todayEntries->first() : null;
+        $insert = false;
+        $pin = self::generatePin();
+
+        if ($todayEntries->count() >= config('custom.password_resets.attempts_per_day', static::$attemptsPerDay)) {
+            SystemService::createEvent('password_reset_limit', ['phone' => $phone]);
+
+            abort(500, 'Превышен лимит попыток');
+        }
 
         if ($todayEntries->count() < config('custom.password_resets.attempts_per_day', static::$attemptsPerDay) && (empty($lastEntry) || $lastEntry->is_active == 0)) {
-            return DB::table('sent_pin')->insert([
+            $insert = DB::table('sent_pin')->insert([
                 'phone' => $phone,
-                'pin_code' => $pin = self::generatePin(),
+                'pin_code' => $pin,
                 'created_at' => Carbon::now(),
                 'is_active' => 1,
-            ]) ? $pin : false;
+            ]);
+        } else {
+            abort(500, 'Невозможно создать новый пин-код');
         }
 
-        if ($todayEntries->count() == config('custom.password_resets.attempts_per_day', static::$attemptsPerDay)) {
-            SystemService::createEvent('password_reset_limit', ['phone' => $phone]);
-        }
-
-        return false;
+        return $insert ? $pin : abort(500, 'Неизвестная ошибка');
     }
 
     /**
@@ -77,9 +86,9 @@ class PasswordResetsService
      * Получить все записи за сутки по номеру телефона
      *
      * @param string $phone
-     * @return object|bool
+     * @return \Illuminate\Support\Collection
      */
-    public static function getTodayEntries(string $phone)
+    public static function getTodayEntries(string $phone): \Illuminate\Support\Collection
     {
         return DB::table('sent_pin')
             ->where('phone', $phone)
@@ -92,7 +101,7 @@ class PasswordResetsService
      * Возвращает последнюю активную запись по номеру телефона
      *
      * @param string $phone
-     * @return object|bool
+     * @return mixed
      */
     public static function getLastActiveEntry(string $phone)
     {
@@ -108,7 +117,7 @@ class PasswordResetsService
      *
      * @param $lastActiveEntry
      * @param $request
-     * @return bool|\Illuminate\Validation\Validator
+     * @return mixed
      */
     public static function checkPinAttempt($lastActiveEntry, $request)
     {
@@ -138,10 +147,10 @@ class PasswordResetsService
      *
      * @param array $array
      */
-    public static function sendPinViaSms(array $array)
+    public static function sendPinViaSms(array $array): void
     {
         if (config('custom.password_resets.send_sms', static::$sendSms)) {
-            $user = User::where('phone', $array['phone'])->first();
+            $user = User::where('phone', $array['phone'])->firstOrFail();
 
             $user->notify(new SmsCenter([
                 'msg' => "Код для восстановления:\n",
@@ -154,17 +163,19 @@ class PasswordResetsService
      * Меняем пароль у пользователя по номеру телефона
      *
      * @param array $array
-     * @return bool
+     * @throws Throwable
      */
-    public static function updateUserPassword(array $array)
+    public static function updateUserPassword(array $array): void
     {
-        $user = User::where('phone', $array['phone'])->first();
+        $user = User::where('phone', $array['phone'])->firstOrFail();
 
-        $user->update([
-            'password' => Hash::make($array['new_password']),
-        ]);
+        DB::transaction(function() use ($user, $array) {
+            $user->update([
+                'password' => Hash::make($array['new_password']),
+            ]);
 
-        if ($user->save()) {
+            $user->saveOrFail();
+
             DB::table('password_resets')->insert([
                 'phone' => $array['phone'],
                 'token' => $array['pin'],
@@ -175,12 +186,8 @@ class PasswordResetsService
                 ->where('phone', $array['phone'])
                 ->where('is_active', 1)
                 ->update(['is_active' => 0]);
+        });
 
-            SystemService::createEvent('password_reset_success', ['phone' => $array['phone']]);
-
-            return true;
-        }
-
-        return false;
+        SystemService::createEvent('password_reset_success', ['phone' => $array['phone']]);
     }
 }
