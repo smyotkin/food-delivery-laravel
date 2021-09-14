@@ -86,7 +86,7 @@
 
         $(document).ready(function() {
             $.ajax({
-                url: '{{ route('profile.getAjax') }}',
+                url: '{{ route('profile/get.ajax') }}',
                 type: 'GET',
                 data: {
                     {{ isset($user) ? 'id: ' . $user->id : '' }}
