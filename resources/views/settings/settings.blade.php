@@ -116,11 +116,17 @@
                         url: closestForm.prop('action'),
                         type: 'POST',
                         data: closestForm.serialize(),
-                        success: function (data) {
+                        success: function () {
                             thisButton
-                                .removeClass('btn-secondary')
+                                .removeClass('btn-secondary btn-danger')
                                 .addClass('btn-success')
                                 .text('Кэш очищен');
+                        },
+                        error: function () {
+                            thisButton
+                                .removeClass('btn-secondary btn-success')
+                                .addClass('btn-danger')
+                                .text('Ошибка');
                         }
                     });
                 }
