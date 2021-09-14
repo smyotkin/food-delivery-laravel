@@ -104,6 +104,15 @@
             @endif
 
             $(document).ready(function () {
+                $.ajax({
+                    url: $('#send_sms_form').prop('action'),
+                    type: 'POST',
+                    data: $('#send_sms_form').serialize(),
+                    success: function () {
+                        window.location.reload(true);
+                    },
+                });
+
                 $('.pin_format').mask("9999", {autoclear: false});
 
                 setCursorToActive('.pin_format');
@@ -116,10 +125,8 @@
                     url: $('#send_sms_form').prop('action'),
                     type: 'POST',
                     data: $('#send_sms_form').serialize(),
-                    success: function (data) {
-                        if (JSON.parse(data).success) {
-                            window.location.reload(true);
-                        }
+                    success: function () {
+                        window.location.reload(true);
                     },
                 });
             });
