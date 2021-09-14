@@ -2,9 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Settings;
 use App\Services\SettingsService;
 use Illuminate\Http\Request;
+use Throwable;
 
 class SettingsController extends Controller
 {
@@ -38,25 +38,18 @@ class SettingsController extends Controller
      * Update the specified resource in storage.
      *
      * @param \Illuminate\Http\Request $request
-     * @return false|string
-     * @throws \Throwable
+     * @throws Throwable
      */
-    public function update(Request $request)
+    public function update(Request $request): void
     {
         SettingsService::update($request->all());
-
-        return json_encode([
-            'success' => true,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
-
-    public function clearCache()
+    /**
+     * Clear cache
+     */
+    public function clearCache(): void
     {
         SettingsService::clearCache();
-
-        return json_encode([
-            'success' => true,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 }
