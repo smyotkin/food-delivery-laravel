@@ -52,7 +52,7 @@
 
     <script>
         $(document).ready(function() {
-            updateTableList('users', '{{ route('users/getAjax') }}', 10000);
+            updateTableList('users', '{{ route('users/get.ajax') }}', 10000);
         });
     </script>
 </x-app-layout>
