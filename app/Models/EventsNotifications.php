@@ -22,4 +22,9 @@ class EventsNotifications extends Model
     {
         return self::where('key', $key)->first();
     }
+
+    public static function getOrFail($key)
+    {
+        return self::where('key', $key)->firstOrFail();
+    }
 }
