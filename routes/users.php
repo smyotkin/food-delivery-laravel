@@ -10,39 +10,38 @@ use App\Http\Controllers\Profile\ProfileController;
  */
 
 Route::middleware(['auth'])->group(function () {
-
     /**
      * AJAX - Users
      */
-    Route::get('/users/getAjax', [UsersController::class, 'getAjax'])
-        ->name('users/getAjax');
+    Route::get('/users/get.ajax', [UsersController::class, 'getAjax'])
+        ->name('users/get.ajax');
 
-    Route::get('/users/getUserFormAjax', [UsersController::class, 'getUserFormAjax'])
-        ->name('users.getUserFormAjax');
+    Route::get('/users/form/get.ajax', [UsersController::class, 'getUserFormAjax'])
+        ->name('users/form/get.ajax');
 
-    Route::get('/profile/getAjax', [ProfileController::class, 'getAjax'])
-        ->name('profile.getAjax');
-
-    Route::get('/users/getPermissionsCheckedAjax', [UsersController::class, 'getPermissionsCheckedAjax'])
-        ->name('users.getPermissionsCheckedAjax');
+    Route::get('/users/permissions/get.ajax', [UsersController::class, 'getPermissionsCheckedAjax'])
+        ->name('users/permissions/get.ajax');
 
     Route::get('/users/export.csv', [UsersController::class, 'exportCsv']);
 
     /**
+     * AJAX - User Profile
+     */
+    Route::get('/profile/get.ajax', [ProfileController::class, 'getAjax'])
+        ->name('profile/get.ajax');
+
+    /**
      * AJAX - Positions
      */
-    Route::get('/users/positions/getFormAjax', [PositionsController::class, 'getFormAjax'])
-        ->name('positions.getFormAjax');
-
-    Route::get('/users/positions/getAjax', [PositionsController::class, 'getAjax'])
+    Route::get('/users/positions/get.ajax', [PositionsController::class, 'getAjax'])
         ->middleware(['permissions:users_positions_view'])
-        ->name('positions.getAjax');
+        ->name('positions/get.ajax');
 
-    Route::get('/users/positions/getAjaxByStatus', [PositionsController::class, 'getAjaxByStatus'])
-        ->name('positions.getAjaxByStatus');
+    Route::get('/users/positions/form/get.ajax', [PositionsController::class, 'getFormAjax'])
+        ->name('positions/form/get.ajax');
 
-    Route::get('/users/positions/getWithPermissions', [PositionsController::class, 'getWithPermissions'])
-        ->name('positions.getWithPermissions');
+    Route::get('/users/positions/select/get.ajax', [PositionsController::class, 'getSelectAjax'])
+        ->name('positions/select/get.ajax');
 
     /**
      * Http - Positions
