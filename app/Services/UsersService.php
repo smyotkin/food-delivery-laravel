@@ -2,16 +2,19 @@
 
 namespace App\Services;
 
-use App\Models\Settings;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Auth;
+use App\Models\Settings;
 use App\Models\User;
 use App\Models\Role;
-use Illuminate\Support\Facades\Auth;
 use App\Notifications\SmsCenter;
 use Illuminate\Support\Facades\Notification;
 use NotificationChannels\SmscRu\SmscRuChannel;
+use Exception;
+use Throwable;
 
 class UsersService
 {
@@ -33,9 +36,7 @@ class UsersService
      * Создание или редактирование(если указан id) пользователя
      *
      * @param array|null $array
-     * @return void
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception|Throwable
      */
     public static function createOrUpdate(?array $array = null): void
     {
@@ -54,7 +55,7 @@ class UsersService
         $user = User::find($params->get('id', 0));
         $role = Role::findOrFail($params->get('position_id'));
 
-        UsersService::checkPermission([
+        self::checkPermission([
                 'role_status' => $role->status,
                 'form_status' => $params->get('status'),
             ], $user ? 'modify' : 'add'
@@ -98,7 +99,6 @@ class UsersService
      *
      * @param array  $statuses
      * @param string $action
-     * @return void
      */
     public static function checkPermission(array $statuses, string $action): void
     {
@@ -110,26 +110,28 @@ class UsersService
         }
     }
 
+    /**
+     * Метод обновляет данные в профиле (только timezone или password)
+     *
+     * @param array|null $array
+     * @throws Throwable
+     */
     public static function updateProfile(?array $array = null): void
     {
         $params = collect($array)->only([
             'timezone',
             'password',
         ]);
-        $user = Auth::user();
+        $user = $updatedUser = Auth::user();
 
         if ($password = $params->get('password', false)) {
             $params->put('password', Hash::make($password));
         }
 
-        DB::transaction(function() use ($params, &$user) {
-            $updatedUser = $user;
+        $updatedUser->update($params->all());
+        $updatedUser->saveOrFail();
 
-            $updatedUser->update($params->all());
-            $updatedUser->saveOrFail();
-
-            SystemService::createEvent('user_updated', $user->toArray(), $updatedUser->toArray());
-        });
+        SystemService::createEvent('user_updated', $user->toArray(), $updatedUser->toArray());
     }
 
     /**
@@ -159,9 +161,9 @@ class UsersService
      * Возвращает одного пользователя
      *
      * @param array $array
-     * @return User
+     * @return User|null
      */
-    public static function get(array $array): User
+    public static function get(array $array): ?User
     {
         return User::find($array['id']);
     }
@@ -170,88 +172,87 @@ class UsersService
      * Получение пользователя по номеру телефона
      *
      * @param string $phone
-     * @return mixed
+     * @return User
      */
-    public static function getByPhone(string $phone)
+    public static function getByPhone(string $phone): User
     {
-        try {
-            return User::where('phone', $phone)->firstOrFail();
-        } catch(\Exception $e) {
-            abort(404, 'Пользователь не найден');
-        }
+        return User::where('phone', $phone)->firstOrFail();
     }
 
     /**
      * Функция смены пароля у пользователя по id
      *
      * @param array $array
-     * @throws \Throwable
+     * @throws Throwable
      */
     public static function changePassword(array $array): void
     {
-        $params = collect($array)->only(['id', 'password']);
-        $user = User::findOrFail($params->get('id', 0));
+        $params = collect($array)->only([
+            'id',
+            'password'
+        ]);
+        $user = $updatedUser = User::findOrFail($params->get('id', 0));
 
         if ($password = $params->get('password', false)) {
             $params->put('password', Hash::make($password));
         }
 
-        DB::transaction(function() use ($params, &$user) {
-            $updatedUser = $user;
+        $updatedUser->update($params->all());
+        $updatedUser->saveOrFail();
 
-            $updatedUser->update($params->all());
-            $updatedUser->saveOrFail();
-
-            SystemService::createEvent('user_updated', $user->toArray(), $updatedUser->toArray());
-        });
+        SystemService::createEvent('user_updated', $user->toArray(), $updatedUser->toArray());
     }
 
     /**
      * Возвращает одного пользователя или ошибку
      *
      * @param array $array
-     * @return mixed
+     * @return User
+     * @throws Throwable
      */
-    public static function getOrFail(array $array)
+    public static function getOrFail(array $array): User
     {
-        return self::checkRoleAndPermission($array['id'], 'view') ? User::findOrFail($array['id']) : false;
+        self::checkRoleAndPermission($array['id'], 'view');
+
+        return User::findOrFail($array['id']);
     }
 
     /**
      * Удаляет пользователя
      *
      * @param int $id
-     * @return void
+     * @throws Throwable
      */
     public static function destroy(int $id): void
     {
+        self::checkRoleAndPermission($id, 'delete');
+
         $user = User::findOrFail($id);
 
-        if (self::checkRoleAndPermission($id, 'delete')) {
-            if ($user->delete()) {
-                SystemService::createEvent('user_removed', $user->toArray());
-            }
+        if ($user->delete()) {
+            SystemService::createEvent('user_removed', $user->toArray());
         }
     }
 
     /**
      * Проверяет наличие должности, право на действие(action) у авторизированного пользователя
      *
-     * @param $id
-     * @param $action
-     * @return mixed
+     * @param int    $id
+     * @param string $action
      */
-    public static function checkRoleAndPermission($id, $action)
+    public static function checkRoleAndPermission(int $id, string $action): void
     {
+        $user = User::findOrFail($id);
+
+        // Разрешать пользователю смотреть данные о себе (профиль или карточка) || Проверка на админа
         if (($action == 'view' && Auth::id() == $id) || User::isRoot()) {
-            return true;
+            return;
         }
 
-        $user = User::find($id);
-        $role = self::getRoleWithPermissions(['id' => $id]);
+        $role = $user->roles->first();
         $permission = isset($role->status) ? "users_{$role->status}_$action" : null;
 
-        if (User::getRoot()->id == $id || $user === null) {
+        if (User::isRoot($id)) {
             abort(404, 'Пользователь не найден');
         } elseif (!isset($permission)) {
             abort(403, 'Пользователь не имеет должности');
@@ -260,17 +261,15 @@ class UsersService
         } elseif ($action == 'delete' && (Auth::user()->id == $id || User::isRoot($id))) {
             abort(403, "Запрещено");
         }
-
-        return true;
     }
 
     /**
      * Возвращает права пользователя
      *
      * @param array $array
-     * @return \Illuminate\Support\Collection|null
+     * @return Collection|null
      */
-    public static function getPermissions(array $array): ?\Illuminate\Support\Collection
+    public static function getPermissions(array $array): ?Collection
     {
         $user = User::with('permissions')->where('id', '=', $array['id'])->first();
 
@@ -281,9 +280,9 @@ class UsersService
      * Возвращает должность пользователя
      *
      * @param array $array
-     * @return \App\Models\Role|null
+     * @return Role|null
      */
-    public static function getRoleWithPermissions(array $array): ?\App\Models\Role
+    public static function getRoleWithPermissions(array $array): ?Role
     {
         $userRole = DB::table('users_roles')->where('user_id', '=', $array['id'])->first();
 
