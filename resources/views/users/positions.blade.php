@@ -43,7 +43,7 @@
 
     <script>
         $(document).ready(function() {
-            updateTableList('positions', '{{ route('positions.getAjax') }}');
+            updateTableList('positions', '{{ route('positions/get.ajax') }}');
         });
     </script>
 </x-app-layout>
