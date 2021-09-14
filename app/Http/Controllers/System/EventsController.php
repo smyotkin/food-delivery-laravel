@@ -6,6 +6,8 @@ use App\Http\Controllers\Controller;
 use App\Exports\SystemEventsExport;
 use App\Services\SystemService;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class EventsController extends Controller
 {
@@ -23,7 +25,7 @@ class EventsController extends Controller
      * Удаление событий за период
      *
      * @param Request $request
-     * @return false|string
+     * @return mixed
      */
     public function clearEvents(Request $request)
     {
@@ -31,19 +33,16 @@ class EventsController extends Controller
             'period' => 'required|in:day,week,month,year',
         ]);
 
-        $count = SystemService::clearEvents($validated['period']);
-
-        return json_encode([
-            'success' => true,
-            'count' => $count,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
+        return response([
+            'count' => SystemService::clearEvents($validated['period']),
+        ]);
     }
 
     /**
      * Экспорт в CSV
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return Response|BinaryFileResponse
      */
     public function exportEventsCsv(Request $request)
     {
