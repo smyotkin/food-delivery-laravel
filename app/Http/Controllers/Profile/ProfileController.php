@@ -2,22 +2,23 @@
 
 namespace App\Http\Controllers\Profile;
 
-use App\Http\Controllers\Controller;
-use App\Http\Requests\Users\UpdateProfileRequest;
-use App\Models\Permission;
-use App\Services\UsersService;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use App\Http\Requests\Users\UpdateProfileRequest;
+use App\Http\Controllers\Controller;
+use App\Services\UsersService;
+use App\Models\Permission;
+use Exception;
+use Throwable;
 
 class ProfileController extends Controller
 {
     /**
      * Шаблон профиля авторизованного пользователя
      *
-     * @param Request $request
      * @return string
+     * @throws Exception|Throwable
      */
-    public function index(Request $request): string
+    public function index(): string
     {
         return view('users/profile', [
             'user' => UsersService::getOrFail(['id' => Auth::user()->id]),
@@ -30,26 +31,20 @@ class ProfileController extends Controller
      * Обновление данных профиля
      *
      * @param UpdateProfileRequest $request
-     * @return string
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception|Throwable
      */
-    public function update(UpdateProfileRequest $request): string
+    public function update(UpdateProfileRequest $request): void
     {
         UsersService::updateProfile($request->validated());
-
-        return json_encode([
-            'success' => true,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
      * Возвращает форму профиля AJAX
      *
-     * @param UpdateProfileRequest $request
      * @return string
+     * @throws Exception|Throwable
      */
-    public function getAjax(UpdateProfileRequest $request): string
+    public function getAjax(): string
     {
         $user = UsersService::getOrFail(['id' => Auth::user()->id]);
         $role = UsersService::getRoleWithPermissions(['id' => Auth::user()->id]);
