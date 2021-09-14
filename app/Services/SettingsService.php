@@ -2,10 +2,14 @@
 
 namespace App\Services;
 
-use App\Models\Settings;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Support\Facades\Crypt;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
+use App\Models\Settings;
+use Exception;
+use Throwable;
+use Log;
 
 class SettingsService
 {
@@ -34,9 +38,9 @@ class SettingsService
      *
      * @param $key
      * @param $value
-     * @return array|bool
+     * @return array|null
      */
-    public static function getSetting($key, $value)
+    public static function getSetting(string $key, string $value): ?array
     {
         switch ($key) {
             case 'global_event_period':
@@ -70,6 +74,8 @@ class SettingsService
                     'raw' => $value,
                     'type' => 'number',
                     'default' => '1000',
+                    'min' => '1',
+                    'max' => '1000',
                 ];
             case 'smscru_login':
                 return [
@@ -99,7 +105,7 @@ class SettingsService
                 ];
         }
 
-        return false;
+        return null;
     }
 
     /**
@@ -131,77 +137,73 @@ class SettingsService
      * Обновление одного параметра настроек
      *
      * @param array|null $array
-     * @throws \Throwable
+     * @throws Exception|Throwable
      */
-    public static function update(?array $array = null)
+    public static function update(?array $array = null): void
     {
-        $basicParams = collect($array)
-            ->only([
-                'global_event_period',
-                'global_rows_per_page',
-                'global_max_rows_limit',
-                'smscru_login',
-                'smscru_secret',
-                'telegram_token',
-            ]);
-
-        $validator = Validator::make($array, [
-            'global_event_period' => 'in:day,week,month,year',
-            'global_rows_per_page' => 'numeric',
-            'global_max_rows_limit' => 'numeric',
-            'smscru_login' => '',
-            'smscru_secret' => '',
-            'telegram_token' => '',
+        $params = collect($array)->only([
+            'global_event_period',
+            'global_rows_per_page',
+            'global_max_rows_limit',
+            'smscru_login',
+            'smscru_secret',
+            'telegram_token',
         ]);
 
-        if ($validator->fails()) {
-            SystemService::createEvent('setting_update_failed', Settings::find($basicParams->keys()->first())
-                ->toArray(), $validator->errors()->toArray() + [
-                    'value' => $basicParams->first(),
-                ]);
+        $validator = Validator::make($params->all(), [
+            'global_event_period' => 'in:day,week,month,year',
+            'global_rows_per_page' => 'numeric|min:1|max:1000',
+            'global_max_rows_limit' => 'numeric|min:1|max:1000',
+        ]);
 
-            abort(500);
+        $key = $params->keys()->first();
+        $value = $params->first();
+        $beforeUpdate = $setting = Settings::findOrFail($key);
+
+        if ($validator->fails()) {
+            SystemService::createEvent(
+                'setting_update_failed',
+                $beforeUpdate->toArray(),
+                $validator->errors()->toArray() + [
+                    'value' => $value,
+                ]
+            );
+
+            throw new ValidationException($validator);
         }
 
-        try {
-            DB::transaction(function() use ($basicParams) {
-                if ($key = $basicParams->keys()->first()) {
-                    if (in_array($key, ['smscru_secret', 'telegram_token'])) {
-                        $value = Crypt::encryptString($basicParams->first());
-                    } else {
-                        $value = $basicParams->first();
-                    }
+        if ($key && $value) {
+            if (in_array($key, ['smscru_secret', 'telegram_token'])) {
+                $value = Crypt::encryptString($value);
+            }
 
-                    $setting = Settings::find($key);
-                    $oldValue = $setting->value;
-                    $updated = $setting->update([
-                        'value' => $value,
-                    ]);
-
-                    if ($updated) {
-                        SystemService::createEvent('setting_updated', $setting->toArray(), [
-                            'old_value' => $oldValue,
-                            'new_value' => $setting->value,
-                        ]);
-                    }
-                }
-            });
-        } catch (\Exception $e) {
-            SystemService::createEvent('setting_update_failed', Settings::find($basicParams->keys()->first())
-                ->toArray(), [
-                    'value' => $basicParams->first(),
+            try {
+                $setting->update(['value' => $value]);
+                $setting->saveOrFail();
+            } catch (Throwable $error) {
+                SystemService::createEvent('setting_update_failed', $setting->toArray(), [
+                    'value' => $value,
+                    'error' => $error,
                 ]);
 
-            abort(500);
+                Log::error($error);
+
+                abort(500, 'Произошла ошибка при обновлении');
+            }
+
+            SystemService::createEvent('setting_updated', $setting->toArray(), [
+                'old_value' => $beforeUpdate->value,
+                'new_value' => $value,
+            ]);
         }
     }
 
     /**
      * Очистка кэша
      *
-     * @return \Illuminate\Http\RedirectResponse
+     * @return RedirectResponse
      */
-    public static function clearCache()
+    public static function clearCache(): RedirectResponse
     {
         \Artisan::call('optimize:clear');
         return redirect()->back()->with('status', 'Cache Cleared!');
