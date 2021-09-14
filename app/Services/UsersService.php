@@ -81,14 +81,16 @@ class UsersService
         });
 
         if ($newUser->wasRecentlyCreated) {
-            $newUser->notify(new SmsCenter([
-                'password' => $password
-            ]));
-
             // todo Удалить пароль с логгера
             Log::info("CREATE_NEW_USER(id: {$newUser->id}, phone: {$newUser->phone}, password: $password)");
 
             SystemService::createEvent('user_created', $newUser->toArray());
+
+            if (config('custom.send_sms', 1)) {
+                $newUser->notify(new SmsCenter([
+                    'password' => $password
+                ]));
+            }
         } else {
             SystemService::createEvent('user_updated', $user->toArray(), $newUser->toArray());
         }
