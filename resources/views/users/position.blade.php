@@ -77,7 +77,7 @@
 
         $(document).ready(function() {
             $.ajax({
-                url: '{{ route('positions.getFormAjax') }}',
+                url: '{{ route('positions/form/get.ajax') }}',
                 type: 'GET',
                 data: {
                     action: '{{ isset($role) ? 'show' : 'create' }}',
@@ -167,25 +167,19 @@
                             url: $('#delete_position').prop('action'),
                             type: 'POST',
                             data: $('#delete_position').serialize(),
-                            success: function (data) {
-                                if (JSON.parse(data).success) {
-                                    window.location.replace('{{ route('positions.index') }}');
-                                }
+                            success: function () {
+                                window.location.replace('{{ route('positions.index') }}');
                             },
                             error: function (response) {
-                                if (response.status === 500) {
-                                    $('#delete').remove();
-
-                                    Swal.fire({
-                                        dangerMode: true,
-                                        title: 'Внимание!',
-                                        text: response.responseJSON.message,
-                                        icon: 'warning',
-                                        cancelButtonText: 'Закрыть',
-                                        showCancelButton: true,
-                                        showConfirmButton: false,
-                                    });
-                                }
+                                Swal.fire({
+                                    dangerMode: true,
+                                    title: 'Внимание!',
+                                    text: response.responseJSON.message,
+                                    icon: 'warning',
+                                    cancelButtonText: 'Закрыть',
+                                    showCancelButton: true,
+                                    showConfirmButton: false,
+                                });
                             }
                         });
                     }
