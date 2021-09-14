@@ -11,35 +11,45 @@ use Illuminate\Validation\ValidationException;
 
 class AuthController extends Controller
 {
-    public function login(Request $request) {
+    /**
+     * Авторизация пользователя(выдача токена) по номеру телефона и паролю через API
+     *
+     * @param Request $request
+     * @return mixed
+     * @throws ValidationException
+     */
+    public function login(Request $request)
+    {
         $fields = $request->validate([
             'phone' => 'required',
             'password' => 'required'
         ]);
 
-        $user = User::where('phone', $fields['phone'])->first();
+        $user = User::where('phone', $fields['phone'])->firstOrFail();
 
-        if (!$user || !Hash::check($fields['password'], $user->password)) {
+        if (!Hash::check($fields['password'], $user->password)) {
             throw ValidationException::withMessages([
                 'msg' => ['Введенные данные некорректны.'],
             ])->status(401);
         }
 
-        $token = $user->createToken('API')->plainTextToken;
-
-        $response = [
+        return response([
             'user' => $user,
-            'token' => $token,
-        ];
-
-        return response($response, 200);
+            'token' => $user->createToken('API')->plainTextToken,
+        ], 200);
     }
 
-    public function logout() {
+    /**
+     * Удаляет все токены у авторизованного пользователя через API
+     *
+     * @return mixed
+     */
+    public function logout()
+    {
         Auth::user()->tokens()->delete();
 
-        return [
+        return response([
             'message' => 'Токен успешно удален.'
-        ];
+        ], 200);
     }
 }
