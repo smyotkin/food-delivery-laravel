@@ -1,5 +1,5 @@
 <x-app-layout>
-    <x-slot name="title">{{ isset($user) ? $user->fullname : 'Новый пользователь' }}</x-slot>
+    <x-slot name="title">{{ isset($user) ? $user->full_name : 'Новый пользователь' }}</x-slot>
     <x-slot name="back_href">{{ route('users.index') }}</x-slot>
     <x-slot name="back_title">
         <span class="d-none d-md-inline-block">Пользователи</span>
@@ -13,7 +13,7 @@
         <div class="row">
             <div class="col-12 col-md d-flex align-items-center">
                 <div class="info">
-                    <h4 class="text-muted fw-light">{{ $user->fullname ?? 'Имя Фамилия' }}</h4>
+                    <h4 class="text-muted fw-light">{{ $user->full_name ?? 'Имя Фамилия' }}</h4>
                     <h6 class="text-muted fw-normal mb-0">{{ isset($user->phone) ? $user->phoneNumber($user->phone) : 'Телефон' }}</h6>
                 </div>
             </div>
@@ -51,9 +51,8 @@
                         </small>
                     </p>
 
-                    @if ((isset($role->status) && (Auth::user()->id != $user->id && !$user::isRoot($user->id))) || ($user::isRoot() && Auth::user()->id != $user->id))
-                        @php ($status = empty($role->status) && $user::isRoot() ? 'admin' : $role->status)
-                        @permission("users_{$status}_delete")
+                    @if ((isset($role_status) && (Auth::user()->id != $user->id && !$user::isRoot($user->id))) || ($user::isRoot() && Auth::user()->id != $user->id))
+                        @permission("users_{$role_status}_delete")
                             <form action="{{ route('users.destroy', ['user' => $user->id]) }}" id="delete_user" method="post">
                                 @method('delete')
                                 @csrf
@@ -80,7 +79,7 @@
     <script>
         $(document).ready(function() {
             $.ajax({
-                url: '{{ route('users.getUserFormAjax') }}',
+                url: '{{ route('users/form/get.ajax') }}',
                 type: 'GET',
                 data: {
                     action: '{{ isset($user) ? 'show' : 'create' }}',
@@ -136,13 +135,10 @@
                     data: {
                         status: $(this).val(),
                     },
-                    url: '{{ route('positions.getAjaxByStatus') }}',
+                    url: '{{ route('positions/select/get.ajax') }}',
                     success: function (data) {
                         $('#permissions').html('');
-
-                        $('#position').attr('disabled',
-                            data.length > 0 ? false : true
-                        ).html(data);
+                        $('#position').attr('disabled', data.length <= 0).html(data);
 
                         checkFormValidation();
                     }
@@ -167,7 +163,7 @@
                         is_custom_permissions: $is_custom_permissions.prop('checked'),
                         {{ isset($user) ? "user_id: {$user->id}," : '' }}
                     },
-                    url: '{{ route('users.getPermissionsCheckedAjax') }}',
+                    url: '{{ route('users/permissions/get.ajax') }}',
                     success: function (data) {
                         $('#permissions').html(data);
                     }
