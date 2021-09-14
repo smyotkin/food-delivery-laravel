@@ -2,20 +2,25 @@
 
 namespace App\Http\Controllers\Users;
 
-use App\Exports\UsersExport;
-use App\Models\Permission;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use App\Http\Requests\Users\CreateOrUpdateUserRequest;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Users\CreateOrUpdateUserRequest;
 
 use App\Services\UsersService;
 use App\Services\PositionsService;
+use App\Exports\UsersExport;
+use App\Models\Permission;
 
-use Illuminate\Support\Facades\Auth;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+
+use Exception;
+use Throwable;
 
 class UsersController extends Controller
 {
-
     /**
      * Шаблон отображения всех пользователей
      *
@@ -31,22 +36,21 @@ class UsersController extends Controller
      *
      * @param int $id
      * @return string
+     * @throws Throwable
      */
     public function show(int $id): string
     {
         $user = UsersService::getOrFail(['id' => $id]);
         $role = UsersService::getRoleWithPermissions(['id' => $id]);
-        $role_permissions = !empty($role) ? $role->permissions->pluck('slug')->toArray() : [];
+        $role_permissions = $current_permissions = !empty($role->permissions) ? $role->permissions->pluck('slug')->toArray() : [];
 
         if ($is_custom_permissions = !empty($user->is_custom_permissions)) {
             $current_permissions = UsersService::getPermissions(['id' => $id])->pluck('slug')->toArray();
-        } else {
-            $current_permissions = $role_permissions;
         }
 
         return view('users/user', [
             'user' => $user,
-            'role' => $role,
+            'role_status' => empty($role->status) && $user::isRoot() ? 'admin' : $role->status,
             'statuses' => PositionsService::statuses,
             'positions' => PositionsService::find(['status' => old('status') ?? $role->status ?? '']),
             'permissions' => Permission::orderBy('group', 'desc')->get(),
@@ -76,43 +80,32 @@ class UsersController extends Controller
      * Редактирование пользователя
      *
      * @param CreateOrUpdateUserRequest $request
-     * @return string
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception|Throwable
      */
-    public function update(CreateOrUpdateUserRequest $request): string
+    public function update(CreateOrUpdateUserRequest $request): void
     {
         UsersService::createOrUpdate($request->validated());
-
-        return json_encode([
-            'success' => true,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
      * Создание нового пользователя
      *
      * @param CreateOrUpdateUserRequest $request
-     * @return string
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception|Throwable
      */
-    public function store(CreateOrUpdateUserRequest $request): string
+    public function store(CreateOrUpdateUserRequest $request): void
     {
         UsersService::createOrUpdate($request->validated());
-
-        return json_encode([
-            'success' => true,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
      * Удаление должности
      *
-     * @param  int  $id
-     * @return \Illuminate\Http\RedirectResponse
+     * @param int $id
+     * @return RedirectResponse
+     * @throws Exception|Throwable
      */
-    public function destroy($id): \Illuminate\Http\RedirectResponse
+    public function destroy($id): RedirectResponse
     {
         UsersService::destroy($id);
 
@@ -139,6 +132,7 @@ class UsersController extends Controller
      *
      * @param Request $request
      * @return string
+     * @throws Throwable
      */
     public function getUserFormAjax(Request $request): string
     {
@@ -204,7 +198,7 @@ class UsersController extends Controller
      * Экспорт в CSV
      *
      * @param Request $request
-     * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\BinaryFileResponse
+     * @return Response|BinaryFileResponse
      */
     public function exportCsv(Request $request)
     {
