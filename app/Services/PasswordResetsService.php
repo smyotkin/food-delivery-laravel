@@ -39,22 +39,21 @@ class PasswordResetsService
      * запись не активна
      *
      * @param string $phone
-     * @return string|bool
+     * @return string
      * @throws Exception|Throwable
      */
-    public static function insertPinOrFail(string $phone): ?string
+    public static function insertPinOrFail(string $phone): string
     {
         self::checkActiveEntries();
 
         $todayEntries = self::getTodayEntries($phone);
         $lastEntry = !empty($todayEntries) ? $todayEntries->first() : null;
-        $insert = false;
         $pin = self::generatePin();
 
         if ($todayEntries->count() >= config('custom.password_resets.attempts_per_day', static::$attemptsPerDay)) {
             SystemService::createEvent('password_reset_limit', ['phone' => $phone]);
 
-            abort(500, 'Превышен лимит попыток');
+            abort(403, 'Превышен лимит попыток');
         }
 
         if ($todayEntries->count() < config('custom.password_resets.attempts_per_day', static::$attemptsPerDay) && (empty($lastEntry) || $lastEntry->is_active == 0)) {
@@ -64,11 +63,15 @@ class PasswordResetsService
                 'created_at' => Carbon::now(),
                 'is_active' => 1,
             ]);
+
+            if ($insert === false) {
+                abort(500, 'Неизвестная ошибка');
+            }
         } else {
-            abort(500, 'Невозможно создать новый пин-код');
+            abort(403, 'Невозможно создать новый пин-код');
         }
 
-        return $insert ? $pin : abort(500, 'Неизвестная ошибка');
+        return $pin;
     }
 
     /**
