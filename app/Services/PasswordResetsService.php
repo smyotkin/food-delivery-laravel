@@ -80,7 +80,7 @@ class PasswordResetsService
      * @return string
      * @throws Exception
      */
-    public static function generatePin()
+    public static function generatePin(): string
     {
         return str_pad(random_int(100, 9999), 4, 0, STR_PAD_LEFT);
     }
