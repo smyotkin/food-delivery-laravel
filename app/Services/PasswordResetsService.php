@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Http\Requests\Auth\PasswordResetRequest;
 use App\Models\User;
 use App\Notifications\SmsCenter;
 use Carbon\Carbon;
@@ -118,11 +119,11 @@ class PasswordResetsService
     /**
      * Проверяет количество неправильных попыток ввода для активного пин-кода
      *
-     * @param $lastActiveEntry
-     * @param $request
+     * @param object          $lastActiveEntry
+     * @param PasswordResetRequest $request
      * @return mixed
      */
-    public static function checkPinAttempt($lastActiveEntry, $request)
+    public static function checkPinAttempt(object $lastActiveEntry, PasswordResetRequest $request)
     {
         $pinValidate = Validator::make($request->all(), [
             'pin' => 'required|digits:4|in:' . $lastActiveEntry->pin_code,
