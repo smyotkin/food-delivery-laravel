@@ -96,6 +96,22 @@
                     $('.ru-phone_format').mask("+7 999 999-99-99", {
                         autoclear: false,
                     });
+                },
+                error: function(request) {
+                    let errorMsg = request.status === 500 || request.responseJSON.message.length === 0 ? 'Произошла неизвестная ошибка' : request.responseJSON.message;
+
+                    Swal.fire({
+                        title: 'Ошибка',
+                        text: errorMsg,
+                        icon: 'warning',
+                        confirmButtonText: 'Обновить',
+                        cancelButtonText: 'Отмена',
+                        showCancelButton: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload(true);
+                        }
+                    });
                 }
             });
 
@@ -139,6 +155,22 @@
                         $('#position').attr('disabled', data.length <= 0).html(data);
 
                         checkFormValidation();
+                    },
+                    error: function(request) {
+                        let errorMsg = request.status === 500 || request.responseJSON.message.length === 0 ? 'Произошла неизвестная ошибка' : request.responseJSON.message;
+
+                        Swal.fire({
+                            title: 'Ошибка',
+                            text: errorMsg,
+                            icon: 'warning',
+                            confirmButtonText: 'Обновить',
+                            cancelButtonText: 'Отмена',
+                            showCancelButton: true,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload(true);
+                            }
+                        });
                     }
                 });
             });
@@ -164,6 +196,22 @@
                     url: '{{ route('users/permissions/get.ajax') }}',
                     success: function (data) {
                         $('#permissions').html(data);
+                    },
+                    error: function(request) {
+                        let errorMsg = request.status === 500 || request.responseJSON.message.length === 0 ? 'Произошла неизвестная ошибка' : request.responseJSON.message;
+
+                        Swal.fire({
+                            title: 'Ошибка',
+                            text: errorMsg,
+                            icon: 'warning',
+                            confirmButtonText: 'Обновить',
+                            cancelButtonText: 'Отмена',
+                            showCancelButton: true,
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.reload(true);
+                            }
+                        });
                     }
                 });
             }

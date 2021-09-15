@@ -93,6 +93,22 @@
                 },
                 success: function (data) {
                     $('#formAjax').html(data);
+                },
+                error: function(request) {
+                    let errorMsg = request.status === 500 || request.responseJSON.message.length === 0 ? 'Произошла неизвестная ошибка' : request.responseJSON.message;
+
+                    Swal.fire({
+                        title: 'Ошибка',
+                        text: errorMsg,
+                        icon: 'warning',
+                        confirmButtonText: 'Обновить',
+                        cancelButtonText: 'Отмена',
+                        showCancelButton: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload(true);
+                        }
+                    });
                 }
             });
         });
@@ -116,6 +132,22 @@
                     $('#timezone-link').addClass('text-success').prop('disabled', true).removeAttr("data-bs-toggle").text(checkedTitle);
                     $('#change_timezone-btn').remove();
                     $("#change_timezone .modal-footer button[data-bs-dismiss='modal']").text('Закрыть');
+                },
+                error: function(request) {
+                    let errorMsg = request.status === 500 || request.responseJSON.message.length === 0 ? 'Произошла неизвестная ошибка' : request.responseJSON.message;
+
+                    Swal.fire({
+                        title: 'Ошибка',
+                        text: errorMsg,
+                        icon: 'warning',
+                        confirmButtonText: 'Обновить',
+                        cancelButtonText: 'Отмена',
+                        showCancelButton: true,
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.reload(true);
+                        }
+                    });
                 }
             });
         });
