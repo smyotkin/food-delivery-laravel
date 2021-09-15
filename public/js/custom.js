@@ -58,6 +58,8 @@ let timeout = 0;
  */
 function showListAjax(params, delay = 0)
 {
+    let ajaxError = false;
+
     $.ajax({
         type: 'GET',
         data: {
@@ -68,9 +70,6 @@ function showListAjax(params, delay = 0)
         beforeSend: function () {
             $('#preloader').removeClass('d-none');
         },
-        complete: function() {
-            $('#preloader').addClass('d-none');
-        },
         success: function (data) {
             $('.table_pagination', params.element).remove();
 
@@ -79,16 +78,38 @@ function showListAjax(params, delay = 0)
             } else {
                 params.element.append(data);
             }
+        },
+        error: function(request) {
+            let errorMsg = request.status === 500 || request.responseJSON.message.length === 0 ? 'Произошла неизвестная ошибка' : request.responseJSON.message;
+
+            ajaxError = true;
+
+            Swal.fire({
+                title: 'Ошибка',
+                text: errorMsg,
+                icon: 'warning',
+                confirmButtonText: 'Обновить',
+                cancelButtonText: 'Отмена',
+                showCancelButton: true,
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    window.location.reload(true);
+                }
+            });
+        },
+        complete: function() {
+            $('#preloader').addClass('d-none');
+
+            if (delay && ajaxError === false) {
+                timeout = setTimeout(function() {
+                    showListAjax(params, delay);
+                }, delay);
+            } else {
+                clearTimeout(timeout);
+            }
         }
     });
 
-    if (delay) {
-        timeout = setTimeout(function() {
-            showListAjax(params, delay);
-        }, delay);
-    } else {
-        clearTimeout(timeout);
-    }
 }
 
 function updateTableList(pageId, route, delay = 0)
