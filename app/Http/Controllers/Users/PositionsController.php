@@ -7,6 +7,8 @@ use App\Http\Requests\Users\CreateOrUpdatePositionRequest;
 use App\Http\Controllers\Controller;
 use App\Services\PositionsService;
 use App\Models\Permission;
+use Exception;
+use Throwable;
 
 class PositionsController extends Controller
 {
@@ -47,26 +49,20 @@ class PositionsController extends Controller
      * Создание новой должности
      *
      * @param CreateOrUpdatePositionRequest $request
-     * @return string
-     * @throws \Exception
-     * @throws \Throwable
+     * @throws Exception|Throwable
      */
-    public function store(CreateOrUpdatePositionRequest $request): string
+    public function store(CreateOrUpdatePositionRequest $request): void
     {
         PositionsService::createOrUpdate($request->validated());
-
-        return json_encode([
-            'success' => true,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
      * Просмотр одной должности (по id)
      *
-     * @param $id
+     * @param int $id
      * @return string
      */
-    public function show($id): string
+    public function show(int $id): string
     {
         $role = PositionsService::getWithPermissionsOrFail(['id' => $id]);
 
@@ -82,32 +78,22 @@ class PositionsController extends Controller
      * Редактирование\обновление должности
      *
      * @param CreateOrUpdatePositionRequest $request
-     * @return string
-     * @throws \Throwable
-     * @throws \Exception
+     * @throws Exception|Throwable
      */
-    public function update(CreateOrUpdatePositionRequest $request): string
+    public function update(CreateOrUpdatePositionRequest $request): void
     {
         PositionsService::createOrUpdate($request->validated());
-
-        return json_encode([
-            'success' => true,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
      * Удаление должности
      *
      * @param int $id
-     * @return false|string
+     * @throws Exception|Throwable
      */
-    public function destroy($id)
+    public function destroy($id): void
     {
         PositionsService::destroy($id);
-
-        return json_encode([
-            'success' => true,
-        ], JSON_PRETTY_PRINT|JSON_UNESCAPED_SLASHES|JSON_FORCE_OBJECT|JSON_UNESCAPED_UNICODE);
     }
 
     /**
