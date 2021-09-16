@@ -3,6 +3,7 @@
 namespace App\Services;
 
 use App\Http\Requests\Auth\PasswordResetRequest;
+use App\Models\SentPin;
 use App\Models\User;
 use App\Notifications\SmsCenter;
 use Carbon\Carbon;
@@ -58,16 +59,12 @@ class PasswordResetsService
         }
 
         if ($todayEntries->count() < config('custom.password_resets.attempts_per_day', static::$attemptsPerDay) && (empty($lastEntry) || $lastEntry->is_active == 0)) {
-            $insert = DB::table('sent_pin')->insert([
+            SentPin::create([
                 'phone' => $phone,
                 'pin_code' => $pin,
                 'created_at' => Carbon::now(),
                 'is_active' => 1,
             ]);
-
-            if ($insert === false) {
-                abort(500, 'Неизвестная ошибка');
-            }
         } else {
             abort(403, 'Невозможно создать новый пин-код');
         }
