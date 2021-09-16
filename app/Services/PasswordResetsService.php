@@ -30,8 +30,7 @@ class PasswordResetsService
      */
     public static function checkActiveEntries(): void
     {
-        DB::table('sent_pin')
-            ->where('is_active', 1)
+        SentPin::where('is_active', 1)
             ->whereRaw('DATE_ADD(`created_at`, INTERVAL ' . config('custom.password_resets.pin_lifetime_minutes', static::$pinLifetimeMinutes) . ' MINUTE) < \'' . Carbon::now() . '\'')
             ->update(['is_active' => 0]);
     }
@@ -87,12 +86,11 @@ class PasswordResetsService
      * Получить все записи за сутки по номеру телефона
      *
      * @param string $phone
-     * @return \Illuminate\Support\Collection
+     * @return Collection
      */
-    public static function getTodayEntries(string $phone): \Illuminate\Support\Collection
+    public static function getTodayEntries(string $phone): Collection
     {
-        return DB::table('sent_pin')
-            ->where('phone', $phone)
+        return SentPin::where('phone', $phone)
             ->whereDate('created_at', Carbon::today())
             ->orderBy('created_at', 'desc')
             ->get();
@@ -102,12 +100,11 @@ class PasswordResetsService
      * Возвращает последнюю активную запись по номеру телефона
      *
      * @param string $phone
-     * @return mixed
+     * @return SentPin|null
      */
-    public static function getLastActiveEntry(string $phone)
+    public static function getLastActiveEntry(string $phone): ?SentPin
     {
-        return DB::table('sent_pin')
-            ->where('phone', $phone)
+        return SentPin::where('phone', $phone)
             ->where('is_active', 1)
             ->orderBy('created_at', 'desc')
             ->first();
@@ -116,11 +113,11 @@ class PasswordResetsService
     /**
      * Проверяет количество неправильных попыток ввода для активного пин-кода
      *
-     * @param object          $lastActiveEntry
-     * @param PasswordResetRequest $request
+     * @param SentPin|null          $lastActiveEntry
+     * @param PasswordResetRequest  $request
      * @return mixed
      */
-    public static function checkPinAttempt(object $lastActiveEntry, PasswordResetRequest $request)
+    public static function checkPinAttempt(?SentPin $lastActiveEntry, PasswordResetRequest $request)
     {
         $pinValidate = Validator::make($request->all(), [
             'pin' => 'required|digits:4|in:' . $lastActiveEntry->pin_code,
