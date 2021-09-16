@@ -5,7 +5,7 @@
                 <div class="fw-bold {{ !has_permission('settings_modify') ? 'text-muted' : '' }}">{{ $setting['name'] }}</div>
             </div>
 
-            <form class="position-relative" method="post" action="{{ route('settings.update', ['setting' => $setting['key']]) }}">
+            <form class="position-relative setting_option-form" method="post" action="{{ route('settings.update', ['setting' => $setting['key']]) }}">
                 @csrf
                 @php ($formattedValue = isset($setting['data']) ? $setting['data'][$setting['value']] : $setting['value'])
 

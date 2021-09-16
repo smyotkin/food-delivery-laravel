@@ -45,6 +45,10 @@
     <script>
         $(document).ready(function() {
             updateTableList('settings', '{{ route('settings/get.ajax') }}');
+
+            $('body').on('submit', '.setting_option-form', function (e) {
+                e.preventDefault();
+            });
         });
 
         $('body').on('click', '.settings_option', function () {
@@ -66,7 +70,7 @@
 
             $.ajax({
                 url: closestForm.prop('action'),
-                type: 'PUT',
+                type: 'PATCH',
                 data: closestForm.serialize(),
                 beforeSend: function () {
                     $('#preloader').removeClass('d-none');
