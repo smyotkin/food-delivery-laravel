@@ -25,6 +25,12 @@
                         <a class="nav-link {{ Request::is('system/notifications') ? 'active disabled' : '' }}" href="{{ route('notifications.index') }}">Уведомления</a>
                     </li>
                 @endpermission
+
+                @permission('cities_view')
+                    <li class="nav-item">
+                        <a class="nav-link {{ Request::is('cities') ? 'active disabled' : '' }}" href="{{ route('cities.index') }}">Города</a>
+                    </li>
+                @endpermission
             </ul>
         </div>
     </div>
