@@ -97,6 +97,16 @@ img {
     max-width: 100%;
 }
 
+.big-checkbox {
+    width: 1.5em;
+    height: 1.5em;
+    margin: 0.25em 0;
+}
+
+.table-sm-padding>:not(caption)>*>* {
+    padding: 0.15rem 0.15rem;
+}
+
 @media (max-width: 768px) {
     .dashboard_link {
         font-size: 16px !important;
