@@ -11,12 +11,12 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap">
 
         <!-- Styles -->
-        <link rel="stylesheet" href="{{ asset('css/app.css') }}">
-        <link rel="stylesheet" href="{{ asset('css/bootstrap.min.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('css/app.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('css/bootstrap.min.css') }}">
 
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
-
-        <link rel="stylesheet" href="{{ asset('css/custom.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('css/select2.min.css') }}"/>
+        <link rel="stylesheet" type="text/css" href="{{ asset('css/custom.css') }}">
 
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
@@ -26,6 +26,10 @@
         <script src="{{ asset('js/jquery.min.js') }}"></script>
         <script src="{{ asset('js/jquery.maskedinput.min.js') }}"></script>
         <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
+{{--        <script src="{{ asset('js/require.min.js') }}"></script>--}}
+{{--        <script src="{{ asset('js/wtime.js') }}"></script>--}}
+
+        <script src="{{ asset('js/select2.min.js') }}"></script>
 
         <!-- FontAwesome -->
         <script defer src="https://use.fontawesome.com/releases/v5.0.6/js/all.js"></script>
