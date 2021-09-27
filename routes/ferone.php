@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Cities\CitiesController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\SettingsController;
 use App\Http\Controllers\System\NotificationsController;
@@ -17,6 +18,23 @@ Route::middleware(['user.is_active'])->group(function () {
     require __DIR__.'/users.php';
 
     Route::middleware(['auth'])->group(function () {
+
+        /**
+         * AJAX - Cities
+         */
+        Route::get('cities', [CitiesController::class, 'index'])
+            ->middleware(['permissions:cities_view'])
+            ->name('cities');
+
+        Route::get('cities/get.ajax', [CitiesController::class, 'getAjax'])
+            ->middleware(['permissions:cities_view'])
+            ->name('cities/get.ajax');
+
+        Route::get('cities/form/get.ajax', [CitiesController::class, 'getFormAjax'])
+            ->name('cities/form/get.ajax');
+
+        Route::get('cities/search/get.ajax', [CitiesController::class, 'searchCitiesAjax'])
+            ->name('cities/search/get.ajax');
 
         /**
          * AJAX - Settings
@@ -54,6 +72,29 @@ Route::middleware(['user.is_active'])->group(function () {
          * Middleware - Last Page
          */
         Route::middleware(['last.page'])->group(function () {
+            /**
+             * Http - Cities
+             */
+            Route::middleware(['permissions:cities_modify'])->group(function () {
+                Route::get('cities/create', [CitiesController::class, 'create'])
+                    ->name('cities.create');
+
+                Route::post('cities', [CitiesController::class, 'store'])
+                    ->name('cities.store');
+
+                Route::match(['put', 'patch'], 'cities/{city}', [CitiesController::class, 'update'])
+                    ->name('cities.update');
+
+                Route::delete('cities/{city}', [CitiesController::class, 'destroy'])
+                    ->name('cities.destroy');
+            });
+            Route::middleware(['permissions:cities_view'])->group(function () {
+                Route::get('cities', [CitiesController::class, 'index'])
+                    ->name('cities.index');
+
+                Route::get('cities/{city}', [CitiesController::class, 'show'])
+                    ->name('cities.show');
+            });
 
             /**
              * Http - Dashboard
