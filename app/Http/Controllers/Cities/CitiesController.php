@@ -69,7 +69,7 @@ class CitiesController extends Controller
 
             $returnedData = $returnedData + [
                 'city' => CitiesService::getOrFail($request->id),
-                'kladr_cities_json' => $kladr_cities->value ?? [],
+                'kladr_cities_json' => $kladr_cities->value ?? '',
                 'kladr_cities' => $kladr_cities->json_decoded_value ?? [],
             ];
         }
