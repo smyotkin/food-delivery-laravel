@@ -11,6 +11,9 @@
             <td>{{ $city->phone_formatted }}</td>
             <td>{{ $city->timezone_formatted }}</td>
             <td>{{ $city->folder }}</td>
+            <td>
+                <span class="badge {{ $city->is_now_open ? 'bg-success' : 'bg-secondary' }} p-2 lh-08">{{ $city->working_time_today[0] }} — {{ $city->working_time_today[1] }}</span>
+            </td>
         </tr>
     @endforeach
 
