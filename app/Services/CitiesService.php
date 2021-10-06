@@ -123,12 +123,16 @@ class CitiesService
             'minimum_order',
         ]);
 
-        $changeSettings = CitiesSettings::updateOrCreate(
-            ['city_id' => $id],
-            $settings->all()
-        );
+        $changeSettings = [];
 
-//        dd(Cities::find(1));
+        //todo Обернуть в транзакцию?
+
+        foreach ($settings as $name => $value) {
+            $changeSettings[] = CitiesSettings::updateOrCreate([
+                'city_id' => $id,
+                'name' => $name,
+            ], ['value' => $value]);
+        }
 
 //        SystemService::createEvent(
 //            $role->wasChanged() ? 'position_updated' : 'position_created',
