@@ -54,4 +54,9 @@ class Cities extends Model
     {
         return json_decode($this->work_hours, true);
     }
+
+    public function settings()
+    {
+        return $this->belongsToMany(CitiesSettings::class, 'cities_settings');
+    }
 }
