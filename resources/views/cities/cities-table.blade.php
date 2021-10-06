@@ -8,7 +8,7 @@
                     {{ $city->name }}
                 @endpermission
             </td>
-            <td>{{ $city->phone_formatted }}</td>
+            <td>{{ $city->phone }}</td>
             <td>{{ $city->timezone_formatted }}</td>
             <td>{{ $city->folder }}</td>
             <td>

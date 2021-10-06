@@ -26,11 +26,9 @@
                     </div>
 
                     <div class="col-12">
-                        <label for="phone" class="form-label fw-bold">Телефонный код</label>
-                        <div class="input-group">
-                            <span class="input-group-text rounded-0" id="country_code">+7</span>
-                            <input type="text" class="form-control rounded-0" id="phone" name="phone" placeholder="Телефонный код" aria-label="Телефонный код" aria-describedby="country_code" value="{{ $city->phone ?? '' }}">
-                        </div>
+                        <label for="phone" class="form-label fw-bold">Телефон колл-центра</label>
+                        <input type="text" class="form-control rounded-0" id="phone" name="phone" placeholder="Телефон колл-центра" aria-label="Телефон колл-центра" aria-describedby="country_code" value="{{ $city->phone ?? '' }}">
+
                         <div class="invalid-feedback text-sm">
                             Поле обязательное, не менее 2 симв.
                         </div>
