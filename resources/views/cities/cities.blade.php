@@ -35,6 +35,7 @@
                                 <td class="border-0">Телефонный код</td>
                                 <td class="border-0">Часовой пояс</td>
                                 <td class="border-0">Каталог</td>
+                                <td class="border-0">Прием заказов</td>
                             </tr>
                         </thead>
                         <tbody id="cities_ajax"></tbody>
