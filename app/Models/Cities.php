@@ -44,16 +44,10 @@ class Cities extends Model
     ];
 
     protected $appends = [
-        'phone_formatted',
         'timezone_formatted',
         'is_now_open',
         'working_time_today',
     ];
-
-    public function getPhoneFormattedAttribute()
-    {
-        return "+7 {$this->phone}";
-    }
 
     public function getTimezoneFormattedAttribute()
     {
