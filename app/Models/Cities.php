@@ -47,6 +47,7 @@ class Cities extends Model
         'timezone_formatted',
         'is_now_open',
         'working_time_today',
+        'multicode',
     ];
 
     public function getTimezoneFormattedAttribute()
@@ -57,6 +58,11 @@ class Cities extends Model
     public function getWorkHoursArrayAttribute()
     {
         return json_decode($this->work_hours, true);
+    }
+
+    public function getMulticodeAttribute()
+    {
+        return $this->settings->where('name', '=', 'multicode')->first()->value ?? null;
     }
 
     public function getWorkingTimeTodayAttribute()
@@ -71,6 +77,6 @@ class Cities extends Model
 
     public function settings()
     {
-        return $this->belongsToMany(CitiesSettings::class, 'cities_settings');
+        return $this->hasMany(CitiesSettings::class, 'city_id');
     }
 }
