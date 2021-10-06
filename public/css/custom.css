@@ -18,6 +18,10 @@ img {
     max-height: 25% !important;
 }
 
+.lh-08 {
+    line-height: .8em !important;
+}
+
 .table-striped>tbody>tr:nth-of-type(odd) {
     --bs-table-accent-bg: #fff;
 }
