@@ -4,6 +4,12 @@
     "description": "The Laravel Framework.",
     "keywords": ["framework", "laravel"],
     "license": "MIT",
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "git@bitbucket.org:ivanov-team/helpers.git"
+        }
+    ],
     "require": {
         "php": "^7.3|^8.0",
         "ext-json": "*",
@@ -20,7 +26,8 @@
         "laravel/sanctum": "^2.11",
         "laravel/tinker": "^2.5",
         "maatwebsite/excel": "^3.1",
-        "rap2hpoutre/laravel-log-viewer": "^1.7"
+        "rap2hpoutre/laravel-log-viewer": "^1.7",
+        "ivanov/helpers": "^1.4"
     },
     "require-dev": {
         "barryvdh/laravel-ide-helper": "^2.10",
