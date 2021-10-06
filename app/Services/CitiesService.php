@@ -61,6 +61,19 @@ class CitiesService
     }
 
     /**
+     * Возвращает одного пользователя или ошибку
+     *
+     * @param int $id
+     * @return Cities
+     */
+    public static function getOrFail(int $id): Cities
+    {
+        self::checkPermission('view');
+
+        return Cities::findOrFail($id);
+    }
+
+    /**
      * Проверяет права на действие(action) у авторизированного пользователя
      *
      * @param $action
@@ -73,19 +86,6 @@ class CitiesService
         if (!User::isRoot() && !Auth::user()->hasPermission($permission)) {
             abort(403, "Нет права: $permission");
         }
-    }
-
-    /**
-     * Возвращает одного пользователя или ошибку
-     *
-     * @param int $id
-     * @return Cities
-     */
-    public static function getOrFail(int $id): Cities
-    {
-        self::checkPermission('view');
-
-        return Cities::findOrFail($id);
     }
 
     /**
@@ -127,6 +127,8 @@ class CitiesService
             ['city_id' => $id],
             $settings->all()
         );
+
+//        dd(Cities::find(1));
 
 //        SystemService::createEvent(
 //            $role->wasChanged() ? 'position_updated' : 'position_created',
