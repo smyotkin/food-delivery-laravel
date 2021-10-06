@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Services\UsersService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Ivanov\Helpers\TimeHelper;
 
 /**
  * @method static \Database\Factories\UserFactory factory(...$parameters)
@@ -45,6 +46,8 @@ class Cities extends Model
     protected $appends = [
         'phone_formatted',
         'timezone_formatted',
+        'is_now_open',
+        'working_time_today',
     ];
 
     public function getPhoneFormattedAttribute()
@@ -60,6 +63,16 @@ class Cities extends Model
     public function getWorkHoursArrayAttribute()
     {
         return json_decode($this->work_hours, true);
+    }
+
+    public function getWorkingTimeTodayAttribute()
+    {
+        return TimeHelper::getWorkingTimeToday($this->work_hours_array, $this->timezone, $this->work_hours_shift);
+    }
+
+    public function getIsNowOpenAttribute()
+    {
+        return TimeHelper::IsNowOpen($this->work_hours_array, $this->timezone, $this->work_hours_shift);
     }
 
     public function settings()
