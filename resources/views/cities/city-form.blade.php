@@ -44,6 +44,13 @@
 
                     <div class="col-12">
                         <div class="form-check mt-1">
+                            <input class="form-check-input" type="checkbox" id="multicode" name="multicode" {{ !empty($city->multicode) || !isset($city) ? 'checked' : '' }}>
+                            <label class="form-check-label" for="multicode">Несколько кодов в одном городе</label>
+                        </div>
+                    </div>
+
+                    <div class="col-12">
+                        <div class="form-check mt-1">
                             <input class="form-check-input" type="checkbox" id="is_active" name="is_active" {{ !empty($city->is_active) || !isset($city) ? 'checked' : '' }}>
                             <label class="form-check-label" for="is_active">Город активен</label>
                         </div>
@@ -64,8 +71,8 @@
                     </div>
 
                     <div class="col-12">
-                        <label for="working_hours_shift" class="form-label fw-bold">Смещение времени закрытия</label>
-                        <select class="form-select rounded-0" id="working_hours_shift" name="working_hours_shift" required>
+                        <label for="work_hours_shift" class="form-label fw-bold">Смещение времени закрытия</label>
+                        <select class="form-select rounded-0" id="work_hours_shift" name="work_hours_shift" required>
                             <option disabled selected>Ничего не выбрано</option>
                             @foreach ($time_shift as $number)
                                 <option value="{{ $number }}" {{ isset($city->work_hours_shift) && $city->work_hours_shift == $number ? 'selected' : '' }}>{{ $number }}</option>
@@ -76,7 +83,7 @@
                     <div class="col-12">
                         <label for="working_hours" class="form-label fw-bold">Часы работы</label>
 
-{{--                        <input name="working_hours" type="hidden" value="" data-convert="json">--}}
+{{--                        <input name="working_hours" type="hidden" value="{{ $kladr_cities_json }}">--}}
 
                         <div class="table-responsive">
                             <table class="table table-sm table-sm-padding text-center align-middle" style="font-size: 10px">
