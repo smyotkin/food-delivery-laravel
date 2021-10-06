@@ -9,7 +9,7 @@
                 @endpermission
             </td>
             <td>{{ $city->phone_formatted }}</td>
-            <td>{{ $city->timezone }}</td>
+            <td>{{ $city->timezone_formatted }}</td>
             <td>{{ $city->folder }}</td>
         </tr>
     @endforeach

@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Services\UsersService;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -43,11 +44,17 @@ class Cities extends Model
 
     protected $appends = [
         'phone_formatted',
+        'timezone_formatted',
     ];
 
     public function getPhoneFormattedAttribute()
     {
         return "+7 {$this->phone}";
+    }
+
+    public function getTimezoneFormattedAttribute()
+    {
+        return UsersService::timezones[$this->timezone] ?? 'Не найден';
     }
 
     public function getWorkHoursArrayAttribute()
