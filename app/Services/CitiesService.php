@@ -100,17 +100,17 @@ class CitiesService
             'id',
             'name',
             'phone',
+            'folder',
             'timezone',
-            'working_hours_shift',
-            'working_hours',
+            'work_hours_shift',
+            'work_hours',
             'is_active',
         ]);
-        $existingModel = Cities::find($id = $params->get('id', 0));
 
         self::checkPermission('modify');
 
-        $result = Cities::updateOrCreate(
-            ['id' => $id],
+        $city = Cities::updateOrCreate(
+            ['id' => $params->get('id', 0)],
             $params->all()
         );
 
@@ -123,22 +123,12 @@ class CitiesService
             'minimum_order',
         ]);
 
-        $changeSettings = [];
-
-        //todo Обернуть в транзакцию?
-
         foreach ($settings as $name => $value) {
-            $changeSettings[] = CitiesSettings::updateOrCreate([
-                'city_id' => $id,
+            CitiesSettings::updateOrCreate([
+                'city_id' => $city->id,
                 'name' => $name,
             ], ['value' => $value]);
         }
-
-//        SystemService::createEvent(
-//            $role->wasChanged() ? 'position_updated' : 'position_created',
-//            $role->wasChanged() ? $existingModel->toArray() : $role->toArray(),
-//            $role->toArray()
-//        );
     }
 
     public static function getKladrByCityId(int $city_id)
