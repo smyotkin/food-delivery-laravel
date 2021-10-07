@@ -73,9 +73,8 @@
                     <div class="col-12">
                         <label for="work_hours_shift" class="form-label fw-bold">Смещение времени закрытия</label>
                         <select class="form-select rounded-0" id="work_hours_shift" name="work_hours_shift" required>
-                            <option disabled selected>Ничего не выбрано</option>
                             @foreach ($time_shift as $number)
-                                <option value="{{ $number }}" {{ isset($city->work_hours_shift) && $city->work_hours_shift == $number ? 'selected' : '' }}>{{ $number }}</option>
+                                <option value="{{ $number }}" {{ (isset($city->work_hours_shift) && $city->work_hours_shift == $number) || $number == 0 ? 'selected' : '' }}>{{ $number }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -117,7 +116,7 @@
                                             </th>
                                             @for ($hour = 0; $hour <= 23; $hour++)
                                                 <td>
-                                                    <input class="form-check-input big-checkbox group-{{ $key }} group-{{ $hour }}" type="checkbox" name="working_hours[{{ $key }}][]" value="{{ $hour }}" {{ !empty($city) && in_array($hour, $city['work_hours_array'][$key]) ? 'checked' : '' }} data-row="{{ $loop->index }}" data-column="{{ $hour }}">
+                                                    <input class="form-check-input big-checkbox group-{{ $key }} group-{{ $hour }}" type="checkbox" name="work_hours[{{ $key }}][]" value="{{ $hour }}" {{ !empty($city) && in_array($hour, $city['work_hours_array'][$key]) ? 'checked' : '' }} data-row="{{ $loop->index }}" data-column="{{ $hour }}">
                                                 </td>
                                             @endfor
                                         </tr>
