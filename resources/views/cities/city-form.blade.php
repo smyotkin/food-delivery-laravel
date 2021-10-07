@@ -214,6 +214,9 @@
                 return "Поиск…"
             }
         },
+        templateSelection: function (state) {
+            return state['hint_text'] || state.text;
+        },
         ajax: {
             type: 'GET',
             url: '{{ '/cities/search/get.ajax' }}',
@@ -235,15 +238,16 @@
                 for (let item in data) {
                     items.push({
                         id: data[item]['data']['kladr_id'],
-                        title: data[item]['value'],
-                        text: data[item]['value']
+                        text: data[item]['value'],
+                        title: data[item]['data']['city'] || data[item]['data']['settlement_with_type'],
+                        hint_text: data[item]['data']['city'] || data[item]['data']['settlement_with_type'],
                     });
                 }
 
                 return {
                     results: items
                 };
-            },
+            }
         }
     }).on('change', function () {
         let items = {};
