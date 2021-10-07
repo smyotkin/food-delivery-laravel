@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Cities;
 
+use App\Rules\UniqueEmptyString;
 use App\Services\UsersService;
 use Illuminate\Foundation\Http\FormRequest;
 
@@ -18,7 +19,7 @@ class CreateOrUpdateCityRequest extends FormRequest
             'multicode' => !empty($this->multicode) ? 1 : 0,
             'is_active' => !empty($this->is_active) ? 1 : 0,
             'work_hours' => !empty($this->work_hours) && is_array($this->work_hours) ? json_encode($this->work_hours) : null,
-            'folder' => '/' . strtolower($this->folder),
+            'folder' => is_null($this->folder) ? '' : $this->folder,
         ]);
     }
 
@@ -43,7 +44,11 @@ class CreateOrUpdateCityRequest extends FormRequest
             'id' => 'required|integer|exists:cities,id',
             'name' => 'required|string|min:2|max:255',
             'phone' => 'required|string|max:50',
-            'folder' => 'string|max:255|unique:cities,folder,' . $this->id,
+            'folder' => [
+                'regex:/^[a-z]{0,50}$/su',
+                "unique:cities,folder,{$this->id}",
+                new UniqueEmptyString('cities', 'folder')
+            ],
             'phone_code' => 'string',
             'multicode' => 'boolean',
             'is_active' => 'boolean',
