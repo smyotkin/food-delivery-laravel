@@ -119,4 +119,15 @@ class CitiesController extends Controller
     {
         CitiesService::createOrUpdate($request->validated());
     }
+
+    /**
+     * Создание города
+     *
+     * @param CreateOrUpdateCityRequest $request
+     * @throws Exception|Throwable
+     */
+    public function store(CreateOrUpdateCityRequest $request): void
+    {
+        CitiesService::createOrUpdate($request->validated());
+    }
 }
