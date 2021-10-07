@@ -43,8 +43,16 @@
                     </div>
 
                     <div class="col-12">
+                        <label for="phone_code" class="form-label fw-bold">
+                            <span id="multicode-active" style="{{ !empty($city->multicode) ? '' : 'display: none' }}">Количество цифр в телефонном коде</span>
+                            <span id="multicode-disable" style="{{ !empty($city->multicode) ? 'display: none' : '' }}">Телефонный код</span>
+                        </label>
+                        <input type="number" min="1" max="99999" step="1" class="form-control rounded-0" id="phone_code" name="phone_code" placeholder="{{ !empty($city->multicode) ? 'Кол-во цифр' : 'Код' }}" aria-label="Телефонный код" value="{{ $city->phone_code ?? '' }}">
+                    </div>
+
+                    <div class="col-12">
                         <div class="form-check mt-1">
-                            <input class="form-check-input" type="checkbox" id="multicode" name="multicode" {{ !empty($city->multicode) || !isset($city) ? 'checked' : '' }}>
+                            <input class="form-check-input" type="checkbox" id="multicode" name="multicode" {{ !empty($city->multicode) ? 'checked' : '' }}>
                             <label class="form-check-label" for="multicode">Несколько кодов в одном городе</label>
                         </div>
                     </div>
@@ -74,7 +82,7 @@
                         <label for="work_hours_shift" class="form-label fw-bold">Смещение времени закрытия</label>
                         <select class="form-select rounded-0" id="work_hours_shift" name="work_hours_shift" required>
                             @foreach ($time_shift as $number)
-                                <option value="{{ $number }}" {{ (isset($city->work_hours_shift) && $city->work_hours_shift == $number) || $number == 0 ? 'selected' : '' }}>{{ $number }}</option>
+                                <option value="{{ $number }}" {{ (isset($city->work_hours_shift) && $city->work_hours_shift == $number) || (!isset($city->work_hours_shift) && $number == 0) ? 'selected' : '' }}>{{ $number }}</option>
                             @endforeach
                         </select>
                     </div>
@@ -82,7 +90,7 @@
                     <div class="col-12">
                         <label for="working_hours" class="form-label fw-bold">Часы работы</label>
 
-{{--                        <input name="working_hours" type="hidden" value="{{ $kladr_cities_json }}">--}}
+{{--                        <input name="working_hours" type="hidden" value="">--}}
 
                         <div class="table-responsive">
                             <table class="table table-sm table-sm-padding text-center align-middle" style="font-size: 10px">
@@ -175,6 +183,17 @@
     //         console.log($(this).data('row') + ':' + $(this).data('column'));
     //     }
     // });
+    $('#multicode').on('change', function() {
+        if ($(this).is(':checked')) {
+            $('#multicode-active').show();
+            $('#multicode-disable').hide();
+            $('#phone_code').attr('placeholder', 'Кол-во цифр').val('').focus().blur();
+        } else {
+            $('#multicode-active').hide();
+            $('#multicode-disable').show();
+            $('#phone_code').attr('placeholder', 'Код').val('').focus().blur();
+        }
+    })
 
     $('#kladr_cities_select').select2({
         minimumInputLength: 1,
