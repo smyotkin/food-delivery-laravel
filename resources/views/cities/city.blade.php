@@ -14,17 +14,19 @@
             <div class="col-12 col-md d-flex align-items-center">
                 <div class="info">
                     <h4 class="text-muted fw-light">{{ $city->name ?? 'Название города' }}</h4>
-                    <h6 class="text-muted fw-normal mb-0">{{ $city->phone_formatted ?? 'Телефонный код' }}</h6>
+                    <h6 class="text-muted fw-normal mb-0">{{ $city->phone ?? 'Телефон колл-центра' }}</h6>
                 </div>
             </div>
 
             <div class="col-12 col-md text-end lh-base">
+                @permission("cities_modify")
+                    <p class="mb-2">
+                        <a href="javascript:" class="save_btn d-block d-md-inline-block btn btn-outline-secondary py-1 py-md-0 mt-3 mt-md-0 disabled">Сохранить</a>
+                    </p>
+                @endpermission
+
                 @isset($city)
                     @permission("cities_modify")
-                        <p class="mb-2">
-                            <a href="javascript:" class="save_btn d-block d-md-inline-block btn btn-outline-secondary py-1 py-md-0 mt-3 mt-md-0 disabled">Сохранить</a>
-                        </p>
-
                         <form action="{{ route('cities.destroy', ['city' => $city->id]) }}" id="delete_city" method="post">
                             @method('delete')
                             @csrf
@@ -99,16 +101,16 @@
                         $('#preloader').addClass('d-none');
                     },
                     success: function () {
-                        window.location.replace('/cities');
+                        // window.location.replace('/cities');
                     },
                     error: function (response) {
-                        if (typeof(response.responseJSON.errors) != 'undefined') {
-                            $('#phone').addClass('is-invalid');
-                            $('#phone + .invalid-feedback').remove();
-                            $('#phone').parent().append(
-                                '<div class="invalid-feedback text-sm">' + response.responseJSON.errors.phone[0] + '</div>'
-                            );
-                        }
+                        // if (typeof(response.responseJSON.errors) != 'undefined') {
+                        //     $('#phone').addClass('is-invalid');
+                        //     $('#phone + .invalid-feedback').remove();
+                        //     $('#phone').parent().append(
+                        //         '<div class="invalid-feedback text-sm">' + response.responseJSON.errors.phone[0] + '</div>'
+                        //     );
+                        // }
                     }
                 });
             });
