@@ -51,11 +51,6 @@ class Cities extends Model
         'phone_code',
     ];
 
-    public function getFolderAttribute()
-    {
-        return $this->attributes['folder'] == '/' ? '' : $this->attributes['folder'];
-    }
-
     public function getTimezoneFormattedAttribute()
     {
         return UsersService::timezones[$this->timezone] ?? 'Не найден';
