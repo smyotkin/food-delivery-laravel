@@ -48,7 +48,13 @@ class Cities extends Model
         'is_now_open',
         'working_time_today',
         'multicode',
+        'phone_code',
     ];
+
+    public function getFolderAttribute()
+    {
+        return $this->attributes['folder'] == '/' ? '' : $this->attributes['folder'];
+    }
 
     public function getTimezoneFormattedAttribute()
     {
@@ -63,6 +69,11 @@ class Cities extends Model
     public function getMulticodeAttribute()
     {
         return $this->settings->where('name', '=', 'multicode')->first()->value ?? null;
+    }
+
+    public function getPhoneCodeAttribute()
+    {
+        return $this->settings->where('name', '=', 'phone_code')->first()->value ?? null;
     }
 
     public function getWorkingTimeTodayAttribute()
