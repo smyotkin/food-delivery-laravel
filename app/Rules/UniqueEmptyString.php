@@ -9,6 +9,7 @@ class UniqueEmptyString implements ImplicitRule
 {
     private $table;
     private $column;
+    private $id;
 
     /**
      * Create a new rule instance.
@@ -16,10 +17,11 @@ class UniqueEmptyString implements ImplicitRule
      * @param $table
      * @param $column
      */
-    public function __construct($table, $column)
+    public function __construct($table, $column, $id)
     {
         $this->table = $table;
         $this->column = $column;
+        $this->id = $id;
     }
 
     /**
@@ -31,7 +33,14 @@ class UniqueEmptyString implements ImplicitRule
      */
     public function passes($attribute, $value)
     {
-        return $value == '' ? (DB::table($this->table)->where($this->column, '=', '')->count() === 0) : true;
+        if ($value == '') {
+            return DB::table($this->table)
+                    ->where($this->column, '=', '')
+                    ->where('id', '<>', $this->id)
+                    ->count() === 0;
+        }
+
+        return true;
     }
 
     /**
