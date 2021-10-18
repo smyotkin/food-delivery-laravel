@@ -31,8 +31,8 @@ SMSCRU_SENDER="sender"
 
 TELEGRAM_BOT_TOKEN="token"
 
-DADATA_TOKEN="***REMOVED***"
-DADATA_SECRET="***REMOVED***"
+DADATA_TOKEN="token"
+DADATA_SECRET="secret"
 ```
 
 ##### 4. Настроить 3 домена на сервере с точкой входа в /public, например (домен => точка входа):
