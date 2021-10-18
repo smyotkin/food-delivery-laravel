@@ -1,18 +1,18 @@
-# Ferone Laravel
+# Food Delivery Laravel
 
 ## Установка и настройка проекта
 
-##### 1. Делаем клон проекта и переключаем ветку на `dev` (консоль)`:
+##### 1. Делаем клон проекта и переключаем ветку на `dev` (консоль):
 
 ```bash
-> git clone https://smyotkin@bitbucket.org/ivanov-team/ferone-mvc.git
-> cd ferone-mvc
+> git clone https://github.com/smyotkin/food-delivery-laravel.git
+> cd food-delivery-laravel
 > git checkout dev
 ```
 
 ##### 2. Загружаем все зависимости через `composer` (консоль):
 ```bash
-> composer update
+> composer install
 ```
 
 ##### 3. В корне проекта переименовываем `.env.example` в `.env` и меняем данные:
