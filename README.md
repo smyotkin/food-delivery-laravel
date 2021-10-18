@@ -15,43 +15,45 @@
 > composer update
 ```
 
-##### 3. В корне проекта переименовываем `.env.example` в `.env` и меняем данные для входа в БД:
+##### 3. В корне проекта переименовываем `.env.example` в `.env` и меняем данные:
 ```env
 DB_DATABASE=database
 DB_USERNAME=username
 DB_PASSWORD=password
+
+API_DOMAIN="api.domain.ru"
+SYSTEM_DOMAIN="back.domain.ru"
+SITE_DOMAIN="domain.ru"
+
+SMSCRU_LOGIN="login"
+SMSCRU_SECRET="secret"
+SMSCRU_SENDER="sender"
+
+TELEGRAM_BOT_TOKEN="token"
+
+DADATA_TOKEN="***REMOVED***"
+DADATA_SECRET="***REMOVED***"
 ```
 
 ##### 4. Настроить 3 домена на сервере с точкой входа в /public, например (домен => точка входа):
 ```bash
-1. api.ferone-mvc.ru => /ferone-mvc/public
-2. back.ferone-mvc.ru => /ferone-mvc/public
-3. suare-mvc.su => /ferone-mvc/public
+1. api.domain.ru => /domain/public
+2. back.domain.ru => /domain/public
+3. domain.ru => /domain/public
 ```
 
-##### 5. В файле `config/custom.php` заменить ссылки на домены
-```php
-return [
-    'subdomain' => [
-        'api' => 'api.ferone-mvc.ru',
-        'ferone' => 'back.ferone-mvc.ru',
-        'site' => 'suare-mvc.su',
-    ],
-];
-```
-
-##### 6. Сгенерировать новый ключ приложения (консоль):
+##### 5. Сгенерировать новый ключ приложения (консоль):
 ```bash
 > php artisan key:generate
 ```
 
-##### 7. Выполнить миграцию и запустить сидеров (консоль):
+##### 6. Выполнить миграцию и запустить сидеров (консоль):
 ```bash
 > php artisan migrate
 > php artisan db:seed
 ```
 
-##### 8. Зайти на домен back.ferone-mvc.ru и войти под юзером:
+##### 7. Зайти на домен back.domain.ru и войти под юзером:
 ```bash
 Телефон:
 +79112223344
