@@ -18,7 +18,6 @@ class CreateOrUpdateCityRequest extends FormRequest
         $this->merge([
             'multicode' => !empty($this->multicode) ? 1 : 0,
             'is_active' => !empty($this->is_active) ? 1 : 0,
-            'work_hours' => !empty($this->work_hours) && is_array($this->work_hours) ? json_encode($this->work_hours) : null,
             'folder' => is_null($this->folder) ? '' : $this->folder,
         ]);
     }
@@ -47,7 +46,7 @@ class CreateOrUpdateCityRequest extends FormRequest
             'folder' => [
                 'regex:/^[a-z]{0,50}$/su',
                 "unique:cities,folder,{$this->id}",
-                new UniqueEmptyString('cities', 'folder')
+                new UniqueEmptyString('cities', 'folder', $this->id)
             ],
             'phone_code' => 'string',
             'multicode' => 'boolean',
