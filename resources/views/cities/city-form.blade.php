@@ -88,50 +88,9 @@
                     </div>
 
                     <div class="col-12">
-                        <label for="working_hours" class="form-label fw-bold">Часы работы</label>
+                        <label for="work_hours" class="form-label fw-bold">Часы работы</label>
 
-{{--                        <input name="working_hours" type="hidden" value="">--}}
-
-                        <div class="table-responsive">
-                            <table class="table table-sm table-sm-padding text-center align-middle" style="font-size: 10px">
-                                <thead>
-                                    <tr>
-                                        <th></th>
-                                        @for ($hour = 0; $hour <= 23; $hour++)
-                                            <th>
-                                                <a href="javascript:" class="text-decoration-none text-dark" onclick="$('.group-{{ $hour }}').prop('checked', !$('.group-{{ $hour }}').prop('checked'))">
-                                                    {{ sprintf('%02d', $hour) }}
-                                                </a>
-                                            </th>
-                                        @endfor
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    @php($weekdays = [
-                                        'mon' => 'ПН',
-                                        'tue' => 'ВТ',
-                                        'wed' => 'СР',
-                                        'thu' => 'ЧТ',
-                                        'fri' => 'ПТ',
-                                        'sat' => 'СБ',
-                                        'sun' => 'ВС',
-                                    ])
-
-                                    @foreach($weekdays as $key => $day)
-                                        <tr>
-                                            <th>
-                                                <a href="javascript:" class="text-decoration-none text-dark" onclick="$('.group-{{ $key }}').prop('checked', !$('.group-{{ $key }}').prop('checked'))">{{ $day }}</a>
-                                            </th>
-                                            @for ($hour = 0; $hour <= 23; $hour++)
-                                                <td>
-                                                    <input class="form-check-input big-checkbox group-{{ $key }} group-{{ $hour }}" type="checkbox" name="work_hours[{{ $key }}][]" value="{{ $hour }}" {{ !empty($city) && in_array($hour, $city['work_hours_array'][$key]) ? 'checked' : '' }} data-row="{{ $loop->index }}" data-column="{{ $hour }}">
-                                                </td>
-                                            @endfor
-                                        </tr>
-                                    @endforeach
-                                </tbody>
-                            </table>
-                        </div>
+                        <input name="work_hours" type="hidden" value="{{ $city->work_hours ?? '' }}">
                     </div>
 
                     <div class="col-12">
@@ -171,18 +130,10 @@
 </div>
 
 <script>
-    // $('.big-checkbox').on('mousedown mouseover', function (e) {
-    //     // console.log(e.type);
-    //     let checkboxes = [];
-    //
-    //     if (e.buttons === 1 || e.buttons === 3) {
-    //     // if (e.type === 'mousedown') { //  && e.type === 'mouseover'
-    //         checkboxes.push($(this).data('row') + ':' + $(this).data('column'));
-    //         // $(this).prop('checked', !$(this).prop('checked'));
-    //         // console.log($(this).val());
-    //         console.log($(this).data('row') + ':' + $(this).data('column'));
-    //     }
-    // });
+    $(document).ready(function () {
+        wtime('work_hours');
+    });
+
     $('#multicode').on('change', function() {
         if ($(this).is(':checked')) {
             $('#multicode-active').show();
