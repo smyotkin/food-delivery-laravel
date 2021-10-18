@@ -1,0 +1,170 @@
+.navbar-brand-box {
+    text-align: left;
+    padding-left: 1.5rem !important;
+}
+
+.pointer {
+    cursor: pointer;
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -khtml-user-select: none; /* Konqueror HTML */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none;
+    /* Non-prefixed version, currently
+                                     supported by Chrome, Edge, Opera and Firefox */
+}
+
+.wtime_block .wtb_container {
+    display: block;
+    position: relative;
+    overflow: hidden;
+    font-size: 70%;
+    font-weight: normal;
+}
+
+.wtime_block.disabled .wtb_container {
+    filter: grayscale(100%);
+}
+
+.wtime_block .wtb_container .wtb_item {
+    display: inline-block;
+    box-sizing: border-box;
+    text-align: center;
+    vertical-align: middle;
+    width: 21px;
+    height: 21px;
+    border: 1px solid #fff;
+    overflow: hidden;
+    background: #eee;
+}
+
+.wtime_block .wtb_container .wtb_item.wtb_blank {
+    border: 0;
+}
+
+.wtime_block .wtb_container .wtb_item.wtb_dh {
+    line-height: 18px;
+}
+
+.wtime_block .wtb_container .wtb_item.wtb_dh:not(.wtb_selected):after {
+    content: '—';
+}
+
+.wtime_block .wtb_container .wtb_item.wtb_selected {
+    background: #2ac14e url("/img/checkmark.svg") no-repeat center;
+    background-size: 10px 10px;
+    line-height: inherit;
+}
+
+.wtime_block .wtb_container .wtb_hour {
+    height: 38px;
+    background: transparent;
+}
+
+.wtime_block .wtb_container .wtb_blank,
+.wtime_block .wtb_container .wtb_day {
+    width: 45px;
+    text-align: right;
+    background: transparent;
+}
+
+.wtime_block .wtb_container .wtb_day input {
+    margin-right: 2px;
+    margin-left: 5px;
+}
+
+.wtime_block .wtb_container .wtb_day strong {
+    vertical-align: bottom;
+}
+
+.wtime_block [type='checkbox'] {
+    border-color: #bbb;
+}
+.wtime_block [type='checkbox']:checked {
+    border-color: transparent;
+}
+
+.settings_colors {
+    display: flex;
+    flex-flow: row nowrap;
+    align-items: center;
+}
+
+.sc_color {
+    display: block;
+    position: relative;
+    width: 22px;
+    height: 22px;
+    border-radius: 11px;
+    border: 2px solid white;
+    margin-left: 8px;
+    cursor: pointer;
+}
+
+.sc_color:first-child {
+    margin-left: 0;
+}
+
+.sc_color:hover,
+.sc_color.sel {
+    border: 0;
+}
+
+.sc_color.sel {
+    background-image: url("/img/checkmark.svg");
+    background-repeat: no-repeat;
+    background-position: center;
+    background-size: 60%;
+}
+
+.scc_blue {
+    background-color: #007bff;
+}
+
+.scc_brown {
+    background-color: #a2855e;
+}
+
+.scc_cyan {
+    background-color: #32ade6;
+}
+
+.scc_green {
+    background-color: #34c759;
+}
+
+.scc_indigo {
+    background-color: #5856d6;
+}
+
+.scc_mint {
+    background-color: #00c7bd;
+}
+
+.scc_orange {
+    background-color: #ff9500;
+}
+
+.scc_pink {
+    background-color: #ff2d54;
+}
+
+.scc_purple {
+    background-color: #af52de;
+}
+
+.scc_red {
+    background-color: #ff3a30;
+}
+
+.scc_yellow {
+    background-color: #ffcc00;
+}
+
+.scc_black {
+    background-color: #151515;
+}

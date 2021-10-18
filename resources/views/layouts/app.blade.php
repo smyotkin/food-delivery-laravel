@@ -17,6 +17,7 @@
         <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.25/css/dataTables.bootstrap5.min.css">
         <link rel="stylesheet" type="text/css" href="{{ asset('css/select2.min.css') }}"/>
         <link rel="stylesheet" type="text/css" href="{{ asset('css/custom.css') }}">
+        <link rel="stylesheet" type="text/css" href="{{ asset('css/fix.css') }}">
 
         <!-- Scripts -->
         <script src="{{ asset('js/app.js') }}" defer></script>
@@ -26,9 +27,6 @@
         <script src="{{ asset('js/jquery.min.js') }}"></script>
         <script src="{{ asset('js/jquery.maskedinput.min.js') }}"></script>
         <script src="{{ asset('js/sweetalert2.all.min.js') }}"></script>
-{{--        <script src="{{ asset('js/require.min.js') }}"></script>--}}
-{{--        <script src="{{ asset('js/wtime.js') }}"></script>--}}
-
         <script src="{{ asset('js/select2.min.js') }}"></script>
 
         <!-- FontAwesome -->
